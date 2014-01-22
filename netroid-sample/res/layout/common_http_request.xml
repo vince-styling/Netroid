@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="10dp">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:id="@+id/btnJsonObject"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Json对象请求"/>
+
+        <Button
+            android:id="@+id/btnJsonArray"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Json数组请求"/>
+
+        <Button
+            android:id="@+id/btnStringRequs"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="字符串请求"/>
+
+        <Button
+            android:id="@+id/btnUsedDiskCache"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="使用硬盘缓存"/>
+
+        <Button
+            android:id="@+id/btnForceUpdate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="强制刷新缓存"/>
+
+        <Button
+            android:id="@+id/btnEventListener"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="各种请求事件"/>
+
+    </LinearLayout>
+
+</ScrollView>
