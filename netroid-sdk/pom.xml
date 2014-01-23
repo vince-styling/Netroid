@@ -4,11 +4,11 @@
 
     <parent>
 	    <groupId>com.yy.android.gameLibs</groupId>
-		 <artifactId>netroid-parent</artifactId>
-        <version>1.0.2-SNAPSHOT</version>
+		<artifactId>netroid</artifactId>
+	    <version>1.0.2-SNAPSHOT</version>
     </parent>
 
-    <artifactId>netroid</artifactId>
+    <artifactId>netroid-sdk</artifactId>
 	<packaging>jar</packaging>
     <name>netroid</name>
 
