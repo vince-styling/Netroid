@@ -6,12 +6,11 @@
 
 	<parent>
 		<groupId>com.yy.android.gameLibs</groupId>
-		<artifactId>gameLibs-parent</artifactId>
+		 <artifactId>netroid-parent</artifactId>
 		<version>1.0.2-SNAPSHOT</version>
 	</parent> 
 
    
-    <artifactId>netroid-parent</artifactId>
     <packaging>pom</packaging>
 
     <name>Netroid (Parent)</name>

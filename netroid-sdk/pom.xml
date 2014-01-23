@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-	     <groupId>com.duowan.mobile.netroid</groupId>
+	    <groupId>com.yy.android.gameLibs</groupId>
 		 <artifactId>netroid-parent</artifactId>
         <version>1.0.2-SNAPSHOT</version>
     </parent>
