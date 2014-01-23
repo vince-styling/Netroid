@@ -6,7 +6,7 @@
     <parent>
         <artifactId>netroid-parent</artifactId>
         <groupId>com.duowan.mobile.netroid</groupId>
-        <version>1.0.2</version>
+        <version>1.0.3-SNAPSHOT</version>
     </parent>
 
     <artifactId>netroid-sample</artifactId>
