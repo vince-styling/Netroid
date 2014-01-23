@@ -6,12 +6,13 @@
 
 	<parent>
 		<groupId>com.yy.android.gameLibs</groupId>
-		 <artifactId>gameLibs-parent</artifactId>
+		<artifactId>gameLibs-parent</artifactId>
 		<version>1.0.2-SNAPSHOT</version>
-	</parent> 
+	</parent>   
 
     <artifactId>netroid</artifactId>
     <packaging>pom</packaging>
+	<version>1.0.2-SNAPSHOT</version>
 
     <name>Netroid (Parent)</name>
     <description>Http Framework for Android</description>
@@ -40,17 +41,7 @@
 
     <dependencyManagement>
         <dependencies>
-            <dependency>
-                <groupId>com.duowan.mobile.netroid</groupId>
-                <artifactId>netroid</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.duowan.mobile.netroid</groupId>
-                <artifactId>netroid-sample</artifactId>
-                <version>${project.version}</version>
-            </dependency>
+         
 
             <dependency>
                 <groupId>com.google.android</groupId>

@@ -5,8 +5,9 @@
 
     <parent>
 	    <groupId>com.yy.android.gameLibs</groupId>
-		 <artifactId>netroid-parent</artifactId>
+		 <artifactId>netroid</artifactId>
         <version>1.0.2-SNAPSHOT</version>
+		
     </parent>
 
     <artifactId>netroid-sample</artifactId>
@@ -15,9 +16,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.duowan.mobile.netroid</groupId>
+            <groupId>com.yy.android.gameLibs</groupId>
             <artifactId>netroid-sdk</artifactId>
-			 <version>1.0.2-SNAPSHOT</version>
+			<version>1.0.2-SNAPSHOT</version>
         </dependency>
 
         <dependency>
