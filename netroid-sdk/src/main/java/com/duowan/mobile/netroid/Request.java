@@ -571,6 +571,13 @@ public abstract class Request<T> implements Comparable<Request<T>> {
 		}
 	}
 
+	/** Delivers when request going to do networking to the Listener. */
+	public void deliverNetworking() {
+		if (mListener != null) {
+			mListener.onNetworking();
+		}
+	}
+
     /**
      * Our comparator sorts from high to low priority, and secondarily by
      * sequence number to provide FIFO ordering.

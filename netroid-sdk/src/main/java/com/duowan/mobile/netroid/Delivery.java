@@ -42,6 +42,9 @@ public interface Delivery {
 	/** Posts cache used callback for the given request. */
 	void postUsedCache(Request<?> request);
 
+	/** Posts networking callback for the given request. */
+	void postNetworking(Request<?> request);
+
 	/** Posts request retry callback for the given request. */
 	void postRetry(Request<?> request);
 }

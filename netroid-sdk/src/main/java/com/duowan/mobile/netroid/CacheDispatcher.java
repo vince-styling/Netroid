@@ -107,18 +107,20 @@ public class CacheDispatcher extends Thread {
 					request.addMarker("cache-miss");
 					// Cache miss; send off to the network dispatcher.
 					mNetworkQueue.put(request);
+					mDelivery.postNetworking(request);
 					continue;
 				}
 
-				NetroidLog.e("Queue " + mNetworkQueue.hashCode() + " shouldCache : " + request.shouldCache() + " isExpired : " + entry.isExpired());
+				NetroidLog.d("shouldCache : " + request.shouldCache() + " isExpired : " + entry.isExpired());
 
                 // If it is completely expired, just send it to the network.
                 if (entry.isExpired()) {
-					// TODO : removeEntry is unnecessary because the new response entry may replace it soon enough
-					mCaches.removeEntry(request.getCacheKey(), request.getCacheSequence());
+					// removeEntry is unnecessary because the new response entry may replace it soon enough
+//					mCaches.removeEntry(request.getCacheKey(), request.getCacheSequence());
 					request.addMarker("cache-hit-expired");
                     mNetworkQueue.put(request);
-                    continue;
+					mDelivery.postNetworking(request);
+					continue;
                 }
 
                 // We have a cache hit; parse its data for delivery back to the request.

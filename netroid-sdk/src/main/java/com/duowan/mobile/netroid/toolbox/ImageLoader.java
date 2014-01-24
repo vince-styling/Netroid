@@ -19,10 +19,7 @@ import android.graphics.Bitmap;
 import android.os.Handler;
 import android.os.Looper;
 import android.widget.ImageView;
-import com.duowan.mobile.netroid.Listener;
-import com.duowan.mobile.netroid.NetroidError;
-import com.duowan.mobile.netroid.Request;
-import com.duowan.mobile.netroid.RequestQueue;
+import com.duowan.mobile.netroid.*;
 import com.duowan.mobile.netroid.request.ImageRequest;
 
 import java.util.HashMap;
@@ -163,20 +160,23 @@ public abstract class ImageLoader {
         // fetch the bitmap
         ImageContainer imageContainer = new ImageContainer(null, requestUrl, requestKey, imageListener);
 
-        // Update the caller to let them know that they should use the default bitmap.
-        imageListener.onSuccess(imageContainer, true);
-
         // Check to see if a request is already in-flight.
         BatchedImageRequest request = mInFlightRequests.get(requestKey);
         if (request != null) {
+			NetroidLog.d("InFlight url : " + requestKey);
+
             // If it is, add this request to the list of listeners.
             request.addContainer(imageContainer);
+
+			// This request will be waiting, use the default bitmap if specified.
+			imageListener.onSuccess(imageContainer, true);
+
             return imageContainer;
         }
 
         // The request is not already in flight. Send the new request to the network and track it.
 		ImageRequest newRequest = buildRequest(requestUrl, maxWidth, maxHeight);
-		newRequest.setListener(new ResponseListener(requestKey));
+		newRequest.setListener(new ResponseListener(requestKey, imageContainer, imageListener));
         mRequestQueue.add(newRequest);
 		
         mInFlightRequests.put(requestKey, new BatchedImageRequest(newRequest, imageContainer));
@@ -195,10 +195,22 @@ public abstract class ImageLoader {
     }
 
 	private class ResponseListener extends Listener<Bitmap> {
+		private ImageContainer imageContainer;
+		private ImageListener imageListener;
 		private String requestKey;
 
-		private ResponseListener(String requestKey) {
+		private ResponseListener( String requestKey, ImageContainer imageContainer, ImageListener imageListener) {
 			this.requestKey = requestKey;
+			this.imageListener = imageListener;
+			this.imageContainer = imageContainer;
+		}
+
+		@Override
+		public void onNetworking() {
+			// Request doesn't use cache, will going to do networking, Update the
+			// caller to let them know that they should use the default bitmap.
+			NetroidLog.d("bitmap : " + imageContainer.getBitmap());
+			imageListener.onSuccess(imageContainer, true);
 		}
 
 		@Override

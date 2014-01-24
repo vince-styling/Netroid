@@ -114,6 +114,17 @@ public class ExecutorDelivery implements Delivery {
 	}
 
 	@Override
+	public void postNetworking(final Request<?> request) {
+		request.addMarker("post-networking");
+		mResponsePoster.execute(new Runnable() {
+			@Override
+			public void run() {
+				request.deliverNetworking();
+			}
+		});
+	}
+
+	@Override
 	public void postRetry(final Request<?> request) {
 		request.addMarker("post-preexecute");
 		mResponsePoster.execute(new Runnable() {

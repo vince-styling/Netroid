@@ -26,6 +26,13 @@ public abstract class Listener<T> {
 	/** Inform when the {@link Request} is truly cancelled. */
 	public void onCancel() {}
 
+	/**
+	 * Inform When the {@link Request} cache non-exist or expired,
+	 * this callback method is opposite by the onUsedCache(),
+	 * means the http retrieving will happen soon.
+	 */
+	public void onNetworking() {}
+
 	/** Inform when the cache already use,
 	 * it means http networking won't execute. */
 	public void onUsedCache() {}

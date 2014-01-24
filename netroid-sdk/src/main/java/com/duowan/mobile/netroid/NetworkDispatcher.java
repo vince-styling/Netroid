@@ -107,7 +107,7 @@ public class NetworkDispatcher extends Thread {
                     TrafficStats.setThreadStatsTag(request.getTrafficStatsTag());
                 }
 
-				NetroidLog.e("Queue " + mQueue.hashCode() + " shouldCache : " + request.shouldCache() + " Network " + mNetwork.hashCode());
+				NetroidLog.d("shouldCache : " + request.shouldCache() + " priority : " + request.getPriority() + " tag : " + request.getTag());
 
                 // Perform the network request.
                 NetworkResponse networkResponse = mNetwork.performRequest(request);

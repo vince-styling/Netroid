@@ -39,7 +39,7 @@ public class CacheChain {
 			if (cache != null) {
 				Cache.Entry entry = cache.getEntry(entryKey);
 				if (entry != null) {
-					NetroidLog.e(cache.getClass().getSimpleName() + " : " + cacheKey);
+					NetroidLog.d(cache.getClass().getSimpleName() + " : " + entryKey);
 
 					// reverse put entry to ahead caches
 					for (int j = --i; j >= 0; j--) {
@@ -59,31 +59,31 @@ public class CacheChain {
 
 	/**
 	 * Adds or replaces an entry to the cache chain.
-	 * @param key Cache key
+	 * @param entryKey Cache key
 	 * @param entry Data to store and metadata for cache coherency
 	 * @param cacheSequence The cache sequence which to put it
 	 */
-	public void putEntry(String key, Cache.Entry entry, int[] cacheSequence) {
+	public void putEntry(String entryKey, Cache.Entry entry, int[] cacheSequence) {
 		for (int cacheKey : cacheSequence) {
 			Cache cache = mCaches.get(cacheKey);
 			if (cache != null) {
-				NetroidLog.e(cache.getClass().getSimpleName() + " : " + cacheKey);
-				cache.putEntry(key, entry);
+				NetroidLog.d(cache.getClass().getSimpleName() + " : " + entryKey);
+				cache.putEntry(entryKey, entry);
 			}
 		}
 	}
 
 	/**
 	 * Remove entry when expired.
-	 * @param key Cache key
+	 * @param entryKey Cache key
 	 * @param cacheSequence The cache sequence which to put it
 	 */
-	public void removeEntry(String key, int[] cacheSequence) {
+	public void removeEntry(String entryKey, int[] cacheSequence) {
 		for (int cacheKey : cacheSequence) {
 			Cache cache = mCaches.get(cacheKey);
 			if (cache != null) {
-				NetroidLog.e(cache.getClass().getSimpleName() + " : " + cacheKey);
-				cache.removeEntry(key);
+				NetroidLog.d(cache.getClass().getSimpleName() + " : " + entryKey);
+				cache.removeEntry(entryKey);
 			}
 		}
 	}

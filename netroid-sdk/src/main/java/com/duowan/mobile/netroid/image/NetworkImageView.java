@@ -132,7 +132,6 @@ public class NetworkImageView extends ImageView {
             } else {
                 // if there is a pre-existing request, cancel it if it's fetching a different URL.
                 mImageContainer.cancelRequest();
-                setDefaultImageOrNull();
             }
         }
 
@@ -155,31 +154,30 @@ public class NetworkImageView extends ImageView {
                         // the main thread.
                         if (isImmediate && isInLayoutPass) {
                             post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    onSuccess(response, false);
-                                }
-                            });
-                            return;
-                        }
+								@Override
+								public void run() {
+									onSuccess(response, false);
+								}
+							});
+							return;
+						}
 
-                        if (response.getBitmap() != null) {
-                            setImageBitmap(response.getBitmap());
-                        } else if (mDefaultImageId != 0) {
-                            setImageResource(mDefaultImageId);
+						if (response.getBitmap() != null) {
+							setImageBitmap(response.getBitmap());
+						} else {
+							setDefaultImageOrNull();
                         }
                     }
                 });
     }
 
     private void setDefaultImageOrNull() {
-        if(mDefaultImageId != 0) {
-            setImageResource(mDefaultImageId);
-        }
-        else {
-            setImageBitmap(null);
-        }
-    }
+		if (mDefaultImageId != 0) {
+			setImageResource(mDefaultImageId);
+		} else {
+			setImageBitmap(null);
+		}
+	}
 
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {

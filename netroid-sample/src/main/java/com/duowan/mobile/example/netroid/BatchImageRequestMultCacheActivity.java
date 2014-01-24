@@ -45,7 +45,7 @@ public class BatchImageRequestMultCacheActivity extends ListActivity {
 			@Override
 			public void makeRequest(ImageRequest request) {
 				request.setCacheSequence(Const.CACHE_KEY_MEMORY, Const.CACHE_KEY_DISK);
-				request.setCacheExpireTime(TimeUnit.SECONDS, 10);
+				request.setCacheExpireTime(TimeUnit.MINUTES, 1);
 			}
 		};
 
@@ -83,7 +83,9 @@ public class BatchImageRequestMultCacheActivity extends ListActivity {
 
 				Book book = getItem(position);
 
+				imvCover.setDefaultImageResId(android.R.drawable.ic_menu_rotate);
 				imvCover.setImageUrl(book.getImageUrl(), mImageLoader);
+
 				txvAuthor.setText(book.getAuthor());
 				txvName.setText(book.getName());
 
