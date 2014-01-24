@@ -8,11 +8,11 @@
 		<groupId>com.yy.android.gameLibs</groupId>
 		<artifactId>gameLibs-parent</artifactId>
 		<version>1.0.2-SNAPSHOT</version>
-	</parent>   
+	</parent>
 
     <artifactId>netroid</artifactId>
     <packaging>pom</packaging>
-	<version>1.0.2-SNAPSHOT</version>
+	<version>1.0.3-SNAPSHOT</version>
 
     <name>Netroid (Parent)</name>
     <description>Http Framework for Android</description>
