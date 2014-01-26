@@ -209,7 +209,6 @@ public abstract class ImageLoader {
 		public void onNetworking() {
 			// Request doesn't use cache, will going to do networking, Update the
 			// caller to let them know that they should use the default bitmap.
-			NetroidLog.d("bitmap : " + imageContainer.getBitmap());
 			imageListener.onSuccess(imageContainer, true);
 		}
 

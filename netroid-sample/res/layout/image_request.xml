@@ -43,6 +43,12 @@
             android:layout_height="wrap_content"
             android:text="ImageLoader加载sdcard图片"/>
 
+        <Button
+            android:id="@+id/btnGridView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="GridViewP0重复加载问题"/>
+
     </LinearLayout>
 
 </ScrollView>

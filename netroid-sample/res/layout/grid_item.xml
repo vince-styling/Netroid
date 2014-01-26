@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="10dp"
+    android:baselineAligned="true">
+
+    <com.duowan.mobile.netroid.image.NetworkImageView
+        android:id="@+id/imvCover"
+        android:layout_width="76dp"
+        android:layout_height="89dp"
+        android:layout_marginRight="5dp"
+        android:scaleType="centerCrop"/>
+
+    <TextView
+        android:id="@+id/txvName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:singleLine="true"
+        android:ellipsize="marquee"
+        android:textSize="16sp"
+        android:textColor="#ffffff"/>
+
+</LinearLayout>

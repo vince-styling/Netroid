@@ -28,7 +28,6 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>1.6</java.version>
         <android.version>4.1.1.4</android.version>
-        <junit.version>4.10</junit.version>
         <android.platform>14</android.platform>
     </properties>
 
@@ -41,18 +40,10 @@
 
     <dependencyManagement>
         <dependencies>
-         
-
             <dependency>
                 <groupId>com.google.android</groupId>
                 <artifactId>android</artifactId>
                 <version>${android.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>junit</groupId>
-                <artifactId>junit</artifactId>
-                <version>${junit.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

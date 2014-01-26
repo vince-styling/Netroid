@@ -236,8 +236,9 @@ public class RequestQueue {
 
         // If the request is uncacheable or forceUpdate, skip the cache queue and go straight to the network.
         if (request.isForceUpdate() || !request.shouldCache()) {
-            mNetworkQueue.add(request);
-            return request;
+			mDelivery.postNetworking(request);
+			mNetworkQueue.add(request);
+			return request;
         }
 
         // Insert request into stage if there's already a request with the same cache key in flight.
