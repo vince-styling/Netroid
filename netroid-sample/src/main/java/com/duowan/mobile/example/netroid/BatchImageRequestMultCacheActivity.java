@@ -41,7 +41,7 @@ public class BatchImageRequestMultCacheActivity extends ListActivity {
 				new CacheWrapper(Const.CACHE_KEY_MEMORY, new MemoryBasedCache(memoryCacheSize)),
 				new CacheWrapper(Const.CACHE_KEY_DISK, new DiskBasedCache(diskCacheDir, diskCacheSize)));
 
-		mImageLoader = new SelfImageLoader(mQueue, getAssets()) {
+		mImageLoader = new SelfImageLoader(mQueue, getResources(), getAssets()) {
 			@Override
 			public void makeRequest(ImageRequest request) {
 				request.setCacheSequence(Const.CACHE_KEY_MEMORY, Const.CACHE_KEY_DISK);

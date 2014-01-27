@@ -34,7 +34,7 @@ public class BatchImageRequestMemActivity extends ListActivity {
 		mQueue = Netroid.newRequestQueue(getApplicationContext(),
 				new CacheWrapper(Const.CACHE_KEY_MEMORY, new MemoryBasedCache(memoryCacheSize)));
 
-		mImageLoader = new SelfImageLoader(mQueue, getAssets()) {
+		mImageLoader = new SelfImageLoader(mQueue, getResources(), getAssets()) {
 			@Override
 			public void makeRequest(ImageRequest request) {
 				request.setCacheSequence(Const.CACHE_KEY_MEMORY);

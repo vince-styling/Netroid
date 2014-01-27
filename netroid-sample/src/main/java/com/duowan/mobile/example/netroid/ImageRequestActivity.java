@@ -56,7 +56,7 @@ public class ImageRequestActivity extends Activity implements View.OnClickListen
 				new CacheWrapper(Const.CACHE_KEY_MEMORY, new MemoryBasedCache(memoryCacheSize)),
 				new CacheWrapper(Const.CACHE_KEY_DISK, new DiskBasedCache(diskCacheDir, diskCacheSize)));
 
-		imageLoader = new SelfImageLoader(mQueue, getAssets());
+		imageLoader = new SelfImageLoader(mQueue, getResources(), getAssets());
 	}
 
 	@Override

@@ -11,36 +11,35 @@ import com.duowan.mobile.example.netroid.mock.Book;
 import com.duowan.mobile.example.netroid.mock.BookDataMock;
 import com.duowan.mobile.example.netroid.netroid.Netroid;
 import com.duowan.mobile.example.netroid.netroid.SelfImageLoader;
-import com.duowan.mobile.netroid.NetroidLog;
 import com.duowan.mobile.netroid.RequestQueue;
 import com.duowan.mobile.netroid.image.NetworkImageView;
 import com.duowan.mobile.netroid.toolbox.ImageLoader;
 
+import java.util.Collections;
 import java.util.List;
 
 public class GridViewActivity extends Activity {
 	private RequestQueue mQueue;
 	private ImageLoader mImageLoader;
+	private BaseAdapter mAdapter;
+	private List<Book> bookList;
 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.gridview_acty);
 
 		mQueue = Netroid.newRequestQueue(getApplicationContext());
+		mImageLoader = new SelfImageLoader(mQueue, getResources(), getAssets());
 
-		mImageLoader = new SelfImageLoader(mQueue, getAssets());
-
-		GridView grvDemonstration = (GridView) findViewById(R.id.grvDemonstration);
-
-		final List<Book> bookList = BookDataMock.getData();
-		while (bookList.size() > 10) {
+		bookList = BookDataMock.getData();
+		while (bookList.size() > 5) {
 			bookList.remove(0);
 		}
 
-		grvDemonstration.setAdapter(new BaseAdapter() {
+		mAdapter = new BaseAdapter() {
 			@Override
 			public int getCount() {
-				return bookList.size();
+				return bookList.size() + 1;
 			}
 
 			@Override
@@ -58,19 +57,45 @@ public class GridViewActivity extends Activity {
 				if (convertView == null) {
 					convertView = getLayoutInflater().inflate(R.layout.grid_item, null);
 				}
-				NetroidLog.e("getView position : " + position);
-
 				NetworkImageView imvCover = (NetworkImageView) convertView.findViewById(R.id.imvCover);
 				TextView txvName = (TextView) convertView.findViewById(R.id.txvName);
 
-				Book book = getItem(position);
+				if (position == bookList.size()) {
+					imvCover.setDefaultImageResId(0);
+					imvCover.setImageUrl(SelfImageLoader.RES_DRAWABLE + R.drawable.default190x338, mImageLoader);
+					txvName.setText("");
+				} else {
+					Book book = getItem(position);
 
-				imvCover.setDefaultImageResId(android.R.drawable.ic_menu_rotate);
-				imvCover.setImageUrl(book.getImageUrl(), mImageLoader);
-
-				txvName.setText(book.getName());
+					imvCover.setDefaultImageResId(android.R.drawable.ic_menu_rotate);
+					imvCover.setImageUrl(book.getImageUrl(), mImageLoader);
+					txvName.setText(book.getName());
+				}
 
 				return convertView;
+			}
+		};
+
+		GridView grvDemonstration = (GridView) findViewById(R.id.grvDemonstration);
+		grvDemonstration.setAdapter(mAdapter);
+
+		findViewById(R.id.btnAddView).setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				List<Book> tmpBookList = BookDataMock.getData();
+				Collections.shuffle(tmpBookList);
+				bookList.add(tmpBookList.get(0));
+				mAdapter.notifyDataSetChanged();
+			}
+		});
+
+		findViewById(R.id.btnRemoveView).setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				if (bookList.size() > 0) {
+					bookList.remove(bookList.size() - 1);
+					mAdapter.notifyDataSetChanged();
+				}
 			}
 		});
 	}

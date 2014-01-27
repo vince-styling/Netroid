@@ -8,7 +8,33 @@
     <GridView
         android:id="@+id/grvDemonstration"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:numColumns="3" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:paddingTop="5dp"
+        android:paddingBottom="10dp">
+
+        <Button
+            android:id="@+id/btnAddView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Add View"
+            android:textSize="16sp"
+            android:textColor="#ffffff"/>
+
+        <Button
+            android:id="@+id/btnRemoveView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Remove View"
+            android:textSize="16sp"
+            android:textColor="#ffffff"/>
+
+    </LinearLayout>
 
 </LinearLayout>

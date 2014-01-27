@@ -1,6 +1,9 @@
 package com.duowan.mobile.example.netroid.netroid;
 
 import android.content.res.AssetManager;
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import com.duowan.mobile.example.netroid.Const;
 import com.duowan.mobile.netroid.NetworkResponse;
 import com.duowan.mobile.netroid.RequestQueue;
@@ -18,12 +21,15 @@ public class SelfImageLoader extends ImageLoader {
 
 	public static final String RES_ASSETS = "assets://";
 	public static final String RES_SDCARD = "sdcard://";
+	public static final String RES_DRAWABLE = "drawable://";
 	public static final String RES_HTTP = "http://";
 
 	private AssetManager mAssetManager;
+	private Resources mResources;
 
-	public SelfImageLoader(RequestQueue queue, AssetManager assetManager) {
+	public SelfImageLoader(RequestQueue queue, Resources resources, AssetManager assetManager) {
 		super(queue);
+		mResources = resources;
 		mAssetManager = assetManager;
 	}
 
@@ -49,6 +55,20 @@ public class SelfImageLoader extends ImageLoader {
 					try {
 						return new NetworkResponse(toBytes(new FileInputStream(getUrl())), HTTP.UTF_8);
 					} catch (IOException e) {
+						return new NetworkResponse(new byte[1], HTTP.UTF_8);
+					}
+				}
+			};
+		}
+		else if (requestUrl.startsWith(RES_DRAWABLE)) {
+			request = new ImageRequest(requestUrl.substring(RES_DRAWABLE.length()), maxWidth, maxHeight) {
+				@Override
+				public NetworkResponse perform() {
+					try {
+						int resId = Integer.parseInt(getUrl());
+						Bitmap bitmap = BitmapFactory.decodeResource(mResources, resId);
+						return new NetworkResponse(bitmap2Bytes(bitmap), HTTP.UTF_8);
+					} catch (Exception e) {
 						return new NetworkResponse(new byte[1], HTTP.UTF_8);
 					}
 				}
@@ -81,6 +101,12 @@ public class SelfImageLoader extends ImageLoader {
 		buffer.flush();
 
 		return buffer.toByteArray();
+	}
+
+	public static byte[] bitmap2Bytes(Bitmap bm) {
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		bm.compress(Bitmap.CompressFormat.PNG, 100, baos);
+		return baos.toByteArray();
 	}
 
 }
