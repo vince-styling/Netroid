@@ -18,6 +18,7 @@ package com.duowan.mobile.netroid.toolbox;
 
 import android.os.SystemClock;
 import com.duowan.mobile.netroid.*;
+import com.duowan.mobile.netroid.request.FileDownloadRequest;
 import com.duowan.mobile.netroid.stack.HttpStack;
 import org.apache.http.*;
 import org.apache.http.conn.ConnectTimeoutException;
@@ -77,8 +78,14 @@ public class BasicNetwork implements Network {
 
 	@Override
 	public NetworkResponse performRequest(Request<?> request) throws NetroidError {
+		// Determine if request had non-http perform.
 		NetworkResponse networkResponse = request.perform();
 		if (networkResponse != null) return networkResponse;
+
+		// If the request was download.
+		if (request instanceof FileDownloadRequest) {
+			return performDownloadRequest((FileDownloadRequest) request);
+		}
 
 		long requestStart = SystemClock.elapsedRealtime();
 		while (true) {
@@ -144,6 +151,35 @@ public class BasicNetwork implements Network {
 				} else {
 					throw new NetworkError(networkResponse);
 				}
+			}
+		}
+	}
+
+	public NetworkResponse performDownloadRequest(FileDownloadRequest request) throws NetroidError {
+		NetworkResponse networkResponse = null;
+		while (true) {
+			// If the request was cancelled already,
+			// do not perform the network request.
+			if (request.isCanceled()) {
+				request.finish("perform-discard-cancelled");
+				mDelivery.postCancel(request);
+				throw new NetworkError(networkResponse);
+			}
+
+			byte[] responseContents = null;
+			try {
+				int statusCode = mHttpStack.performDownloadRequest(request, mDelivery);
+				if (statusCode < 200 || statusCode > 299) throw new IOException();
+
+				return new NetworkResponse(statusCode, responseContents, HTTP.UTF_8);
+			} catch (SocketTimeoutException e) {
+				attemptRetryOnException("socket", request, new TimeoutError());
+			} catch (ConnectTimeoutException e) {
+				attemptRetryOnException("connection", request, new TimeoutError());
+			} catch (MalformedURLException e) {
+				throw new RuntimeException("Bad URL " + request.getUrl(), e);
+			} catch (IOException e) {
+				throw new NoConnectionError(e);
 			}
 		}
 	}

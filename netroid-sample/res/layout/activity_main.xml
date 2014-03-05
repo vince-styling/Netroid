@@ -39,6 +39,12 @@
             android:layout_height="wrap_content"
             android:text="批量图片加载-双缓存"/>
 
+        <Button
+            android:id="@+id/btnFileDownload"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="文件下载器"/>
+
     </LinearLayout>
 
 </ScrollView>

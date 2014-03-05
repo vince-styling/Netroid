@@ -76,7 +76,7 @@ public class NetroidLog {
      * calling thread ID and method name.
      */
     private static String buildMessage(String format, Object... args) {
-        String msg = (args == null) ? format : String.format(Locale.US, format, args);
+        String msg = (args == null || args.length == 0) ? format : String.format(Locale.US, format, args);
         StackTraceElement[] trace = new Throwable().fillInStackTrace().getStackTrace();
 
         String caller = "<unknown>";

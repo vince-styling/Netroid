@@ -39,4 +39,8 @@ public abstract class Listener<T> {
 
 	/** Inform when {@link Request} execute is going to retry. */
 	public void onRetry() {}
+
+	/** Inform when download progress change. */
+	public void onProgressChange(long fileSize, long downloadedSize) {
+	}
 }

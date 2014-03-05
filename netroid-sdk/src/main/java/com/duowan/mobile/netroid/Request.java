@@ -578,6 +578,13 @@ public abstract class Request<T> implements Comparable<Request<T>> {
 		}
 	}
 
+	/** Delivers when download request progress change to the Listener. */
+	public void deliverDownloadProgress(long fileSize, long downloadedSize) {
+		if (mListener != null) {
+			mListener.onProgressChange(fileSize, downloadedSize);
+		}
+	}
+
     /**
      * Our comparator sorts from high to low priority, and secondarily by
      * sequence number to provide FIFO ordering.

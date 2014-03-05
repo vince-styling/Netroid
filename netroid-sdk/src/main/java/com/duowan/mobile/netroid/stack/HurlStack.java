@@ -18,19 +18,23 @@ package com.duowan.mobile.netroid.stack;
 
 import android.text.TextUtils;
 import com.duowan.mobile.netroid.AuthFailureError;
+import com.duowan.mobile.netroid.Delivery;
 import com.duowan.mobile.netroid.Request;
 import com.duowan.mobile.netroid.Request.Method;
+import com.duowan.mobile.netroid.request.FileDownloadRequest;
 import org.apache.http.*;
 import org.apache.http.entity.BasicHttpEntity;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.message.BasicHttpResponse;
 import org.apache.http.message.BasicStatusLine;
+import org.apache.http.protocol.HTTP;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLSocketFactory;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.RandomAccessFile;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.HashMap;
@@ -42,49 +46,17 @@ import java.util.Map.Entry;
  */
 public class HurlStack implements HttpStack {
 
-    private static final String HEADER_CONTENT_TYPE = "Content-Type";
-    private static final String HEADER_USER_AGENT = "User-Agent";
-
-    /**
-     * An interface for transforming URLs before use.
-     */
-    public interface UrlRewriter {
-        /**
-         * Returns a URL to use instead of the provided one, or null to indicate
-         * this URL should not be used at all.
-         */
-        public String rewriteUrl(String originalUrl);
-    }
-
     private String mUserAgent;
-    private final UrlRewriter mUrlRewriter;
     private final SSLSocketFactory mSslSocketFactory;
     private boolean mFollowRedirect;
 
-    public HurlStack() {
-        this(null);
-    }
-
-    public HurlStack(String userAgent) {
-        this(userAgent, null);
-    }
-
     /**
-     * @param urlRewriter Rewriter to use for request URLs
-     */
-    public HurlStack(String userAgent, UrlRewriter urlRewriter) {
-        this(userAgent, urlRewriter, null);
-    }
-
-    /**
-     * @param urlRewriter Rewriter to use for request URLs
      * @param sslSocketFactory SSL factory to use for HTTPS connections
      */
-    public HurlStack(String userAgent, UrlRewriter urlRewriter, SSLSocketFactory sslSocketFactory) {
-        mUserAgent = userAgent;
-        mUrlRewriter = urlRewriter;
+    public HurlStack(String userAgent, SSLSocketFactory sslSocketFactory) {
         mSslSocketFactory = sslSocketFactory;
-        mFollowRedirect = true;
+		mUserAgent = userAgent;
+		mFollowRedirect = true;
     }
 
     /**
@@ -95,54 +67,137 @@ public class HurlStack implements HttpStack {
         mFollowRedirect = followRedirects;
     }
 
-    @Override
-    public HttpResponse performRequest(Request<?> request)
-            throws IOException, AuthFailureError {
-        String url = request.getUrl();
-        HashMap<String, String> map = new HashMap<String, String>();
-        if (!TextUtils.isEmpty(mUserAgent)) {
-            map.put(HEADER_USER_AGENT, mUserAgent);
-        }
-        map.putAll(request.getHeaders());
+	// Common part of perform a request.
+	private HttpURLConnection perform(Request<?> request, String... headers) throws IOException, AuthFailureError {
+		HashMap<String, String> map = new HashMap<String, String>();
+		if (!TextUtils.isEmpty(mUserAgent)) {
+			map.put(HTTP.USER_AGENT, mUserAgent);
+		}
+		for (int i = 0; i < headers.length; i++) {
+			map.put(headers[i], headers[++i]);
+		}
+		map.putAll(request.getHeaders());
 
-        if (mUrlRewriter != null) {
-            String rewritten = mUrlRewriter.rewriteUrl(url);
-            if (rewritten == null) {
-                throw new IOException("URL blocked by rewriter: " + url);
-            }
-            url = rewritten;
-        }
-        URL parsedUrl = new URL(url);
-        HttpURLConnection connection = openConnection(parsedUrl, request);
-        for (String headerName : map.keySet()) {
-            connection.addRequestProperty(headerName, map.get(headerName));
-        }
-        connection.setInstanceFollowRedirects(mFollowRedirect);
-        setConnectionParametersForRequest(connection, request);
-        // Initialize HttpResponse with data from the HttpURLConnection.
-        ProtocolVersion protocolVersion = new ProtocolVersion("HTTP", 1, 1);
-        int responseCode = connection.getResponseCode();
-        if (responseCode == -1) {
-            // -1 is returned by getResponseCode() if the response code could not be retrieved.
-            // Signal to the caller that something was wrong with the connection.
-            throw new IOException("Could not retrieve response code from HttpUrlConnection.");
-        }
-        StatusLine responseStatus = new BasicStatusLine(protocolVersion,
+		URL parsedUrl = new URL(request.getUrl());
+		HttpURLConnection connection = openConnection(parsedUrl, request);
+		for (String headerName : map.keySet()) {
+			connection.addRequestProperty(headerName, map.get(headerName));
+		}
+
+		connection.setInstanceFollowRedirects(mFollowRedirect);
+		setConnectionParametersForRequest(connection, request);
+
+		int responseCode = connection.getResponseCode();
+		if (responseCode == -1) {
+			// -1 is returned by getResponseCode() if the response code could not be retrieved.
+			// Signal to the caller that something was wrong with the connection.
+			throw new IOException("Could not retrieve response code from HttpUrlConnection.");
+		}
+
+		return connection;
+	}
+
+    @Override
+    public HttpResponse performRequest(Request<?> request) throws IOException, AuthFailureError {
+        HttpURLConnection connection = perform(request);
+
+		StatusLine responseStatus = new BasicStatusLine(new ProtocolVersion("HTTP", 1, 1),
                 connection.getResponseCode(), connection.getResponseMessage());
         BasicHttpResponse response = new BasicHttpResponse(responseStatus);
         response.setEntity(entityFromConnection(connection));
+
         for (Entry<String, List<String>> header : connection.getHeaderFields().entrySet()) {
             if (header.getKey() != null) {
                 Header h = new BasicHeader(header.getKey(), header.getValue().get(0));
                 response.addHeader(h);
             }
         }
+
         return response;
+    }
+
+    @Override
+    public int performDownloadRequest(FileDownloadRequest request, Delivery delivery) throws IOException, AuthFailureError {
+		long downloadedSize = request.getTemporaryFile().length();
+
+		// Note: if the request header "Range" greater than the actual length that server-size have,
+		// the response header "Content-Range" will return "bytes */[actual length]", that's wrong.
+        HttpURLConnection connection = perform(request, "Range", "bytes=" + downloadedSize + "-");
+
+		// The file actually size.
+		long fileSize = Long.parseLong(connection.getHeaderField(HTTP.CONTENT_LEN));
+
+		boolean isSupportRange = isSupportRange(connection);
+		if (isSupportRange) {
+			fileSize += downloadedSize;
+
+			// Verify the Content-Range Header, to ensure temporary file is part of the whole file.
+			// Sometime, temporary file length add response content-length might greater than actual file length,
+			// in this situation, we consider the temporary file is invalid, then throw an exception.
+			String realRangeValue = connection.getHeaderField("Content-Range");
+			// response Content-Range may be null when "Range=bytes=0-"
+			if (!TextUtils.isEmpty(realRangeValue)) {
+				String assumeRangeValue = "bytes " + downloadedSize + "-" + (fileSize - 1);
+				if (TextUtils.indexOf(realRangeValue, assumeRangeValue) == -1) {
+					throw new IllegalStateException(
+							"The Content-Range Header is invalid Assume[" + assumeRangeValue + "] vs Real[" + realRangeValue + "], " +
+									"please remove the temporary file [" + request.getTemporaryFile() + "].");
+				}
+			}
+		}
+
+		// Don't go on if fileSize illegal.
+		if (fileSize < 1) throw new IOException("Response's Empty!");
+
+		// Compare the store file size(after download successes have) to server-side Content-Length.
+		// temporary file will rename to store file after download success, so we compare the
+		// Content-Length to ensure this request already download or not.
+		if (request.getStoreFile().length() == fileSize) {
+			// Rename the store file to temporary file, mock the download success. ^_^
+			request.getStoreFile().renameTo(request.getTemporaryFile());
+
+			// Deliver download progress.
+			delivery.postDownloadProgress(request, fileSize, fileSize);
+
+			return connection.getResponseCode();
+		}
+
+		RandomAccessFile tmpFileRaf = new RandomAccessFile(request.getTemporaryFile(), "rw");
+
+		// If server-side support range download, we seek to last point of the temporary file.
+		if (isSupportRange) {
+			// Seek to last point.
+			tmpFileRaf.seek(downloadedSize);
+		}
+		// If not, truncate the temporary file then start download from beginning.
+		else {
+			tmpFileRaf.setLength(0);
+			downloadedSize = 0;
+		}
+
+		InputStream inStream = connection.getInputStream();
+		byte[] buffer = new byte[8 * 1024]; // 8K buffer
+		int offset;
+
+		while ((offset = inStream.read(buffer)) != -1) {
+			tmpFileRaf.write(buffer, 0, offset);
+
+			downloadedSize += offset;
+			delivery.postDownloadProgress(request, fileSize, downloadedSize);
+
+			if (request.isCanceled()) {
+				delivery.postCancel(request);
+				break;
+			}
+		}
+		tmpFileRaf.close();
+		inStream.close();
+
+        return connection.getResponseCode();
     }
 
     /**
      * Initializes an {@link HttpEntity} from the given {@link HttpURLConnection}.
-     * @param connection
      * @return an HttpEntity populated with data from <code>connection</code>.
      */
     private static HttpEntity entityFromConnection(HttpURLConnection connection) {
@@ -163,15 +218,13 @@ public class HurlStack implements HttpStack {
     /**
      * Create an {@link HttpURLConnection} for the specified {@code url}.
      */
-    protected HttpURLConnection createConnection(URL url) throws IOException {
+    private HttpURLConnection createConnection(URL url) throws IOException {
         return (HttpURLConnection) url.openConnection();
     }
 
     /**
      * Opens an {@link HttpURLConnection} with parameters.
-     * @param url
      * @return an open connection
-     * @throws IOException
      */
     private HttpURLConnection openConnection(URL url, Request<?> request) throws IOException {
         HttpURLConnection connection = createConnection(url);
@@ -190,9 +243,8 @@ public class HurlStack implements HttpStack {
         return connection;
     }
 
-    @SuppressWarnings("deprecation")
-    /* package */ static void setConnectionParametersForRequest(HttpURLConnection connection,
-            Request<?> request) throws IOException, AuthFailureError {
+	private static void setConnectionParametersForRequest(
+			HttpURLConnection connection, Request<?> request) throws IOException, AuthFailureError {
         switch (request.getMethod()) {
             case Method.GET:
                 // Not necessary to set the request method because connection defaults to GET but
@@ -220,10 +272,18 @@ public class HurlStack implements HttpStack {
         byte[] body = request.getBody();
         if (body != null) {
             connection.setDoOutput(true);
-            connection.addRequestProperty(HEADER_CONTENT_TYPE, request.getBodyContentType());
+            connection.addRequestProperty(HTTP.CONTENT_TYPE, request.getBodyContentType());
             DataOutputStream out = new DataOutputStream(connection.getOutputStream());
             out.write(body);
             out.close();
         }
     }
+
+	private static boolean isSupportRange(HttpURLConnection connection) {
+		if (TextUtils.equals(connection.getHeaderField("Accept-Ranges"), "bytes")) {
+			return true;
+		}
+		String value = connection.getHeaderField("Content-Range");
+		return value != null && value.startsWith("bytes");
+	}
 }

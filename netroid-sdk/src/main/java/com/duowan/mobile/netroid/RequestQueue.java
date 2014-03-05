@@ -159,11 +159,9 @@ public class RequestQueue {
         if (mCacheDispatcher != null) {
             mCacheDispatcher.quit();
         }
-        for (int i = 0; i < mDispatchers.length; i++) {
-            if (mDispatchers[i] != null) {
-                mDispatchers[i].quit();
-            }
-        }
+		for (NetworkDispatcher mDispatcher : mDispatchers) {
+			if (mDispatcher != null) mDispatcher.quit();
+		}
     }
 
     /**
@@ -172,6 +170,13 @@ public class RequestQueue {
     public int getSequenceNumber() {
         return mSequenceGenerator.incrementAndGet();
     }
+
+	/**
+	 * Gets the thread pool size.
+	 */
+	public int getThreadPoolSize() {
+		return mDispatchers.length;
+	}
 
     /**
      * Gets the {@link CacheChain} instance being used.

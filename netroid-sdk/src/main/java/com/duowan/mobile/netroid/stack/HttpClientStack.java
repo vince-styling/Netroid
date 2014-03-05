@@ -17,8 +17,10 @@
 package com.duowan.mobile.netroid.stack;
 
 import com.duowan.mobile.netroid.AuthFailureError;
+import com.duowan.mobile.netroid.Delivery;
 import com.duowan.mobile.netroid.Request;
 import com.duowan.mobile.netroid.Request.Method;
+import com.duowan.mobile.netroid.request.FileDownloadRequest;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -95,6 +97,12 @@ public class HttpClientStack implements HttpStack {
         HttpConnectionParams.setConnectionTimeout(httpParams, 5000);
         HttpConnectionParams.setSoTimeout(httpParams, timeoutMs);
         return mClient.execute(httpRequest);
+    }
+
+	@Override
+	public int performDownloadRequest(FileDownloadRequest request, Delivery delivery) throws IOException, AuthFailureError {
+		// TODO : implement this method for download file!
+		return 0;
     }
 
     /**

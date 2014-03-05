@@ -47,4 +47,7 @@ public interface Delivery {
 
 	/** Posts request retry callback for the given request. */
 	void postRetry(Request<?> request);
+
+	/** Posts file download progress stat. */
+	void postDownloadProgress(Request<?> request, long fileSize, long downloadedSize);
 }

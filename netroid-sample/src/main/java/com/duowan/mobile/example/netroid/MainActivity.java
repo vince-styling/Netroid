@@ -12,6 +12,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
     private Button btnBatchImageMem;
     private Button btnBatchImageDisk;
     private Button btnBatchImageMultCache;
+    private Button btnFileDownload;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +33,9 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
 		btnBatchImageMultCache = (Button) findViewById(R.id.btnBatchImageMultCache);
 		btnBatchImageMultCache.setOnClickListener(this);
+
+		btnFileDownload = (Button) findViewById(R.id.btnFileDownload);
+		btnFileDownload.setOnClickListener(this);
 	}
 
     @Override
@@ -56,5 +60,10 @@ public class MainActivity extends Activity implements View.OnClickListener {
 			Intent intent = new Intent(this, BatchImageRequestMultCacheActivity.class);
 			startActivity(intent);
 		}
+		else if (view.equals(btnFileDownload)) {
+			Intent intent = new Intent(this, FileDownloadActivity.class);
+			startActivity(intent);
+		}
     }
+
 }

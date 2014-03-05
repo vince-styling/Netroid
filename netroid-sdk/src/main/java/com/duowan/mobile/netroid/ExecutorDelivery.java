@@ -135,6 +135,17 @@ public class ExecutorDelivery implements Delivery {
 		});
 	}
 
+	@Override
+	public void postDownloadProgress(final Request<?> request, final long fileSize, final long downloadedSize) {
+		request.addMarker("post-downloadprogress");
+		mResponsePoster.execute(new Runnable() {
+			@Override
+			public void run() {
+				request.deliverDownloadProgress(fileSize, downloadedSize);
+			}
+		});
+	}
+
 	/**
      * A Runnable used for delivering network responses to a listener on the
      * main thread.

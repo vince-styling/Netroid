@@ -33,7 +33,7 @@ public class Netroid {
 		}
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
-			stack = new HurlStack(userAgent);
+			stack = new HurlStack(userAgent, null);
 		} else {
 			// Prior to Gingerbread, HttpUrlConnection was unreliable.
 			// See: http://android-developers.blogspot.com/2011/09/androids-http-clients.html

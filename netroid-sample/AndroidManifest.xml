@@ -24,7 +24,7 @@
 
         <activity
             android:name=".CommonHttpRequestActivity"
-            android:label="CommonHttpRequestActivity">
+            android:label="CommonHttpRequest">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
@@ -32,7 +32,7 @@
 
         <activity
             android:name=".ImageRequestActivity"
-            android:label="ImageRequestActivity">
+            android:label="ImageRequest">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
@@ -40,7 +40,7 @@
 
         <activity
             android:name=".BatchImageRequestDiskActivity"
-            android:label="BatchImageRequestDiskActivity">
+            android:label="BatchImageRequestDisk">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
@@ -48,7 +48,7 @@
 
         <activity
             android:name=".BatchImageRequestMemActivity"
-            android:label="BatchImageRequestMemActivity">
+            android:label="BatchImageRequestMem">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
@@ -56,7 +56,7 @@
 
         <activity
             android:name=".BatchImageRequestMultCacheActivity"
-            android:label="BatchImageRequestMultCacheActivity">
+            android:label="BatchImageRequestMultCache">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
@@ -64,7 +64,11 @@
 
         <activity
             android:name=".GridViewActivity"
-            android:label="GridViewActivity" />
+            android:label="GridView" />
+
+        <activity
+            android:name=".FileDownloadActivity"
+            android:label="FileDownload" />
 
     </application>
 
