@@ -124,6 +124,12 @@ public class HurlStack implements HttpStack {
 		// the response header "Content-Range" will return "bytes */[actual length]", that's wrong.
         HttpURLConnection connection = perform(request, "Range", "bytes=" + downloadedSize + "-");
 
+		// Request might be cancel while perform() runs long time.
+		if (request.isCanceled()) {
+			delivery.postCancel(request);
+			throw new IOException("Request has been cancel!");
+		}
+
 		// The file actually size.
 		long fileSize = Long.parseLong(connection.getHeaderField(HTTP.CONTENT_LEN));
 

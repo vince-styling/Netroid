@@ -137,7 +137,6 @@ public class FileDownloader {
 			while (mTaskQueue.size() > 0) {
 				mTaskQueue.get(0).discard();
 			}
-			mTaskQueue.clear();
 		}
 	}
 
