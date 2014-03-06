@@ -72,12 +72,10 @@ public class HttpClientStack implements HttpStack {
         return result;
     }
 
-	private HttpResponse perform(Request<?> request, String... headers) throws IOException, AuthFailureError {
+	@Override
+	public HttpResponse performRequest(Request<?> request) throws IOException, AuthFailureError {
 		HttpUriRequest httpRequest = createHttpRequest(request);
 		addHeaders(httpRequest, request.getHeaders());
-		for (int i = 0; i < headers.length; i++) {
-			httpRequest.setHeader(headers[i], headers[++i]);
-		}
 		onPrepareRequest(httpRequest);
 		HttpParams httpParams = httpRequest.getParams();
 		int timeoutMs = request.getTimeoutMs();
@@ -89,19 +87,13 @@ public class HttpClientStack implements HttpStack {
 	}
 
 	@Override
-	public HttpResponse performRequest(Request<?> request) throws IOException, AuthFailureError {
-		return perform(request);
-	}
-
-	@Override
 	public int performDownloadRequest(FileDownloadRequest request, Delivery delivery) throws IOException, AuthFailureError {
-		long downloadedSize = request.getTemporaryFile().length();
-
-		HttpResponse response = perform(request, "Range", "bytes=" + downloadedSize + "-");
+		HttpResponse response = performRequest(request);
 		int statusCode = response.getStatusLine().getStatusCode();
 
 		// The file actually size.
 		long fileSize = Long.parseLong(getHeader(response, HTTP.CONTENT_LEN));
+		long downloadedSize = request.getTemporaryFile().length();
 
 		boolean isSupportRange = isSupportRange(response);
 		if (isSupportRange) {

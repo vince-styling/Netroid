@@ -15,6 +15,10 @@ public class FileDownloadRequest extends Request<Void> {
 		super(url, null);
 		mStoreFile = new File(storeFilePath);
 		mTemporaryFile = new File(storeFilePath + ".tmp");
+
+		// Note: if the request header "Range" greater than the actual length that server-size have,
+		// the response header "Content-Range" will return "bytes */[actual length]", that's wrong.
+		addHeader("Range", "bytes=" + mTemporaryFile.length() + "-");
 	}
 
 	@Override

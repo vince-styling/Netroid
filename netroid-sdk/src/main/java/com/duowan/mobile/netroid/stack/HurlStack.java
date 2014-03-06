@@ -68,13 +68,10 @@ public class HurlStack implements HttpStack {
     }
 
 	// Common part of perform a request.
-	private HttpURLConnection perform(Request<?> request, String... headers) throws IOException, AuthFailureError {
+	private HttpURLConnection perform(Request<?> request) throws IOException, AuthFailureError {
 		HashMap<String, String> map = new HashMap<String, String>();
 		if (!TextUtils.isEmpty(mUserAgent)) {
 			map.put(HTTP.USER_AGENT, mUserAgent);
-		}
-		for (int i = 0; i < headers.length; i++) {
-			map.put(headers[i], headers[++i]);
 		}
 		map.putAll(request.getHeaders());
 
@@ -118,11 +115,7 @@ public class HurlStack implements HttpStack {
 
     @Override
     public int performDownloadRequest(FileDownloadRequest request, Delivery delivery) throws IOException, AuthFailureError {
-		long downloadedSize = request.getTemporaryFile().length();
-
-		// Note: if the request header "Range" greater than the actual length that server-size have,
-		// the response header "Content-Range" will return "bytes */[actual length]", that's wrong.
-        HttpURLConnection connection = perform(request, "Range", "bytes=" + downloadedSize + "-");
+        HttpURLConnection connection = perform(request);
 
 		// Request might be cancel while perform() runs long time.
 		if (request.isCanceled()) {
@@ -132,6 +125,7 @@ public class HurlStack implements HttpStack {
 
 		// The file actually size.
 		long fileSize = Long.parseLong(connection.getHeaderField(HTTP.CONTENT_LEN));
+		long downloadedSize = request.getTemporaryFile().length();
 
 		boolean isSupportRange = isSupportRange(connection);
 		if (isSupportRange) {
