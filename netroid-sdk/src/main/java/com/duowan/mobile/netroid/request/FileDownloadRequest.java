@@ -20,7 +20,7 @@ import java.io.RandomAccessFile;
  * 		also return Accept-Ranges=bytes tell us the server-side supported range transmission.
  *
  * This request will stay longer in the thread which dependent your download file size,
- * that will fill up your thread poll as soon as possible if you open many request,
+ * that will fill up your thread poll as soon as possible if you launch many request,
  * if all threads is busy, the high priority request such as {@link StringRequest}
  * might waiting long time, so don't use it alone.
  * we highly recommend you to use it with the {@link com.duowan.mobile.netroid.toolbox.FileDownloader},
