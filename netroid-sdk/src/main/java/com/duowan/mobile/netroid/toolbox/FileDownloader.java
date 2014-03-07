@@ -165,7 +165,7 @@ public class FileDownloader {
 		public static final int STATUS_WAITING = 0;
 		public static final int STATUS_DOWNLOADING = 1;
 		public static final int STATUS_PAUSE = 2;
-		public static final int STATUS_FINISH = 3;
+		public static final int STATUS_SUCCESS = 3;
 		public static final int STATUS_DISCARD = 4;
 
 		private DownloadController(String storeFilePath, String url, Listener<Void> listener) {
@@ -196,7 +196,7 @@ public class FileDownloader {
 				public void onFinish() {
 					// we don't inform FINISH when it was cancel.
 					if (!isCanceled) {
-						mStatus = STATUS_FINISH;
+						mStatus = STATUS_SUCCESS;
 						mListener.onFinish();
 						// when request was FINISH, remove the task and re-schedule Task Queue.
 						remove(DownloadController.this);
@@ -280,7 +280,7 @@ public class FileDownloader {
 		 */
 		public boolean discard() {
 			if (mStatus == STATUS_DISCARD) return false;
-			if (mStatus == STATUS_FINISH) return false;
+			if (mStatus == STATUS_SUCCESS) return false;
 			if (mStatus == STATUS_DOWNLOADING) mRequest.cancel();
 			mStatus = STATUS_DISCARD;
 			remove(this);

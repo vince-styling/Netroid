@@ -223,7 +223,7 @@ public class FileDownloadActivity extends Activity implements View.OnClickListen
 				case FileDownloader.DownloadController.STATUS_PAUSE:
 					btnStatus.setText("paused");
 					break;
-				case FileDownloader.DownloadController.STATUS_FINISH:
+				case FileDownloader.DownloadController.STATUS_SUCCESS:
 					btnStatus.setText("done");
 					break;
 			}
