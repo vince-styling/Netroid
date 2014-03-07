@@ -18,18 +18,15 @@ package com.duowan.mobile.netroid.toolbox;
 
 import android.os.SystemClock;
 import com.duowan.mobile.netroid.*;
-import com.duowan.mobile.netroid.request.FileDownloadRequest;
 import com.duowan.mobile.netroid.stack.HttpStack;
-import org.apache.http.*;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.StatusLine;
 import org.apache.http.conn.ConnectTimeoutException;
-import org.apache.http.protocol.HTTP;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.SocketTimeoutException;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * A network performing Netroid requests over an {@link HttpStack}.
@@ -43,8 +40,7 @@ public class BasicNetwork implements Network {
 
 	private final HttpStack mHttpStack;
 
-	private final ByteArrayPool mPool;
-
+	/** The default charset only use when response doesn't offer the Content-Type header. */
 	private final String mDefaultCharset;
 
 	/** Request delivery mechanism. */
@@ -57,18 +53,18 @@ public class BasicNetwork implements Network {
     public BasicNetwork(HttpStack httpStack, String defaultCharset) {
         // If a pool isn't passed in, then build a small default pool that will give us a lot of
         // benefit and not use too much memory.
-        this(httpStack, new ByteArrayPool(DEFAULT_POOL_SIZE), defaultCharset);
+        this(httpStack, DEFAULT_POOL_SIZE, defaultCharset);
     }
 
     /**
      * @param httpStack HTTP stack to be used
-     * @param pool a buffer pool that improves GC performance in copy operations
+     * @param bytePoolSize Size of buffer pool that improves GC performance in copy operations.
 	 * @param defaultCharset when Http Header doesn't offer the 'Content-Type:Charset', it will be use.
      */
-    public BasicNetwork(HttpStack httpStack, ByteArrayPool pool, String defaultCharset) {
+    public BasicNetwork(HttpStack httpStack, int bytePoolSize, String defaultCharset) {
+		ByteArrayPool.init(bytePoolSize);
 		mDefaultCharset = defaultCharset;
 		mHttpStack = httpStack;
-        mPool = pool;
     }
 
 	@Override
@@ -82,11 +78,6 @@ public class BasicNetwork implements Network {
 		NetworkResponse networkResponse = request.perform();
 		if (networkResponse != null) return networkResponse;
 
-		// If the request was download.
-		if (request instanceof FileDownloadRequest) {
-			return performDownloadRequest((FileDownloadRequest) request);
-		}
-
 		long requestStart = SystemClock.elapsedRealtime();
 		while (true) {
 			// If the request was cancelled already,
@@ -99,36 +90,20 @@ public class BasicNetwork implements Network {
 
 			HttpResponse httpResponse = null;
 			byte[] responseContents = null;
-			Map<String, String> responseHeaders = new HashMap<String, String>();
 			try {
 				httpResponse = mHttpStack.performRequest(request);
+
 				StatusLine statusLine = httpResponse.getStatusLine();
 				int statusCode = statusLine.getStatusCode();
+				if (statusCode < 200 || statusCode > 299) throw new IOException();
 
-				responseHeaders = convertHeaders(httpResponse.getAllHeaders());
-				// Handle cache validation.
-				// CHANGES : we assume it never return NOT_MODIFIED Status because we didn't send header of last request.
-//                if (statusCode == HttpStatus.SC_NOT_MODIFIED) {
-//                    return new NetworkResponse(HttpStatus.SC_NOT_MODIFIED,
-//                            request.getCacheEntry().data, responseHeaders, true);
-//                }
-
-				// Some responses such as 204s do not have content.  We must check.
-				if (httpResponse.getEntity() != null) {
-					responseContents = entityToBytes(httpResponse.getEntity());
-				} else {
-					// Add 0 byte response as a way of honestly representing a
-					// no-content request.
-					responseContents = new byte[0];
-				}
+				responseContents = request.handleResponse(httpResponse, mDelivery);
 
 				// if the request is slow, log it.
 				long requestLifetime = SystemClock.elapsedRealtime() - requestStart;
 				logSlowRequests(requestLifetime, request, responseContents, statusLine);
 
-				if (statusCode < 200 || statusCode > 299) throw new IOException();
-
-				return new NetworkResponse(statusCode, responseContents, parseCharset(responseHeaders));
+				return new NetworkResponse(statusCode, responseContents, parseCharset(httpResponse));
 			} catch (SocketTimeoutException e) {
 				attemptRetryOnException("socket", request, new TimeoutError());
 			} catch (ConnectTimeoutException e) {
@@ -141,7 +116,7 @@ public class BasicNetwork implements Network {
 				int statusCode = httpResponse.getStatusLine().getStatusCode();
 				NetroidLog.e("Unexpected response code %d for %s", statusCode, request.getUrl());
 				if (responseContents != null) {
-					networkResponse = new NetworkResponse(statusCode, responseContents, parseCharset(responseHeaders));
+					networkResponse = new NetworkResponse(statusCode, responseContents, parseCharset(httpResponse));
 					if (statusCode == HttpStatus.SC_UNAUTHORIZED || statusCode == HttpStatus.SC_FORBIDDEN) {
 						attemptRetryOnException("auth", request, new AuthFailureError(networkResponse));
 					} else {
@@ -151,35 +126,6 @@ public class BasicNetwork implements Network {
 				} else {
 					throw new NetworkError(networkResponse);
 				}
-			}
-		}
-	}
-
-	public NetworkResponse performDownloadRequest(FileDownloadRequest request) throws NetroidError {
-		NetworkResponse networkResponse = null;
-		while (true) {
-			// If the request was cancelled already,
-			// do not perform the network request.
-			if (request.isCanceled()) {
-				request.finish("perform-discard-cancelled");
-				mDelivery.postCancel(request);
-				throw new NetworkError(networkResponse);
-			}
-
-			byte[] responseContents = null;
-			try {
-				int statusCode = mHttpStack.performDownloadRequest(request, mDelivery);
-				if (statusCode < 200 || statusCode > 299) throw new IOException();
-
-				return new NetworkResponse(statusCode, responseContents, HTTP.UTF_8);
-			} catch (SocketTimeoutException e) {
-				attemptRetryOnException("socket", request, new TimeoutError());
-			} catch (ConnectTimeoutException e) {
-				attemptRetryOnException("connection", request, new TimeoutError());
-			} catch (MalformedURLException e) {
-				throw new RuntimeException("Bad URL " + request.getUrl(), e);
-			} catch (IOException e) {
-				throw new NoConnectionError(e);
 			}
 		}
 	}
@@ -218,86 +164,18 @@ public class BasicNetwork implements Network {
 		mDelivery.postRetry(request);
     }
 
-//    private void addCacheHeaders(Map<String, String> headers, Cache.Entry entry) {
-//        // If there's no cache entry, we're done.
-//        if (entry == null) {
-//            return;
-//        }
-//
-//        if (entry.etag != null) {
-//            headers.put("If-None-Match", entry.etag);
-//        }
-//
-//        if (entry.serverDate > 0) {
-//            Date refTime = new Date(entry.serverDate);
-//            headers.put("If-Modified-Since", DateUtils.formatDate(refTime));
-//        }
-//    }
-
     protected void logError(String what, String url, long start) {
         long now = SystemClock.elapsedRealtime();
         NetroidLog.v("HTTP ERROR(%s) %d ms to fetch %s", what, (now - start), url);
-    }
-
-    /** Reads the contents of HttpEntity into a byte[]. */
-    private byte[] entityToBytes(HttpEntity entity) throws IOException, ServerError {
-        PoolingByteArrayOutputStream bytes =
-                new PoolingByteArrayOutputStream(mPool, (int) entity.getContentLength());
-        byte[] buffer = null;
-        try {
-            InputStream in = entity.getContent();
-            if (in == null) {
-                throw new ServerError();
-            }
-            buffer = mPool.getBuf(1024);
-            int count;
-            while ((count = in.read(buffer)) != -1) {
-                bytes.write(buffer, 0, count);
-            }
-            return bytes.toByteArray();
-        } finally {
-            try {
-                // Close the InputStream and release the resources by "consuming the content".
-                entity.consumeContent();
-            } catch (IOException e) {
-                // This can happen if there was an exception above that left the entity in
-                // an invalid state.
-                NetroidLog.v("Error occured when calling consumingContent");
-            }
-            mPool.returnBuf(buffer);
-            bytes.close();
-        }
-    }
-
-    /**
-     * Converts Headers[] to Map<String, String>.
-     */
-    private static Map<String, String> convertHeaders(Header[] headers) {
-        Map<String, String> result = new HashMap<String, String>();
-		for (Header header : headers) {
-			result.put(header.getName(), header.getValue());
-		}
-        return result;
     }
 
 	/**
 	 * Returns the charset specified in the Content-Type of this header,
 	 * or the defaultCharset if none can be found.
 	 */
-	public String parseCharset(Map<String, String> headers) {
-		String contentType = headers.get(HTTP.CONTENT_TYPE);
-		if (contentType != null) {
-			String[] params = contentType.split(";");
-			for (int i = 1; i < params.length; i++) {
-				String[] pair = params[i].trim().split("=");
-				if (pair.length == 2) {
-					if (pair[0].equals("charset")) {
-						return pair[1];
-					}
-				}
-			}
-		}
-		return mDefaultCharset;
+	private String parseCharset(HttpResponse response) {
+		String charset = HttpUtils.getCharset(response);
+		return charset == null ? mDefaultCharset : charset;
 	}
 
 	public String getDefaultCharset() {

@@ -17,9 +17,7 @@
 package com.duowan.mobile.netroid.stack;
 
 import com.duowan.mobile.netroid.AuthFailureError;
-import com.duowan.mobile.netroid.Delivery;
 import com.duowan.mobile.netroid.Request;
-import com.duowan.mobile.netroid.request.FileDownloadRequest;
 import org.apache.http.HttpResponse;
 
 import java.io.IOException;
@@ -38,12 +36,5 @@ public interface HttpStack {
      * @return the HTTP response
      */
     public HttpResponse performRequest(Request<?> request)
-        throws IOException, AuthFailureError;
-
-	/**
-	 * Performs a File Download request with the given parameters.
-	 * @return the HTTP response statusCode.
-	 */
-	int performDownloadRequest(FileDownloadRequest request, Delivery delivery)
 			throws IOException, AuthFailureError;
 }

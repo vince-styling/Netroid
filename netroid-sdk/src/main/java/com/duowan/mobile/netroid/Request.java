@@ -21,7 +21,9 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.SystemClock;
 import com.duowan.mobile.netroid.NetroidLog.MarkerLog;
+import org.apache.http.HttpResponse;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.HashMap;
@@ -404,6 +406,23 @@ public abstract class Request<T> implements Comparable<Request<T>> {
             throw new RuntimeException("Encoding not supported: " + paramsEncoding, uee);
         }
     }
+
+	/**
+	 * Handle the response for various request, normally, a request was a short and low memory-usage request,
+	 * thus we can parse the response-content as byte[] in memory.
+	 * However the {@link com.duowan.mobile.netroid.request.FileDownloadRequest}
+	 * itself was a large memory-usage case, that's inadvisable for parse all
+	 * response content to memory, so it had self-implement mechanism.
+	 */
+	public byte[] handleResponse(HttpResponse response, Delivery delivery) throws IOException, ServerError {
+		// Some responses such as 204s do not have content.
+		if (response.getEntity() != null) {
+			return HttpUtils.entityToBytes(response.getEntity());
+		} else {
+			// Add 0 byte response as a way of honestly representing a no-content request.
+			return new byte[0];
+		}
+	}
 
 	/**
 	 * Set a cache sequence.

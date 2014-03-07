@@ -1,0 +1,79 @@
+package com.duowan.mobile.netroid;
+
+import android.text.TextUtils;
+import com.duowan.mobile.netroid.toolbox.ByteArrayPool;
+import com.duowan.mobile.netroid.toolbox.PoolingByteArrayOutputStream;
+import org.apache.http.Header;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.protocol.HTTP;
+
+import java.io.IOException;
+import java.io.InputStream;
+
+public class HttpUtils {
+
+	/** Reads the contents of HttpEntity into a byte[]. */
+	public static byte[] entityToBytes(HttpEntity entity) throws IOException, ServerError {
+		PoolingByteArrayOutputStream bytes =
+				new PoolingByteArrayOutputStream(ByteArrayPool.get(), (int) entity.getContentLength());
+		byte[] buffer = null;
+		try {
+			InputStream in = entity.getContent();
+			if (in == null) {
+				throw new ServerError();
+			}
+			buffer = ByteArrayPool.get().getBuf(1024);
+			int count;
+			while ((count = in.read(buffer)) != -1) {
+				bytes.write(buffer, 0, count);
+			}
+			return bytes.toByteArray();
+		} finally {
+			try {
+				// Close the InputStream and release the resources by "consuming the content".
+				entity.consumeContent();
+			} catch (IOException e) {
+				// This can happen if there was an exception above that left the entity in
+				// an invalid state.
+				NetroidLog.v("Error occured when calling consumingContent");
+			}
+			ByteArrayPool.get().returnBuf(buffer);
+			bytes.close();
+		}
+	}
+
+	/** Returns the charset specified in the Content-Type of this header. */
+	public static String getCharset(HttpResponse response) {
+		Header header = response.getFirstHeader(HTTP.CONTENT_TYPE);
+		if (header != null) {
+			String contentType = header.getValue();
+			if (!TextUtils.isEmpty(contentType)) {
+				String[] params = contentType.split(";");
+				for (int i = 1; i < params.length; i++) {
+					String[] pair = params[i].trim().split("=");
+					if (pair.length == 2) {
+						if (pair[0].equals("charset")) {
+							return pair[1];
+						}
+					}
+				}
+			}
+		}
+		return null;
+	}
+
+	public static String getHeader(HttpResponse response, String key) {
+		Header header = response.getFirstHeader(key);
+		return header == null ? null : header.getValue();
+	}
+
+	public static boolean isSupportRange(HttpResponse response) {
+		if (TextUtils.equals(getHeader(response, "Accept-Ranges"), "bytes")) {
+			return true;
+		}
+		String value = getHeader(response, "Content-Range");
+		return value != null && value.startsWith("bytes");
+	}
+
+}

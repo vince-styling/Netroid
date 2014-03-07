@@ -72,9 +72,22 @@ public class ByteArrayPool {
     /**
      * @param sizeLimit the maximum size of the pool, in bytes
      */
-    public ByteArrayPool(int sizeLimit) {
+    private ByteArrayPool(int sizeLimit) {
         mSizeLimit = sizeLimit;
     }
+
+	/** Singleton for this class. */
+	private static ByteArrayPool mPool;
+
+	/** Get the singleton instance. */
+	public static ByteArrayPool get() {
+		return mPool;
+	}
+
+	/** Init and persisting the singleton instance. */
+	public static void init(int poolSize) {
+		mPool = new ByteArrayPool(poolSize);
+	}
 
     /**
      * Returns a buffer from the pool if one is available in the requested size, or allocates a new
