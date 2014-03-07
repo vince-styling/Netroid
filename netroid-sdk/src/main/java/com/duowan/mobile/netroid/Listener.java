@@ -40,7 +40,10 @@ public abstract class Listener<T> {
 	/** Inform when {@link Request} execute is going to retry. */
 	public void onRetry() {}
 
-	/** Inform when download progress change. */
+	/**
+	 * Inform when download progress change, this callback method only available
+	 * when request was {@link com.duowan.mobile.netroid.request.FileDownloadRequest}.
+	 */
 	public void onProgressChange(long fileSize, long downloadedSize) {
 	}
 }
