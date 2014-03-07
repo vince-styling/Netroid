@@ -21,7 +21,7 @@ import java.text.DecimalFormat;
 import java.util.LinkedList;
 
 public class FileDownloadActivity extends Activity implements View.OnClickListener, AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener {
-	public final static DecimalFormat DECIMAL_POINT_DF = new DecimalFormat("0.0");
+	public final static DecimalFormat DECIMAL_POINT = new DecimalFormat("0.0");
 	private static final String mSaveDirPath = "/sdcard/0000netroid/";
 
 	private LinkedList<DownloadTask> mTaskList;
@@ -107,42 +107,40 @@ public class FileDownloadActivity extends Activity implements View.OnClickListen
 
 	@Override
 	public void onClick(View v) {
-		if (btnAddTask == v) {
-			if (mTaskList.size() == 0) return;
-			final DownloadTask task = mTaskList.poll();
-			task.controller = mDownloder.add(mSaveDirPath + task.storeFileName, task.url, new Listener<Void>() {
-				@Override
-				public void onPreExecute() {
-					task.invalidate();
-				}
+		if (mTaskList.size() == 0) return;
+		final DownloadTask task = mTaskList.poll();
+		task.controller = mDownloder.add(mSaveDirPath + task.storeFileName, task.url, new Listener<Void>() {
+			@Override
+			public void onPreExecute() {
+				task.invalidate();
+			}
 
-				@Override
-				public void onSuccess(Void response) {
-					showToast(task.storeFileName + " Success!");
-				}
+			@Override
+			public void onSuccess(Void response) {
+				showToast(task.storeFileName + " Success!");
+			}
 
-				@Override
-				public void onError(NetroidError error) {
-					NetroidLog.e(error.getMessage());
-				}
+			@Override
+			public void onError(NetroidError error) {
+				NetroidLog.e(error.getMessage());
+			}
 
-				@Override
-				public void onFinish() {
-					NetroidLog.e("onFinish size : " + Formatter.formatFileSize(
-							FileDownloadActivity.this, new File(mSaveDirPath + task.storeFileName).length()));
-					task.invalidate();
-				}
+			@Override
+			public void onFinish() {
+				NetroidLog.e("onFinish size : " + Formatter.formatFileSize(
+						FileDownloadActivity.this, new File(mSaveDirPath + task.storeFileName).length()));
+				task.invalidate();
+			}
 
-				@Override
-				public void onProgressChange(long fileSize, long downloadedSize) {
-					task.onProgressChange(fileSize, downloadedSize);
-//					NetroidLog.e("---- fileSize : " + fileSize + " downloadedSize : " + downloadedSize);
-				}
-			});
-			mDownloadList.add(task);
-			mAdapter.notifyDataSetChanged();
-			btnAddTask.setText("添加任务(" + mTaskList.size() + ")");
-		}
+			@Override
+			public void onProgressChange(long fileSize, long downloadedSize) {
+				task.onProgressChange(fileSize, downloadedSize);
+//				NetroidLog.e("---- fileSize : " + fileSize + " downloadedSize : " + downloadedSize);
+			}
+		});
+		mDownloadList.add(task);
+		mAdapter.notifyDataSetChanged();
+		btnAddTask.setText("添加任务(" + mTaskList.size() + ")");
 	}
 
 	@Override
@@ -212,7 +210,7 @@ public class FileDownloadActivity extends Activity implements View.OnClickListen
 			switch (controller.getStatus()) {
 				case FileDownloader.DownloadController.STATUS_DOWNLOADING:
 					if (fileSize > 0 && downloadedSize > 0) {
-						btnStatus.setText(DECIMAL_POINT_DF.format(downloadedSize * 1.0f / fileSize * 100) + '%');
+						btnStatus.setText(DECIMAL_POINT.format(downloadedSize * 1.0f / fileSize * 100) + '%');
 					} else {
 						btnStatus.setText("0%");
 					}
