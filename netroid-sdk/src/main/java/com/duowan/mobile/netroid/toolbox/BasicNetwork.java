@@ -91,6 +91,9 @@ public class BasicNetwork implements Network {
 			HttpResponse httpResponse = null;
 			byte[] responseContents = null;
 			try {
+				// prepare to perform this request, normally is reset the request headers.
+				request.prepare();
+
 				httpResponse = mHttpStack.performRequest(request);
 
 				StatusLine statusLine = httpResponse.getStatusLine();

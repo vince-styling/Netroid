@@ -32,8 +32,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Base class for all network requests.
- *
- * @param <T> The type of parsed response this request expects.
+` * @param <T> The type of parsed response this request expects.
  */
 public abstract class Request<T> implements Comparable<Request<T>> {
 
@@ -61,7 +60,7 @@ public abstract class Request<T> implements Comparable<Request<T>> {
     /** URL of this request. */
     private final String mUrl;
 
-	/** The additional headers */
+	/** The additional headers. */
 	private HashMap<String, String> mHashHeaders;
 
 	/** Default tag for {@link TrafficStats}. */
@@ -100,13 +99,6 @@ public abstract class Request<T> implements Comparable<Request<T>> {
 
 	/** What time the cache is expired, in milliSeconds. */
 	private long mCacheExpireTime;
-
-//    /**
-//     * When a request can be retrieved from cache but must be refreshed from
-//     * the network, the cache entry will be stored here so that in the event of
-//     * a "Not Modified" response, we can be sure it hasn't been evicted from cache.
-//     */
-//    private Cache.Entry mCacheEntry = null;
 
     /** An opaque token tagging this request; used for bulk cancellation. */
     private Object mTag;
@@ -252,36 +244,19 @@ public abstract class Request<T> implements Comparable<Request<T>> {
     }
 
 	/**
-	 * Returns the cache key for this request.  By default, this is the URL.
+	 * Returns the cache key for this request.
+	 * By default, this is the URL.
 	 */
 	public String getCacheKey() {
-//		try {
-//			return Base64.encodeToString(getUrl().getBytes("UTF-8"), Base64.DEFAULT);
-//		} catch (UnsupportedEncodingException e) {}
 		return getUrl();
 	}
 
-//    /**
-//     * Annotates this request with an entry retrieved for it from cache.
-//     * Used for cache coherency support.
-//     */
-//    public void setCacheEntry(Cache.Entry entry) {
-//        mCacheEntry = entry;
-//    }
-//
-//    /**
-//     * Returns the annotated cache entry, or null if there isn't one.
-//     */
-//    public Cache.Entry getCacheEntry() {
-//        return mCacheEntry;
-//    }
-
-	/** Ask if should force update */
+	/** Ask if should force update. */
 	public boolean isForceUpdate() {
 		return mForceUpdate;
 	}
 
-	/** tell {@link Network} should force update or no */
+	/** tell {@link Network} should force update or no. */
 	public void setForceUpdate(boolean forceUpdate) {
 		this.mForceUpdate = forceUpdate;
 	}
@@ -333,6 +308,8 @@ public abstract class Request<T> implements Comparable<Request<T>> {
 	 * @param value header value
 	 */
 	public final void addHeader(String field, String value) {
+		// We don't accept duplicate header.
+		removeHeader(field);
 		mHashHeaders.put(field, value);
 	}
 
@@ -408,6 +385,16 @@ public abstract class Request<T> implements Comparable<Request<T>> {
     }
 
 	/**
+	 * Prepare to execute, invoke before {@link com.duowan.mobile.netroid.stack.HttpStack#performRequest}.
+	 * it's original purpose is reset some request parameters after timeout then retry, especially headers,
+	 * the situation is when you have some headers need to init or reset every perform, for example the "Range"
+	 * header for download a file, you obviously must retrieve the begin position of file and reset the "Range"
+	 * for every time you going to retry, so that's why we add this method.
+	 */
+	public void prepare() {
+	}
+
+	/**
 	 * Handle the response for various request, normally, a request was a short and low memory-usage request,
 	 * thus we can parse the response-content as byte[] in memory.
 	 * However the {@link com.duowan.mobile.netroid.request.FileDownloadRequest}
@@ -422,6 +409,15 @@ public abstract class Request<T> implements Comparable<Request<T>> {
 			// Add 0 byte response as a way of honestly representing a no-content request.
 			return new byte[0];
 		}
+	}
+
+	/**
+	 * By default, everyone Request is http-base request, if you wants to load
+	 * local file or perform others, also wants to use Cache, you can override
+	 * this method to implement non-http request.
+	 */
+	public NetworkResponse perform() {
+		return null;
 	}
 
 	/**
@@ -447,7 +443,7 @@ public abstract class Request<T> implements Comparable<Request<T>> {
 		return mCacheSequence != null && mCacheSequence.length > 0 && mCacheExpireTime > 0;
 	}
 
-    /**
+	/**
      * Priority values.  Requests will be processed from higher priorities to
      * lower priorities, in FIFO order.
      */
@@ -496,15 +492,6 @@ public abstract class Request<T> implements Comparable<Request<T>> {
         return mResponseDelivered;
     }
 
-	/**
-	 * By default, everyone Request is http-base request, if you wants to load
-	 * local file or perform others, also wants to use Cache, you can override
-	 * this method to implement non-http request.
-	 */
-	public NetworkResponse perform() {
-		return null;
-	}
-
     /**
      * Subclasses must implement this to parse the raw network response
      * and return an appropriate response type. This method will be
@@ -513,7 +500,7 @@ public abstract class Request<T> implements Comparable<Request<T>> {
      * @param response Response from the network
      * @return The parsed response, or null in the case of an error
      */
-    abstract protected Response<T> parseNetworkResponse(NetworkResponse response);
+    protected abstract Response<T> parseNetworkResponse(NetworkResponse response);
 
     /**
      * Subclasses can override this method to parse 'networkError' and return a more specific error.

@@ -37,6 +37,13 @@ public class FileDownloadRequest extends Request<Void> {
 		mStoreFile = new File(storeFilePath);
 		mTemporaryFile = new File(storeFilePath + ".tmp");
 
+		// Turn the retries frequency greater.
+		setRetryPolicy(new DefaultRetryPolicy(DefaultRetryPolicy.DEFAULT_TIMEOUT_MS, 200, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+	}
+
+	/** Init or reset the Range header, ensure the begin position always be the temporary file size. */
+	@Override
+	public void prepare() {
 		// Note: if the request header "Range" greater than the actual length that server-size have,
 		// the response header "Content-Range" will return "bytes */[actual length]", that's wrong.
 		addHeader("Range", "bytes=" + mTemporaryFile.length() + "-");
