@@ -18,10 +18,8 @@ package com.duowan.mobile.netroid.stack;
 
 import android.text.TextUtils;
 import com.duowan.mobile.netroid.AuthFailureError;
-import com.duowan.mobile.netroid.Delivery;
 import com.duowan.mobile.netroid.Request;
 import com.duowan.mobile.netroid.Request.Method;
-import com.duowan.mobile.netroid.request.FileDownloadRequest;
 import org.apache.http.*;
 import org.apache.http.entity.BasicHttpEntity;
 import org.apache.http.message.BasicHeader;
@@ -34,7 +32,6 @@ import javax.net.ssl.SSLSocketFactory;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.RandomAccessFile;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.HashMap;
@@ -56,6 +53,10 @@ public class HurlStack implements HttpStack {
         mSslSocketFactory = sslSocketFactory;
 		mUserAgent = userAgent;
     }
+
+	public HurlStack(String userAgent) {
+		this(userAgent, null);
+	}
 
     @Override
     public HttpResponse performRequest(Request<?> request) throws IOException, AuthFailureError {
@@ -161,13 +162,26 @@ public class HurlStack implements HttpStack {
                 connection.setRequestMethod("PUT");
                 addBodyIfExists(connection, request);
                 break;
+            case Method.HEAD:
+                connection.setRequestMethod("HEAD");
+                break;
+            case Method.OPTIONS:
+                connection.setRequestMethod("OPTIONS");
+                break;
+            case Method.TRACE:
+                connection.setRequestMethod("TRACE");
+                break;
+            case Method.PATCH:
+                addBodyIfExists(connection, request);
+                connection.setRequestMethod("PATCH");
+                break;
             default:
                 throw new IllegalStateException("Unknown method type.");
         }
     }
 
-    private static void addBodyIfExists(HttpURLConnection connection, Request<?> request)
-            throws IOException, AuthFailureError {
+    private static void addBodyIfExists(
+			HttpURLConnection connection, Request<?> request) throws IOException, AuthFailureError {
         byte[] body = request.getBody();
         if (body != null) {
             connection.setDoOutput(true);

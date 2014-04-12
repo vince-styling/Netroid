@@ -32,6 +32,7 @@ import org.apache.http.params.HttpParams;
 import org.apache.http.protocol.HTTP;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -100,6 +101,18 @@ public class HttpClientStack implements HttpStack {
                 setEntityIfNonEmptyBody(putRequest, request);
                 return putRequest;
             }
+            case Method.HEAD:
+                return new HttpHead(request.getUrl());
+            case Method.OPTIONS:
+                return new HttpOptions(request.getUrl());
+            case Method.TRACE:
+                return new HttpTrace(request.getUrl());
+            case Method.PATCH: {
+                HttpPatch patchRequest = new HttpPatch(request.getUrl());
+                patchRequest.addHeader(HTTP.CONTENT_TYPE, request.getBodyContentType());
+                setEntityIfNonEmptyBody(patchRequest, request);
+                return patchRequest;
+            }
             default:
                 throw new IllegalStateException("Unknown request method.");
         }
@@ -121,5 +134,34 @@ public class HttpClientStack implements HttpStack {
      */
     protected void onPrepareRequest(HttpUriRequest request) throws IOException {
         // Nothing.
+	}
+
+	/**
+	 * The HttpPatch class does not exist in the Android framework, so this has been defined here.
+	 */
+	public static final class HttpPatch extends HttpEntityEnclosingRequestBase {
+		public final static String METHOD_NAME = "PATCH";
+
+		public HttpPatch() {
+			super();
+		}
+
+		public HttpPatch(final URI uri) {
+			super();
+			setURI(uri);
+		}
+
+		/**
+		 * @throws IllegalArgumentException if the uri is invalid.
+		 */
+		public HttpPatch(final String uri) {
+			super();
+			setURI(URI.create(uri));
+		}
+
+		@Override
+		public String getMethod() {
+			return METHOD_NAME;
+		}
 	}
 }
