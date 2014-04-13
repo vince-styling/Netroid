@@ -5,7 +5,7 @@
     <parent>
 	    <groupId>com.yy.android.gameLibs</groupId>
 		<artifactId>netroid</artifactId>
-	    <version>1.1.1</version>
+	    <version>1.2.0</version>
     </parent>
 
     <artifactId>netroid-sdk</artifactId>
