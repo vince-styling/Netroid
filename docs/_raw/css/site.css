@@ -1,0 +1,272 @@
+html, body, div, span, h1, h2, h3, h4, h5, h6, p, pre, a, code, img, strong, ul, li, form, label, table, caption, tr, th, td {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    outline: 0;
+    font-size: 100%;
+    vertical-align: baseline;
+    background: transparent;
+}
+
+ol, ul {
+    list-style: none
+}
+
+.clearfix:after {
+    content: ".";
+    display: block;
+    height: 0;
+    clear: both;
+    visibility: hidden;
+}
+
+.clearfix {
+    display: block;
+}
+
+body {
+    border-top: 10px solid #f5f5f5;
+    font-family: Helvetica, Arial, sans-serif;
+}
+
+a {
+    color:#d14;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+a img {
+    border: none
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-weight: normal;
+    padding: 0;
+}
+
+.container {
+    width: 800px;
+    margin: 0 auto;
+    padding: 0 0 20px 0;
+}
+
+
+.page-title {
+    font-family: "Droid Serif", Georgia, Times, serif;
+    border-bottom: 2px solid #d5d5d5;
+    clear:both;
+    overflow:auto;
+    padding: 20px 0 10px 0;
+}
+
+.page-title h1 {
+    font-size: 50px;
+    font-family: "Droid Serif", Georgia, Times, serif;
+    text-shadow: 2px 2px #ddd;
+    padding: 0;
+    border-bottom: none;
+    line-height: 70px;
+    font-weight: bold;
+}
+
+.page-title h1 a {
+    color: black;
+    text-decoration: none;
+}
+
+.page-title h2 {
+    font-size: 14px;
+    font-family: "Droid Serif", Georgia, Times, serif;
+}
+
+.primary {
+    float: left;
+    width: 800px;
+}
+
+.primary .post-thumb p {
+    font-family: "微软雅黑", "宋体", "Droid Serif", Georgia, Times, serif;
+    color: #333333;
+    font-size: 15px;
+    line-height: 25px;
+    padding-bottom: 18px;
+}
+
+.primary .post-thumb a {
+    padding-left: 2px;
+    padding-right: 2px;
+}
+
+.primary .post-thumb h1 {
+    font-family: "Droid Serif", Georgia, Times, serif;
+    font-size: 30px;
+    padding-bottom: 10px;
+    margin-top: 24px;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #ddd;
+    color: #d14;
+}
+
+.primary .post-thumb h1 a {
+    text-decoration: none;
+}
+
+.primary .post-thumb h2 {
+    font-family: "Droid Serif", Georgia, Times, serif;
+    font-size: 19px;
+    color: #d14;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+.primary .post-thumb h2 a {
+    text-decoration: none;
+}
+
+.primary .post-thumb h3 {
+    font-family: "Droid Serif", Georgia, Times, serif;
+    font-size: 17px;
+    color: #0c74a6;
+    line-height: 25px;
+    padding-bottom: 6px;
+}
+
+.primary .post-thumb h4 {
+    font-family: "Droid Serif", Georgia, Times, serif;
+    font-size: 13px;
+    color: #333333;
+    padding-bottom: 12px;
+    line-height: 18px;
+}
+
+.primary .post-thumb ul {
+    margin-top: 10px;
+    list-style: square inside;
+}
+
+.primary .post-thumb ul li {
+    line-height: 28px;
+    font-family: "Droid Serif", Georgia, Times, serif;
+    font-size: 16px;
+}
+
+.primary .post-thumb code {
+    font-family: "Droid Serif", Georgia, Times, serif;
+    font-size: 15px;
+    padding: 3px 4px;
+    color: #d14;
+    background-color: #f7f7f9;
+    border: 1px solid #e1e1e8;
+    border-radius: 3px;
+    margin-left: 4px;
+    margin-right: 4px;
+}
+
+.primary .post-thumb table {
+    width: 100%;
+    overflow: auto;
+    display: block;
+    border-collapse: collapse;
+    border-spacing: 0;
+    border-color: gray;
+    margin-bottom: 20px;
+}
+
+.primary .post-thumb table tr {
+    border-top: 1px solid #ccc;
+    background-color: #fff;
+}
+
+.primary .post-thumb table th,
+.primary .post-thumb table td {
+    font-family: "微软雅黑", "宋体", "Droid Serif", Georgia, Times, serif;
+    border: 1px solid #ddd;
+    padding: 6px 13px;
+    vertical-align: middle;
+}
+
+.primary .post-thumb table td {
+    font-size: 15px;
+    line-height: 26px;
+}
+
+.primary .post-thumb table th {
+    font-weight: bold;
+}
+
+.primary .title {
+    font-size: 19px;
+    padding-bottom: 20px;
+}
+
+.footer {
+    width: 800px;
+    margin: 0 auto;
+    border-top: 2px solid #d5d5d5;
+    font-size: 13px;
+    color: #666;
+    padding-top: 20px;
+    padding-bottom: 120px;
+}
+
+.footer .aboutus {
+    float: left;
+}
+
+.footer .findme {
+    float: right;
+}
+
+
+.primary .post-thumb pre {
+    word-wrap: normal;
+    background-color: #f8f8f8;
+    border: 1px solid #ddd;
+    line-height: 19px;
+    overflow: auto;
+    padding: 6px 10px;
+    border-radius: 3px;
+    margin-bottom: 20px;
+
+    font-family: Consolas, "Liberation Mono", Courier, monospace;
+    font-size: 13px;
+    color: #333333;
+    line-height: 19px;
+    word-wrap: normal;
+}
+
+.primary .post-thumb pre .comment, .primary .post-thumb pre .doc_comment { color: #008800; }
+.primary .post-thumb pre .string, .primary .post-thumb pre .esc_string { color: #BB4444; }
+.primary .post-thumb pre .character { color: #3b84cc; }
+.primary .post-thumb pre .esc_character { color: #3b84cc; }
+.primary .post-thumb pre .numeric { color: #2300CE; }
+.primary .post-thumb pre .identifier, .predefined_identifier { color: #000000; }
+.primary .post-thumb pre .type, .predefined_type { color: #59ffff; }
+.primary .post-thumb pre .reserved_word { color: #AA0D92; }
+.primary .post-thumb pre .library_function { color: #face43; }
+.primary .post-thumb pre .include { color: #7f0055; }
+.primary .post-thumb pre .preprocessor { color: #face43; }
+.primary .post-thumb pre .braces { color: #000000; }
+.primary .post-thumb pre .symbol { color: #EC6C1E; }
+.primary .post-thumb pre .function_header { color: #face43; }
+.primary .post-thumb pre .function_header_name { color: #face43; }
+.primary .post-thumb pre .function_header_args { color: #face43; }
+.primary .post-thumb pre .regex { color: #face43; }
+.primary .post-thumb pre .text { color: #face43; }
+.primary .post-thumb pre .html_entity { color: #face43; }
+.primary .post-thumb pre .makefile_assignment { color: #face43; }
+.primary .post-thumb pre .makefile_dependency_line { color: #face43; }
+.primary .post-thumb pre .makefile_dependency_target { color: #face43; }
+.primary .post-thumb pre .makefile_dependency_continuation { color: #face43; }
+.primary .post-thumb pre .makefile_continuation { color: #face43; }
+.primary .post-thumb pre .macro { color: #face43; }
+.primary .post-thumb pre .int_macro { color: #face43; }
+.primary .post-thumb pre .esc_3dollr { color: #face43; }
+.primary .post-thumb pre .patch_separator { color: #face43; }
+.primary .post-thumb pre .patch_line_spec { color: #face43; }
+.primary .post-thumb pre .patch_deletion { color: #face43; }
+.primary .post-thumb pre .patch_insertion { color: #face43; }

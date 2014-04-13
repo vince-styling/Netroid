@@ -26,3 +26,6 @@ proguard.cfg
 
 #OSX
 .DS_Store
+
+# Minerl Site Dir
+site
