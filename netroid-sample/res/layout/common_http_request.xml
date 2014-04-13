@@ -28,12 +28,6 @@
             android:text="字符串请求"/>
 
         <Button
-            android:id="@+id/btnUsedDiskCache"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="使用硬盘缓存"/>
-
-        <Button
             android:id="@+id/btnForceUpdate"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

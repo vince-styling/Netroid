@@ -18,8 +18,7 @@ package com.duowan.mobile.netroid;
 
 import android.os.Handler;
 import android.os.Looper;
-import com.duowan.mobile.netroid.cache.CacheChain;
-import com.duowan.mobile.netroid.cache.CacheWrapper;
+import com.duowan.mobile.netroid.cache.DiskCache;
 
 import java.util.*;
 import java.util.concurrent.PriorityBlockingQueue;
@@ -68,8 +67,8 @@ public class RequestQueue {
     private final PriorityBlockingQueue<Request> mNetworkQueue =
         new PriorityBlockingQueue<Request>();
 
-    /** CacheChain interface for retrieving and storing respones for multiple instance. */
-    private final CacheChain mCaches;
+	/** Disk cache for retrieving and storing responses. */
+	private final DiskCache mCache;
 
     /** Network interface for performing requests. */
     private final Network mNetwork;
@@ -89,19 +88,14 @@ public class RequestQueue {
      * @param network A Network interface for performing HTTP requests
      * @param threadPoolSize Number of network dispatcher threads to create
      * @param delivery A Delivery interface for posting responses and errors
-     * @param caches what kind of caches will be used
+     * @param cache A Cache to use for persisting responses to disk
      */
-    public RequestQueue(Network network, int threadPoolSize, Delivery delivery, CacheWrapper... caches) {
+    public RequestQueue(Network network, int threadPoolSize, Delivery delivery, DiskCache cache) {
+		mCache = cache;
 		mNetwork = network;
 		mDelivery = delivery;
 		mNetwork.setDelivery(delivery);
-
 		mDispatchers = new NetworkDispatcher[threadPoolSize];
-
-		mCaches = new CacheChain();
-		for (CacheWrapper wrapper : caches) {
-			putCache(wrapper.getCacheKey(), wrapper.getCache());
-		}
     }
 
     /**
@@ -109,11 +103,10 @@ public class RequestQueue {
      *
      * @param network A Network interface for performing HTTP requests
      * @param threadPoolSize Number of network dispatcher threads to create
-	 * @param caches what kind of caches will be used
+	 * @param cache A Cache to use for persisting responses to disk
      */
-    public RequestQueue(Network network, int threadPoolSize, CacheWrapper... caches) {
-        this(network, threadPoolSize,
-                new ExecutorDelivery(new Handler(Looper.getMainLooper())), caches);
+    public RequestQueue(Network network, int threadPoolSize, DiskCache cache) {
+        this(network, threadPoolSize, new ExecutorDelivery(new Handler(Looper.getMainLooper())), cache);
     }
 
     /**
@@ -122,17 +115,8 @@ public class RequestQueue {
      * @param network A Network interface for performing HTTP requests
      */
     public RequestQueue(Network network) {
-        this(network, DEFAULT_NETWORK_THREAD_POOL_SIZE);
+        this(network, DEFAULT_NETWORK_THREAD_POOL_SIZE, null);
     }
-
-	/**
-	 * Put a cache instance to cache chain.
-	 * @param cacheKey the cache key in the chain
-	 * @param cache A Cache to use for persisting responses
-	 */
-	private void putCache(int cacheKey, Cache cache) {
-		mCaches.putCache(cacheKey, cache);
-	}
 
     /**
      * Starts the dispatchers in this queue.
@@ -140,13 +124,13 @@ public class RequestQueue {
     public void start() {
         stop();  // Make sure any currently running dispatchers are stopped.
         // Create the cache dispatcher and start it.
-        mCacheDispatcher = new CacheDispatcher(mCacheQueue, mNetworkQueue, mCaches, mDelivery);
+        mCacheDispatcher = new CacheDispatcher(mCacheQueue, mNetworkQueue, mCache, mDelivery);
         mCacheDispatcher.start();
 
         // Create network dispatchers (and corresponding threads) up to the pool size.
         for (int i = 0; i < mDispatchers.length; i++) {
-            NetworkDispatcher networkDispatcher = new NetworkDispatcher(mNetworkQueue, mNetwork,
-					mCaches, mDelivery);
+            NetworkDispatcher networkDispatcher =
+					new NetworkDispatcher(mNetworkQueue, mNetwork, mCache, mDelivery);
             mDispatchers[i] = networkDispatcher;
             networkDispatcher.start();
         }
@@ -177,13 +161,6 @@ public class RequestQueue {
 	public int getThreadPoolSize() {
 		return mDispatchers.length;
 	}
-
-    /**
-     * Gets the {@link CacheChain} instance being used.
-     */
-    public CacheChain getCacheChain() {
-        return mCaches;
-    }
 
     /**
      * A simple predicate or filter interface for Requests, for use by

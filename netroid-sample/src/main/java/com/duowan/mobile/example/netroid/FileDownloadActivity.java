@@ -35,7 +35,7 @@ public class FileDownloadActivity extends Activity implements View.OnClickListen
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.file_downloader);
 
-		RequestQueue queue = Netroid.newRequestQueue(getApplicationContext());
+		RequestQueue queue = Netroid.newRequestQueue(getApplicationContext(), null);
 		mDownloder = new FileDownloader(queue, 1);
 
 		File downloadDir = new File(mSaveDirPath);

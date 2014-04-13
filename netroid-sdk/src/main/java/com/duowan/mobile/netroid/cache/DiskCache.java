@@ -17,17 +17,16 @@
 package com.duowan.mobile.netroid.cache;
 
 import android.os.SystemClock;
-import com.duowan.mobile.netroid.Cache;
 import com.duowan.mobile.netroid.NetroidLog;
 
 import java.io.*;
 import java.util.*;
 
 /**
- * Cache implementation that caches files directly onto the hard disk in the specified
+ * LruCache implementation that caches files directly onto the hard disk in the specified
  * directory. The default disk usage size is 5MB, but is configurable.
  */
-public class DiskBasedCache implements Cache {
+public class DiskCache {
 
     /** Map of the Key, CacheHeader pairs */
     private final Map<String, CacheHeader> mEntries =
@@ -52,28 +51,27 @@ public class DiskBasedCache implements Cache {
     private static final int CACHE_MAGIC = 0x20120504;
 
     /**
-     * Constructs an instance of the DiskBasedCache at the specified directory.
+     * Constructs an instance of the DiskCache at the specified directory.
      * @param rootDirectory The root directory of the cache.
      * @param maxCacheSizeInBytes The maximum size of the cache in bytes.
      */
-    public DiskBasedCache(File rootDirectory, int maxCacheSizeInBytes) {
+    public DiskCache(File rootDirectory, int maxCacheSizeInBytes) {
         mRootDirectory = rootDirectory;
         mMaxCacheSizeInBytes = maxCacheSizeInBytes;
     }
 
     /**
-     * Constructs an instance of the DiskBasedCache at the specified directory using
+     * Constructs an instance of the DiskCache at the specified directory using
      * the default maximum cache size of 5MB.
      * @param rootDirectory The root directory of the cache.
      */
-    public DiskBasedCache(File rootDirectory) {
+    public DiskCache(File rootDirectory) {
         this(rootDirectory, DEFAULT_DISK_USAGE_BYTES);
     }
 
     /**
      * Clears the cache. Deletes all cached files from disk.
      */
-    @Override
     public synchronized void clearCache() {
         File[] files = mRootDirectory.listFiles();
         if (files != null) {
@@ -89,7 +87,6 @@ public class DiskBasedCache implements Cache {
     /**
      * Returns the cache entry with the specified key if it exists, null otherwise.
      */
-    @Override
     public synchronized Entry getEntry(String key) {
         CacheHeader entry = mEntries.get(key);
         // if the entry does not exist, return.
@@ -119,10 +116,9 @@ public class DiskBasedCache implements Cache {
     }
 
     /**
-     * Initializes the DiskBasedCache by scanning for all files currently in the
+     * Initializes the DiskCache by scanning for all files currently in the
      * specified root directory. Creates the root directory if necessary.
      */
-    @Override
     public synchronized void initialize() {
         if (!mRootDirectory.exists()) {
             if (!mRootDirectory.mkdirs()) {
@@ -165,7 +161,6 @@ public class DiskBasedCache implements Cache {
      * @param key Cache key
      * @param expireTime The new expireTime
      */
-    @Override
     public synchronized void invalidate(String key, long expireTime) {
         Entry entry = getEntry(key);
         if (Entry.invalidate(entry, expireTime)) {
@@ -176,7 +171,6 @@ public class DiskBasedCache implements Cache {
     /**
      * Puts the entry with the specified key into the cache.
      */
-    @Override
     public synchronized void putEntry(String key, Entry entry) {
         pruneIfNeeded(entry.data.length);
         File file = getFileForKey(key);
@@ -199,7 +193,6 @@ public class DiskBasedCache implements Cache {
     /**
      * Removes the specified key from the cache if it exists.
      */
-    @Override
     public synchronized void removeEntry(String key) {
         boolean deleted = getFileForKey(key).delete();
 
@@ -354,13 +347,6 @@ public class DiskBasedCache implements Cache {
             entry.key = readString(is);
             entry.expireTime = readLong(is);
             entry.charset = readString(is);
-//            if (entry.etag.equals("")) {
-//                entry.etag = null;
-//            }
-//            entry.serverDate = readLong(is);
-//            entry.ttl = readLong(is);
-//            entry.softTtl = readLong(is);
-//            entry.responseHeaders = readStringStringMap(is);
             return entry;
         }
 
@@ -390,11 +376,6 @@ public class DiskBasedCache implements Cache {
                 writeString(os, key);
                 writeLong(os, expireTime);
                 writeString(os, charset);
-//				writeString(os, etag == null ? "" : etag);
-//				writeLong(os, serverDate);
-//				writeLong(os, ttl);
-//				writeLong(os, softTtl);
-//				writeStringStringMap(responseHeaders, os);
                 os.flush();
                 return true;
             } catch (IOException e) {
@@ -402,8 +383,54 @@ public class DiskBasedCache implements Cache {
                 return false;
             }
         }
-
     }
+
+	/**
+	 * Data and metadata for an entry returned by the cache.
+	 */
+	public static class Entry {
+		public Entry() {}
+
+		public Entry(byte[] data, String charset) {
+			this.data = data;
+			this.charset = charset;
+		}
+
+		/** The data returned from cache. */
+		public byte[] data;
+
+		/** Expire time for cache entry. */
+		public long expireTime;
+
+		/** Charset for cache entry, retrieve by the http header. */
+		public String charset;
+
+		/** True if the entry is expired. */
+		public boolean isExpired() {
+			return expireTime < System.currentTimeMillis();
+		}
+
+		/** True if a refresh is needed from the original data source. */
+		public boolean refreshNeeded() {
+			// still unimplemented, might be use a constant like 'refreshTime'?
+			return this.expireTime < System.currentTimeMillis();
+		}
+
+		/** Get the cache data size in byte. */
+		public int getSize() {
+			return data != null ? data.length : 0;
+		}
+
+		/** Invalidate cache entry by the expireTime. */
+		public static boolean invalidate(Entry entry, long expireTime) {
+			if (entry != null) {
+				entry.expireTime = expireTime;
+				return true;
+			}
+			return false;
+		}
+
+	}
 
     private static class CountingInputStream extends FilterInputStream {
         private int bytesRead = 0;

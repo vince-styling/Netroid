@@ -25,14 +25,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
-            android:textSize="16sp"
+            android:textSize="14sp"
             android:textColor="#ffffff"/>
 
         <TextView
             android:id="@+id/txvAuthor"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="14sp"
+            android:textSize="12sp"
             android:textColor="#ffffff"/>
 
     </LinearLayout>

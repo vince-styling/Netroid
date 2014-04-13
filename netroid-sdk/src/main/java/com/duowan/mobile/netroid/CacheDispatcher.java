@@ -17,7 +17,7 @@
 package com.duowan.mobile.netroid;
 
 import android.os.Process;
-import com.duowan.mobile.netroid.cache.CacheChain;
+import com.duowan.mobile.netroid.cache.DiskCache;
 
 import java.util.concurrent.BlockingQueue;
 
@@ -41,8 +41,8 @@ public class CacheDispatcher extends Thread {
     /** The queue of requests going out to the network. */
     private final BlockingQueue<Request> mNetworkQueue;
 
-    /** The cacheChain to read from. */
-    private final CacheChain mCaches;
+	/** The cache to read from. */
+    private final DiskCache mCache;
 
     /** For posting responses. */
     private final Delivery mDelivery;
@@ -56,17 +56,16 @@ public class CacheDispatcher extends Thread {
      *
      * @param cacheQueue Queue of incoming requests for triage
      * @param networkQueue Queue to post requests that require network to
-     * @param caches Cache interface to use for resolution
+     * @param cache Cache interface to use for resolution
      * @param delivery Delivery interface to use for posting responses
      */
-    public CacheDispatcher(
-            BlockingQueue<Request> cacheQueue, BlockingQueue<Request> networkQueue,
-            CacheChain caches, Delivery delivery) {
-        mCacheQueue = cacheQueue;
-        mNetworkQueue = networkQueue;
-		mCaches = caches;
-        mDelivery = delivery;
-    }
+    public CacheDispatcher(BlockingQueue<Request> cacheQueue, BlockingQueue<Request> networkQueue,
+						   DiskCache cache, Delivery delivery) {
+		mCache = cache;
+		mDelivery = delivery;
+		mCacheQueue = cacheQueue;
+		mNetworkQueue = networkQueue;
+	}
 
     /**
      * Forces this dispatcher to quit immediately.  If any requests are still in
@@ -83,7 +82,7 @@ public class CacheDispatcher extends Thread {
         Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
 
         // Make a blocking call to initialize the cache.
-        mCaches.initialize();
+		if (mCache != null) mCache.initialize();
 
         while (true) {
             try {
@@ -102,7 +101,7 @@ public class CacheDispatcher extends Thread {
                 }
 
 				// Attempt to retrieve this item from cache.
-				Cache.Entry entry = mCaches.getEntry(request.getCacheKey(), request.getCacheSequence());
+				DiskCache.Entry entry = mCache != null ? mCache.getEntry(request.getCacheKey()) : null;
 				if (entry == null) {
 					request.addMarker("cache-miss");
 					// Cache miss; send off to the network dispatcher.
@@ -111,12 +110,10 @@ public class CacheDispatcher extends Thread {
 					continue;
 				}
 
-				NetroidLog.d("shouldCache : " + request.shouldCache() + " isExpired : " + entry.isExpired());
+				NetroidLog.e("shouldCache : " + request.shouldCache() + " isExpired : " + entry.isExpired());
 
                 // If it is completely expired, just send it to the network.
                 if (entry.isExpired()) {
-					// removeEntry is unnecessary because the new response entry may replace it soon enough
-//					mCaches.removeEntry(request.getCacheKey(), request.getCacheSequence());
 					request.addMarker("cache-hit-expired");
                     mNetworkQueue.put(request);
 					mDelivery.postNetworking(request);

@@ -8,10 +8,9 @@ import android.widget.Button;
 import android.widget.ImageView;
 import com.duowan.mobile.example.netroid.netroid.Netroid;
 import com.duowan.mobile.example.netroid.netroid.SelfImageLoader;
-import com.duowan.mobile.netroid.*;
-import com.duowan.mobile.netroid.cache.CacheWrapper;
-import com.duowan.mobile.netroid.cache.DiskBasedCache;
-import com.duowan.mobile.netroid.cache.MemoryBasedCache;
+import com.duowan.mobile.netroid.RequestQueue;
+import com.duowan.mobile.netroid.cache.BitmapImageCache;
+import com.duowan.mobile.netroid.cache.DiskCache;
 import com.duowan.mobile.netroid.image.NetworkImageView;
 import com.duowan.mobile.netroid.toolbox.ImageLoader;
 
@@ -19,7 +18,7 @@ import java.io.File;
 
 public class ImageRequestActivity extends Activity implements View.OnClickListener {
 	private RequestQueue mQueue;
-	private ImageLoader imageLoader;
+	private ImageLoader mImageLoader;
 	private ImageView mImageView;
 	private NetworkImageView mNetworkImageView;
 	private Button btnLoadSingleImage;
@@ -52,11 +51,8 @@ public class ImageRequestActivity extends Activity implements View.OnClickListen
 		File diskCacheDir = new File(getCacheDir(), "netroid");
 		int diskCacheSize = 50 * 1024 * 1024; // 50MB
 
-		mQueue = Netroid.newRequestQueue(getApplicationContext(),
-				new CacheWrapper(Const.CACHE_KEY_MEMORY, new MemoryBasedCache(memoryCacheSize)),
-				new CacheWrapper(Const.CACHE_KEY_DISK, new DiskBasedCache(diskCacheDir, diskCacheSize)));
-
-		imageLoader = new SelfImageLoader(mQueue, getResources(), getAssets());
+		mQueue = Netroid.newRequestQueue(getApplicationContext(), new DiskCache(diskCacheDir, diskCacheSize));
+		mImageLoader = new SelfImageLoader(mQueue, new BitmapImageCache(memoryCacheSize), getResources(), getAssets());
 	}
 
 	@Override
@@ -88,20 +84,20 @@ public class ImageRequestActivity extends Activity implements View.OnClickListen
 		String url = "http://upload.newhua.com/3/3e/1292303714308.jpg";
 		ImageLoader.ImageListener listener = ImageLoader.getImageListener(mImageView,
 						android.R.drawable.ic_menu_rotate, android.R.drawable.ic_delete);
-		imageLoader.get(url, listener);
+		mImageLoader.get(url, listener);
 	}
 
 	private void loadHttpImage() {
 		String url = "http://i3.sinaimg.cn/blog/sports/idx/2014/0114/U5295P346T302D1F7961DT20140114132743.jpg";
-		mNetworkImageView.setImageUrl(url, imageLoader);
+		mNetworkImageView.setImageUrl(url, mImageLoader);
 	}
 
 	private void loadAssetsImage() {
-		mNetworkImageView.setImageUrl(SelfImageLoader.RES_ASSETS + "cover_16539.jpg", imageLoader);
+		mNetworkImageView.setImageUrl(SelfImageLoader.RES_ASSETS + "cover_16539.jpg", mImageLoader);
 	}
 
 	private void loadSdcardImage() {
-		mNetworkImageView.setImageUrl(SelfImageLoader.RES_SDCARD + "/sdcard/sample.jpg", imageLoader);
+		mNetworkImageView.setImageUrl(SelfImageLoader.RES_SDCARD + "/sdcard/sample.jpg", mImageLoader);
 	}
 
 	private void loadGridView() {

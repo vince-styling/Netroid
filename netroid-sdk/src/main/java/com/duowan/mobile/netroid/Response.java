@@ -16,6 +16,8 @@
 
 package com.duowan.mobile.netroid;
 
+import com.duowan.mobile.netroid.cache.DiskCache;
+
 /**
  * Encapsulates a parsed response for delivery.
  * @param <T> Parsed type of this response
@@ -24,7 +26,7 @@ public class Response<T> {
 
     /** Returns a successful response containing the parsed result. */
     public static <T> Response<T> success(T result, NetworkResponse response) {
-        return new Response<T>(result, new Cache.Entry(response.data, response.charset));
+        return new Response<T>(result, new DiskCache.Entry(response.data, response.charset));
     }
 
     /**
@@ -39,7 +41,7 @@ public class Response<T> {
     public final T result;
 
     /** Cache metadata for this response, or null in the case of error. */
-    public final Cache.Entry cacheEntry;
+    public final DiskCache.Entry cacheEntry;
 
     /** Detailed error information if <code>errorCode != OK</code>. */
     public final NetroidError error;
@@ -54,7 +56,7 @@ public class Response<T> {
         return error == null;
     }
 
-    private Response(T result, Cache.Entry cacheEntry) {
+    private Response(T result, DiskCache.Entry cacheEntry) {
         this.result = result;
         this.cacheEntry = cacheEntry;
         this.error = null;

@@ -16,7 +16,6 @@
 
 package com.duowan.mobile.netroid;
 
-import android.net.TrafficStats;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.SystemClock;
@@ -70,9 +69,6 @@ public abstract class Request<T> implements Comparable<Request<T>> {
 	/** The additional headers. */
 	private HashMap<String, String> mHashHeaders;
 
-	/** Default tag for {@link TrafficStats}. */
-	public static final int TRAFFICSTATS_TAG = 94201314;
-
     /** Listener interface for response and error. */
     private Listener<T> mListener;
 
@@ -81,10 +77,6 @@ public abstract class Request<T> implements Comparable<Request<T>> {
 
     /** The request queue this request is associated with. */
     private RequestQueue mRequestQueue;
-
-    /** Which cache should be use, some cache key set by the {@link RequestQueue#putCache(int, Cache)},
-	 * an ordered chain so it had priority to schedule, null or empty means not use cache. */
-    private int[] mCacheSequence;
 
 	/** perform request directly, ignore which caches should be used. */
 	private boolean mForceUpdate;
@@ -156,13 +148,6 @@ public abstract class Request<T> implements Comparable<Request<T>> {
      */
     public Object getTag() {
         return mTag;
-    }
-
-    /**
-     * @return A tag for use with {@link TrafficStats#setThreadStatsTag(int)}
-     */
-    public int getTrafficStatsTag() {
-        return TRAFFICSTATS_TAG;
     }
 
     /**
@@ -273,7 +258,7 @@ public abstract class Request<T> implements Comparable<Request<T>> {
 	}
 
 	/**
-	 * Set how long the cache is expired, {@link com.duowan.mobile.netroid.cache.CacheChain}
+	 * Set how long the cache is expired, {@link com.duowan.mobile.netroid.cache.DiskCache}
 	 * will determine the cache entry is expired or not.
 	 * For example :
 	 * Request.setCacheExpireTime(TimeUnit.MINUTES, 1); // cache stays one minute
@@ -428,26 +413,10 @@ public abstract class Request<T> implements Comparable<Request<T>> {
 	}
 
 	/**
-	 * Set a cache sequence.
-	 * @param cacheSequence a priority cache sequence
-	 */
-	public void setCacheSequence(int... cacheSequence) {
-		this.mCacheSequence = cacheSequence;
-	}
-
-	/**
-	 * Get the cache sequence.
-	 * @return the cache sequence
-	 */
-	public int[] getCacheSequence() {
-		return mCacheSequence;
-	}
-
-	/**
      * Returns true if responses to this request should be cached.
      */
     public final boolean shouldCache() {
-		return mCacheSequence != null && mCacheSequence.length > 0 && mCacheExpireTime > 0;
+		return mCacheExpireTime > 0;
 	}
 
 	/**
@@ -616,8 +585,6 @@ public abstract class Request<T> implements Comparable<Request<T>> {
 
     @Override
     public String toString() {
-        String trafficStatsTag = "0x" + Integer.toHexString(getTrafficStatsTag());
-        return (mCanceled ? "[X] " : "[ ] ") + getUrl() + " " + trafficStatsTag + " "
-                + getPriority() + " " + mSequence;
+        return (mCanceled ? "[X] " : "[ ] ") + getUrl() + " " + getPriority() + " " + mSequence;
     }
 }

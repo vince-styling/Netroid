@@ -16,10 +16,8 @@
 
 package com.duowan.mobile.netroid;
 
-import android.net.TrafficStats;
-import android.os.Build;
 import android.os.Process;
-import com.duowan.mobile.netroid.cache.CacheChain;
+import com.duowan.mobile.netroid.cache.DiskCache;
 
 import java.util.concurrent.BlockingQueue;
 
@@ -28,8 +26,8 @@ import java.util.concurrent.BlockingQueue;
  *
  * Requests added to the specified queue are processed from the network via a
  * specified {@link Network} interface. Responses are committed to cache, if
- * eligible, using a specified {@link Cache} interface. Valid responses and
- * errors are posted back to the caller via a {@link Delivery}.
+ * eligible, using a specified {@link com.duowan.mobile.netroid.cache.DiskCache} interface.
+ * Valid responses and errors are posted back to the caller via a {@link Delivery}.
  */
 @SuppressWarnings("rawtypes")
 public class NetworkDispatcher extends Thread {
@@ -40,7 +38,7 @@ public class NetworkDispatcher extends Thread {
     private final Network mNetwork;
 
 	/** The cache to write to. */
-    private final CacheChain mCaches;
+    private final DiskCache mCache;
 
 	/** For posting responses and errors. */
     private final Delivery mDelivery;
@@ -54,15 +52,15 @@ public class NetworkDispatcher extends Thread {
      *
      * @param queue Queue of incoming requests for triage
      * @param network Network interface to use for performing requests
-     * @param caches Cache chain to use for writing responses to cache
+	 * @param cache Cache interface to use for writing responses to cache
      * @param delivery Delivery interface to use for posting responses
      */
     public NetworkDispatcher(BlockingQueue<Request> queue,
-            Network network, CacheChain caches,
+            Network network, DiskCache cache,
             Delivery delivery) {
         mQueue = queue;
-        mNetwork = network;
-        mCaches = caches;
+		mCache = cache;
+		mNetwork = network;
         mDelivery = delivery;
     }
 
@@ -102,33 +100,20 @@ public class NetworkDispatcher extends Thread {
                     continue;
                 }
 
-                // Tag the request (if API >= 14)
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-                    TrafficStats.setThreadStatsTag(request.getTrafficStatsTag());
-                }
-
-				NetroidLog.d("shouldCache : " + request.shouldCache() + " priority : " + request.getPriority() + " tag : " + request.getTag());
+				NetroidLog.e("shouldCache : " + request.shouldCache() + " priority : " + request.getPriority() + " tag : " + request.getTag());
 
                 // Perform the network request.
                 NetworkResponse networkResponse = mNetwork.performRequest(request);
                 request.addMarker("network-http-complete");
-
-//                // If the server returned 304 AND we delivered a response already,
-//                // we're done -- don't deliver a second identical response.
-				// CHANGES : we assume it never return NOT_MODIFIED Status because we didn't send header of last request.
-//                if (networkResponse.notModified && request.hasHadResponseDelivered()) {
-//                    request.finish("not-modified");
-//                    continue;
-//                }
 
                 // Parse the response here on the worker thread.
                 Response<?> response = request.parseNetworkResponse(networkResponse);
                 request.addMarker("network-parse-complete");
 
                 // Write to cache if applicable.
-				if (request.shouldCache() && response.cacheEntry != null) {
+				if (mCache != null && request.shouldCache() && response.cacheEntry != null) {
 					response.cacheEntry.expireTime = request.getCacheExpireTime();
-					mCaches.putEntry(request.getCacheKey(), response.cacheEntry, request.getCacheSequence());
+					mCache.putEntry(request.getCacheKey(), response.cacheEntry);
 					request.addMarker("network-cache-written");
 				}
 

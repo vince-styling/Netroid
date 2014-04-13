@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.RandomAccessFile;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Its purpose is provide a big file download impmenetation, suport continuous transmission
@@ -166,7 +167,7 @@ public class FileDownloadRequest extends Request<Void> {
 
 	/** Never use cache in this case. */
 	@Override
-	public void setCacheSequence(int... cacheSequence) {
+	public void setCacheExpireTime(TimeUnit timeUnit, int amount) {
 	}
 
 }

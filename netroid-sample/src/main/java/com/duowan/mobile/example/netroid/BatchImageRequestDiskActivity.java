@@ -13,8 +13,7 @@ import com.duowan.mobile.example.netroid.mock.BookDataMock;
 import com.duowan.mobile.example.netroid.netroid.Netroid;
 import com.duowan.mobile.example.netroid.netroid.SelfImageLoader;
 import com.duowan.mobile.netroid.RequestQueue;
-import com.duowan.mobile.netroid.cache.CacheWrapper;
-import com.duowan.mobile.netroid.cache.DiskBasedCache;
+import com.duowan.mobile.netroid.cache.DiskCache;
 import com.duowan.mobile.netroid.image.NetworkImageView;
 import com.duowan.mobile.netroid.request.ImageRequest;
 import com.duowan.mobile.netroid.toolbox.ImageLoader;
@@ -33,14 +32,12 @@ public class BatchImageRequestDiskActivity extends ListActivity {
 
 		File diskCacheDir = new File(getCacheDir(), "netroid");
 		int diskCacheSize = 50 * 1024 * 1024; // 50MB
-		mQueue = Netroid.newRequestQueue(getApplicationContext(),
-				new CacheWrapper(Const.CACHE_KEY_DISK, new DiskBasedCache(diskCacheDir, diskCacheSize)));
+		mQueue = Netroid.newRequestQueue(getApplicationContext(), new DiskCache(diskCacheDir, diskCacheSize));
 
-		mImageLoader = new SelfImageLoader(mQueue, getResources(), getAssets()) {
+		mImageLoader = new SelfImageLoader(mQueue, null, getResources(), getAssets()) {
 			@Override
 			public void makeRequest(ImageRequest request) {
-				request.setCacheSequence(Const.CACHE_KEY_DISK);
-				request.setCacheExpireTime(TimeUnit.DAYS, 10);
+				request.setCacheExpireTime(TimeUnit.MINUTES, 10);
 			}
 		};
 

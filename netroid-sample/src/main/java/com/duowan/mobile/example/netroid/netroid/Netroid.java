@@ -6,7 +6,7 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Build;
 import com.duowan.mobile.netroid.Network;
 import com.duowan.mobile.netroid.RequestQueue;
-import com.duowan.mobile.netroid.cache.CacheWrapper;
+import com.duowan.mobile.netroid.cache.DiskCache;
 import com.duowan.mobile.netroid.stack.HttpClientStack;
 import com.duowan.mobile.netroid.stack.HttpStack;
 import com.duowan.mobile.netroid.stack.HurlStack;
@@ -20,7 +20,7 @@ public class Netroid {
      * @param context A {@link Context} to use for creating the cache dir.
      * @return A started {@link RequestQueue} instance.
      */
-    public static RequestQueue newRequestQueue(Context context, CacheWrapper... caches) {
+    public static RequestQueue newRequestQueue(Context context, DiskCache cache) {
 		int poolSize = RequestQueue.DEFAULT_NETWORK_THREAD_POOL_SIZE;
 
 		HttpStack stack;
@@ -41,7 +41,7 @@ public class Netroid {
 		}
 
 		Network network = new BasicNetwork(stack, HTTP.UTF_8);
-		RequestQueue queue = new RequestQueue(network, poolSize, caches);
+		RequestQueue queue = new RequestQueue(network, poolSize, cache);
 		queue.start();
 
         return queue;

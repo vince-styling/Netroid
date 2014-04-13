@@ -16,34 +16,27 @@
 
 package com.duowan.mobile.netroid.cache;
 
-import com.duowan.mobile.netroid.Cache;
+import android.graphics.Bitmap;
+import com.duowan.mobile.netroid.toolbox.ImageLoader;
 
-/**
- * A cache that doesn't.
- */
-public class NoCache implements Cache {
-    @Override
-    public void clearCache() {
-    }
+public class BitmapImageCache extends LruCache<String, Bitmap> implements ImageLoader.ImageCache {
+	public BitmapImageCache(int maxSize) {
+		super(maxSize);
+	}
 
-    @Override
-    public Entry getEntry(String key) {
-        return null;
-    }
+	@Override
+	protected int sizeOf(String key, Bitmap value) {
+		return value.getRowBytes() * value.getHeight();
+	}
 
-    @Override
-    public void putEntry(String key, Entry entry) {
-    }
+	@Override
+	public Bitmap getBitmap(String url) {
+		return get(url);
+	}
 
-    @Override
-	public void invalidate(String key, long expireTime) {
-    }
+	@Override
+	public void putBitmap(String url, Bitmap bitmap) {
+		put(url, bitmap);
+	}
 
-    @Override
-    public void removeEntry(String key) {
-    }
-
-    @Override
-    public void initialize() {
-    }
 }

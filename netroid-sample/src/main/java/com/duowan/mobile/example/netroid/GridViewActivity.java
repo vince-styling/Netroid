@@ -12,6 +12,7 @@ import com.duowan.mobile.example.netroid.mock.BookDataMock;
 import com.duowan.mobile.example.netroid.netroid.Netroid;
 import com.duowan.mobile.example.netroid.netroid.SelfImageLoader;
 import com.duowan.mobile.netroid.RequestQueue;
+import com.duowan.mobile.netroid.cache.BitmapImageCache;
 import com.duowan.mobile.netroid.image.NetworkImageView;
 import com.duowan.mobile.netroid.toolbox.ImageLoader;
 
@@ -28,8 +29,11 @@ public class GridViewActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.gridview_acty);
 
-		mQueue = Netroid.newRequestQueue(getApplicationContext());
-		mImageLoader = new SelfImageLoader(mQueue, getResources(), getAssets());
+		mQueue = Netroid.newRequestQueue(getApplicationContext(), null);
+		int memoryCacheSize = 5 * 1024 * 1024;
+		ImageLoader.ImageCache cache = new BitmapImageCache(memoryCacheSize);
+		mImageLoader = new SelfImageLoader(mQueue, cache, getResources(), getAssets());
+//		mImageLoader = new SelfImageLoader(mQueue, null, getResources(), getAssets());
 
 		bookList = BookDataMock.getData();
 		while (bookList.size() > 5) {

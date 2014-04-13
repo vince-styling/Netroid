@@ -4,7 +4,6 @@ import android.content.res.AssetManager;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import com.duowan.mobile.example.netroid.Const;
 import com.duowan.mobile.netroid.NetworkResponse;
 import com.duowan.mobile.netroid.RequestQueue;
 import com.duowan.mobile.netroid.request.ImageRequest;
@@ -27,8 +26,8 @@ public class SelfImageLoader extends ImageLoader {
 	private AssetManager mAssetManager;
 	private Resources mResources;
 
-	public SelfImageLoader(RequestQueue queue, Resources resources, AssetManager assetManager) {
-		super(queue);
+	public SelfImageLoader(RequestQueue queue, ImageCache cache, Resources resources, AssetManager assetManager) {
+		super(queue, cache);
 		mResources = resources;
 		mAssetManager = assetManager;
 	}
@@ -86,8 +85,7 @@ public class SelfImageLoader extends ImageLoader {
 	}
 
 	public void makeRequest(ImageRequest request) {
-		request.setCacheSequence(Const.CACHE_KEY_MEMORY);
-		request.setCacheExpireTime(TimeUnit.MINUTES, 1);
+		request.setCacheExpireTime(TimeUnit.MINUTES, 10);
 	}
 
 	public static byte[] toBytes(InputStream is) throws IOException {
