@@ -1,4 +1,4 @@
-netroid.github.com
+Netroid Introduction
 =======================
 
-Netroid Introduction site files
+Netroid Introduction wrote by Chinese.
