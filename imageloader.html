@@ -1,0 +1,188 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang='zh-CN' xml:lang='zh-CN' xmlns='http://www.w3.org/1999/xhtml'>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="robots" content="noindex, nofollow, none, noarchive">
+    <link rel="stylesheet" href="/css/site.css" type="text/css" media="screen">
+    <title>Netroid ImageLoader</title>
+</head>
+<body>
+    <div class="container">
+        <div class="clearfix">
+            <div class="page-title">
+    <h1><a href="/">Netroid ImageLoader</a></h1>
+    <h2>last modified : 2014-04-13 17:45</h2>
+</div>
+<div class="primary">
+    <div class="post-thumb">
+        <html>
+ <head></head>
+ <body>
+  <h1>图片加载</h1> 
+  <p>使用Netroid提供的<code>ImageLoader</code>可以非常方便地实现图片加载功能，ImageLoader是一个抽象类，需要由开发者实现其中的创建请求方法：</p> 
+  <pre><span class="reserved_word">public</span> <span class="reserved_word">abstract</span> <span class="reserved_word">class</span> <span class="identifier">ImageLoader</span> <span class="braces">{</span>
+    <span class="reserved_word">public</span> <span class="reserved_word">abstract</span> <span class="identifier">ImageRequest</span> <span class="identifier">buildRequest</span><span class="braces">(</span><span class="identifier">String</span> <span class="identifier">requestUrl</span>, <span class="reserved_word">int</span> <span class="identifier">maxWidth</span>, <span class="reserved_word">int</span> <span class="identifier">maxHeight</span><span class="braces">)</span><span class="symbol">;</span>
+<span class="braces">}</span></pre> 
+  <p>这样做的原因是在创建请求时需要指定硬盘缓存的过期时间，这些必须由开发者根据需要自行设置：</p> 
+  <pre><span class="reserved_word">public</span> <span class="reserved_word">class</span> <span class="identifier">SelfImageLoader</span> <span class="reserved_word">extends</span> <span class="identifier">ImageLoader</span> <span class="braces">{</span>
+
+    @<span class="identifier">Override</span>
+    <span class="reserved_word">public</span> <span class="identifier">ImageRequest</span> <span class="identifier">buildRequest</span><span class="braces">(</span><span class="identifier">String</span> <span class="identifier">requestUrl</span>, <span class="reserved_word">int</span> <span class="identifier">maxWidth</span>, <span class="reserved_word">int</span> <span class="identifier">maxHeight</span><span class="braces">)</span> <span class="braces">{</span>
+        <span class="identifier">ImageRequest</span> <span class="identifier">request</span> <span class="symbol">=</span> <span class="reserved_word">new</span> <span class="identifier">ImageRequest</span><span class="braces">(</span><span class="identifier">requestUrl</span>, <span class="identifier">maxWidth</span>, <span class="identifier">maxHeight</span><span class="braces">)</span><span class="symbol">;</span>
+        <span class="identifier">request</span>.<span class="identifier">setCacheExpireTime</span><span class="braces">(</span><span class="identifier">TimeUnit</span>.<span class="identifier">MINUTES</span>, <span class="numeric">20</span><span class="braces">)</span><span class="symbol">;</span>
+        <span class="reserved_word">return</span> <span class="identifier">request</span><span class="symbol">;</span>
+    <span class="braces">}</span>
+
+<span class="braces">}</span></pre> 
+  <h2>单张图片</h2> 
+  <p>单张图片的加载可以通过发起<code>ImageRequest</code>请求来实现，但为了应用内存缓存，推荐使用 <strong>ImageLoader</strong> 来完成：</p> 
+  <pre><span class="identifier">String</span> <span class="identifier">url</span> <span class="symbol">=</span> <span class="string">&quot;http://server.domain/sample.jpg&quot;</span><span class="symbol">;</span>
+<span class="identifier">ImageLoader</span>.<span class="identifier">ImageListener</span> <span class="identifier">listener</span> <span class="symbol">=</span> <span class="identifier">ImageLoader</span>.<span class="identifier">getImageListener</span><span class="braces">(</span>
+    <span class="identifier">ImageView</span>, <span class="identifier">R</span>.<span class="identifier">drawable</span>.<span class="identifier">defaultImageResId</span>, <span class="identifier">R</span>.<span class="identifier">drawable</span>.<span class="identifier">errorImageResId</span><span class="braces">)</span><span class="symbol">;</span>
+
+<span class="comment">// 允许设置最终显示位置的尺寸，ImageLoader将根据比例缩放图片，不设置或设置为0代表使用图片原始尺寸</span>
+<span class="identifier">imageLoader</span>.<span class="identifier">get</span><span class="braces">(</span><span class="identifier">url</span>, <span class="identifier">listener</span>, <span class="identifier">ImageView</span>.<span class="identifier">getWidth</span><span class="braces">(</span><span class="braces">)</span>, <span class="identifier">ImageView</span>.<span class="identifier">getHeight</span><span class="braces">(</span><span class="braces">)</span><span class="braces">)</span><span class="symbol">;</span></pre> 
+  <h2>批量图片</h2> 
+  <p>Netroid提供了<code>NetworkImageView</code>专门用于批量图片加载的场景：</p> 
+  <pre><span class="reserved_word">public</span> <span class="reserved_word">class</span> <span class="identifier">NetworkImageView</span> <span class="reserved_word">extends</span> <span class="identifier">ImageView</span> <span class="braces">{</span>
+    <span class="reserved_word">private</span> <span class="identifier">String</span> <span class="identifier">mUrl</span><span class="symbol">;</span>
+
+    <span class="comment">// 默认显示的图片</span>
+    <span class="reserved_word">private</span> <span class="reserved_word">int</span> <span class="identifier">mDefaultImageId</span><span class="symbol">;</span>
+
+    <span class="comment">// 加载失败时显示的图片</span>
+    <span class="reserved_word">private</span> <span class="reserved_word">int</span> <span class="identifier">mErrorImageId</span><span class="symbol">;</span>
+
+    <span class="comment">// 主方法入口</span>
+    <span class="reserved_word">public</span> <span class="reserved_word">void</span> <span class="identifier">setImageUrl</span><span class="braces">(</span><span class="identifier">String</span> <span class="identifier">url</span>, <span class="identifier">ImageLoader</span> <span class="identifier">imageLoader</span><span class="braces">)</span> <span class="braces">{</span>
+        <span class="identifier">mUrl</span> <span class="symbol">=</span> <span class="identifier">url</span><span class="symbol">;</span>
+        <span class="identifier">mImageLoader</span> <span class="symbol">=</span> <span class="identifier">imageLoader</span><span class="symbol">;</span>
+        <span class="comment">// 这个方法将会对ImageView的尺寸是否有效、是否为同一张图片进行判断</span>
+        <span class="comment">// 在执行新请求前，也会取消上一次在这个View里启动的另一个已经失效的请求</span>
+        <span class="comment">// 由于篇幅的限制以及代码行数太多，这里不贴出具体实现的代码</span>
+        <span class="identifier">loadImageIfNecessary</span><span class="braces">(</span><span class="reserved_word">false</span><span class="braces">)</span><span class="symbol">;</span>
+    <span class="braces">}</span>
+
+    <span class="comment">// 如果图片已经滑离屏幕，变为不可见，将执行取消请求的操作</span>
+    @<span class="identifier">Override</span>
+    <span class="reserved_word">protected</span> <span class="reserved_word">void</span> <span class="identifier">onDetachedFromWindow</span><span class="braces">(</span><span class="braces">)</span> <span class="braces">{</span>
+        <span class="reserved_word">if</span> <span class="braces">(</span><span class="identifier">mImageContainer</span> <span class="symbol">!</span><span class="symbol">=</span> <span class="reserved_word">null</span><span class="braces">)</span> <span class="identifier">mImageContainer</span>.<span class="identifier">cancelRequest</span><span class="braces">(</span><span class="braces">)</span><span class="symbol">;</span>
+        <span class="reserved_word">super</span>.<span class="identifier">onDetachedFromWindow</span><span class="braces">(</span><span class="braces">)</span><span class="symbol">;</span>
+    <span class="braces">}</span>
+
+<span class="braces">}</span></pre> 
+  <p>在 <strong>Adapter.getView()</strong> 中只需要简单的调用 <strong>NetworkImageView.setImageUrl()</strong> 即可完成所有事情：</p> 
+  <pre><span class="reserved_word">public</span> <span class="identifier">View</span> <span class="identifier">getView</span><span class="braces">(</span><span class="reserved_word">int</span> <span class="identifier">position</span>, <span class="identifier">View</span> <span class="identifier">convertView</span>, <span class="identifier">ViewGroup</span> <span class="identifier">parent</span><span class="braces">)</span> <span class="braces">{</span>
+    <span class="reserved_word">if</span> <span class="braces">(</span><span class="identifier">convertView</span> <span class="symbol">=</span><span class="symbol">=</span> <span class="reserved_word">null</span><span class="braces">)</span> <span class="braces">{</span>
+        <span class="identifier">convertView</span> <span class="symbol">=</span> <span class="identifier">getLayoutInflater</span><span class="braces">(</span><span class="braces">)</span>.<span class="identifier">inflate</span><span class="braces">(</span><span class="identifier">R</span>.<span class="identifier">layout</span>.<span class="identifier">list_item</span>, <span class="reserved_word">null</span><span class="braces">)</span><span class="symbol">;</span>
+    <span class="braces">}</span>
+
+    <span class="identifier">NetworkImageView</span> <span class="identifier">imvCover</span> <span class="symbol">=</span> <span class="braces">(</span><span class="identifier">NetworkImageView</span><span class="braces">)</span> <span class="identifier">convertView</span>.<span class="identifier">findViewById</span><span class="braces">(</span><span class="identifier">R</span>.<span class="identifier">id</span>.<span class="identifier">imvCover</span><span class="braces">)</span><span class="symbol">;</span>
+    <span class="identifier">TextView</span> <span class="identifier">txvAuthor</span> <span class="symbol">=</span> <span class="braces">(</span><span class="identifier">TextView</span><span class="braces">)</span> <span class="identifier">convertView</span>.<span class="identifier">findViewById</span><span class="braces">(</span><span class="identifier">R</span>.<span class="identifier">id</span>.<span class="identifier">txvAuthor</span><span class="braces">)</span><span class="symbol">;</span>
+    <span class="identifier">TextView</span> <span class="identifier">txvName</span> <span class="symbol">=</span> <span class="braces">(</span><span class="identifier">TextView</span><span class="braces">)</span> <span class="identifier">convertView</span>.<span class="identifier">findViewById</span><span class="braces">(</span><span class="identifier">R</span>.<span class="identifier">id</span>.<span class="identifier">txvName</span><span class="braces">)</span><span class="symbol">;</span>
+
+    <span class="identifier">imvCover</span>.<span class="identifier">setImageUrl</span><span class="braces">(</span><span class="identifier">Book</span>.<span class="identifier">getImageUrl</span><span class="braces">(</span><span class="braces">)</span>, <span class="identifier">mImageLoader</span><span class="braces">)</span><span class="symbol">;</span>
+    <span class="identifier">txvAuthor</span>.<span class="identifier">setText</span><span class="braces">(</span><span class="identifier">Book</span>.<span class="identifier">getAuthor</span><span class="braces">(</span><span class="braces">)</span><span class="braces">)</span><span class="symbol">;</span>
+    <span class="identifier">txvName</span>.<span class="identifier">setText</span><span class="braces">(</span><span class="identifier">Book</span>.<span class="identifier">getName</span><span class="braces">(</span><span class="braces">)</span><span class="braces">)</span><span class="symbol">;</span>
+
+    <span class="reserved_word">return</span> <span class="identifier">convertView</span><span class="symbol">;</span>
+<span class="braces">}</span></pre> 
+  <p>ImageLoader内部对于批量加载做了很好的处理，开发者可以设定每个任务的延时执行时间，在列表快速滑动时，可最大限度避免已离开屏幕的失效请求占用线程资源。 在请求执行前，会根据url对请求进行重复性判断，避免相同的url执行多次，在请求失效时会立即调用 <strong>Request.cancel()</strong> 方法尝试终止操作。</p> 
+  <p>注：在图片一次加载成功后不再改变的情况下，可以使用普通的ImageView，但在ListView、GridView这种场景时建议使用 <strong>NetworkImageView</strong>， 特别是遇到GridView position 0多次getView的bug时，普通的ImageView将会导致图片错位的异常问题，这种情况在演示程序中有专门的解决方案。</p> 
+  <h2 id="http">非Http图片</h2> 
+  <p>默认情况下，ImageLoader只能加载网络图片并使用缓存方案，但在实际开发中你除此之外可能也需要读取assets、raw、drawable、sdcard 目录中的图片资源，这种非Http的请求在原来的Volley架构中是无法实现的。</p> 
+  <p>为了避免重复开发，Netroid对此做了扩展，只需要重写 <strong>Request.perform()</strong> 方法， 手动构造 <strong>NetworkResponse</strong> 对象，就可以模拟Http请求完成整个流程。</p> 
+  <pre><span class="identifier">ImageRequest</span> <span class="identifier">request</span> <span class="symbol">=</span> <span class="reserved_word">new</span> <span class="identifier">ImageRequest</span><span class="braces">(</span><span class="string">&quot;image_file_name_in_assert_folder.jpg&quot;</span>, ...<span class="braces">)</span> <span class="braces">{</span>
+    <span class="comment">// 核心代码在于重写perform方法，返回NetworkResponse实例</span>
+    @<span class="identifier">Override</span>
+    <span class="reserved_word">public</span> <span class="identifier">NetworkResponse</span> <span class="identifier">perform</span><span class="braces">(</span><span class="braces">)</span> <span class="braces">{</span>
+        <span class="reserved_word">try</span> <span class="braces">{</span>
+            <span class="reserved_word">return</span> <span class="reserved_word">new</span> <span class="identifier">NetworkResponse</span><span class="braces">(</span><span class="identifier">InputStreamToBytes</span><span class="braces">(</span><span class="identifier">getAssets</span><span class="braces">(</span><span class="braces">)</span>.<span class="identifier">open</span><span class="braces">(</span><span class="identifier">getUrl</span><span class="braces">(</span><span class="braces">)</span><span class="braces">)</span><span class="braces">)</span>, <span class="identifier">HTTP</span>.<span class="identifier">UTF_8</span><span class="braces">)</span><span class="symbol">;</span>
+        <span class="braces">}</span> <span class="reserved_word">catch</span> <span class="braces">(</span><span class="identifier">IOException</span> <span class="identifier">e</span><span class="braces">)</span> <span class="braces">{</span>
+            <span class="reserved_word">return</span> <span class="reserved_word">new</span> <span class="identifier">NetworkResponse</span><span class="braces">(</span><span class="reserved_word">new</span> <span class="reserved_word">byte</span><span class="braces">[</span><span class="numeric">1</span><span class="braces">]</span>, <span class="identifier">HTTP</span>.<span class="identifier">UTF_8</span><span class="braces">)</span><span class="symbol">;</span>
+        <span class="braces">}</span>
+    <span class="braces">}</span>
+<span class="braces">}</span><span class="symbol">;</span></pre> 
+  <p>在 <strong>perform()</strong> 方法中，只需要加载assets资源为字节数组返回即可，InputStreamToBytes()方法的实现在此不详细列出。 这个扩展方案解决了无法加载本地资源的问题，得以继续应用Cache、ImageLoader的强大功能。</p> 
+  <p>ImageLoader通过重写 <strong>buildRequest()</strong> 方法来实现同时兼容sdcard、http、assets等不同的图片来源：</p> 
+  <pre><span class="reserved_word">public</span> <span class="reserved_word">class</span> <span class="identifier">SelfImageLoader</span> <span class="reserved_word">extends</span> <span class="identifier">ImageLoader</span> <span class="braces">{</span>
+
+    <span class="reserved_word">public</span> <span class="reserved_word">static</span> <span class="reserved_word">final</span> <span class="identifier">String</span> <span class="identifier">RES_ASSETS</span> <span class="symbol">=</span> <span class="string">&quot;assets://&quot;</span><span class="symbol">;</span>
+    <span class="reserved_word">public</span> <span class="reserved_word">static</span> <span class="reserved_word">final</span> <span class="identifier">String</span> <span class="identifier">RES_SDCARD</span> <span class="symbol">=</span> <span class="string">&quot;sdcard://&quot;</span><span class="symbol">;</span>
+    <span class="reserved_word">public</span> <span class="reserved_word">static</span> <span class="reserved_word">final</span> <span class="identifier">String</span> <span class="identifier">RES_HTTP</span> <span class="symbol">=</span> <span class="string">&quot;http://&quot;</span><span class="symbol">;</span>
+
+    <span class="reserved_word">private</span> <span class="identifier">AssetManager</span> <span class="identifier">mAssetManager</span><span class="symbol">;</span>
+
+    <span class="reserved_word">public</span> <span class="identifier">SelfImageLoader</span><span class="braces">(</span><span class="identifier">RequestQueue</span> <span class="identifier">queue</span>, <span class="identifier">AssetManager</span> <span class="identifier">assetManager</span><span class="braces">)</span> <span class="braces">{</span>
+        <span class="reserved_word">super</span><span class="braces">(</span><span class="identifier">queue</span><span class="braces">)</span><span class="symbol">;</span>
+        <span class="identifier">mAssetManager</span> <span class="symbol">=</span> <span class="identifier">assetManager</span><span class="symbol">;</span>
+    <span class="braces">}</span>
+
+    @<span class="identifier">Override</span>
+    <span class="reserved_word">public</span> <span class="identifier">ImageRequest</span> <span class="identifier">buildRequest</span><span class="braces">(</span><span class="identifier">String</span> <span class="identifier">requestUrl</span>, <span class="reserved_word">int</span> <span class="identifier">maxWidth</span>, <span class="reserved_word">int</span> <span class="identifier">maxHeight</span><span class="braces">)</span> <span class="braces">{</span>
+        <span class="identifier">ImageRequest</span> <span class="identifier">request</span><span class="symbol">;</span>
+        <span class="reserved_word">if</span> <span class="braces">(</span><span class="identifier">requestUrl</span>.<span class="identifier">startsWith</span><span class="braces">(</span><span class="identifier">RES_ASSETS</span><span class="braces">)</span><span class="braces">)</span> <span class="braces">{</span>
+            <span class="identifier">request</span> <span class="symbol">=</span> <span class="reserved_word">new</span> <span class="identifier">ImageRequest</span><span class="braces">(</span><span class="identifier">requestUrl</span>.<span class="identifier">substring</span><span class="braces">(</span><span class="identifier">RES_ASSETS</span>.<span class="identifier">length</span><span class="braces">(</span><span class="braces">)</span><span class="braces">)</span>, <span class="identifier">maxWidth</span>, <span class="identifier">maxHeight</span><span class="braces">)</span> <span class="braces">{</span>
+                @<span class="identifier">Override</span>
+                <span class="reserved_word">public</span> <span class="identifier">NetworkResponse</span> <span class="identifier">perform</span><span class="braces">(</span><span class="braces">)</span> <span class="braces">{</span>
+                    <span class="reserved_word">try</span> <span class="braces">{</span>
+                        <span class="reserved_word">return</span> <span class="reserved_word">new</span> <span class="identifier">NetworkResponse</span><span class="braces">(</span><span class="identifier">toBytes</span><span class="braces">(</span><span class="identifier">mAssetManager</span>.<span class="identifier">open</span><span class="braces">(</span><span class="identifier">getUrl</span><span class="braces">(</span><span class="braces">)</span><span class="braces">)</span><span class="braces">)</span>, <span class="identifier">HTTP</span>.<span class="identifier">UTF_8</span><span class="braces">)</span><span class="symbol">;</span>
+                    <span class="braces">}</span> <span class="reserved_word">catch</span> <span class="braces">(</span><span class="identifier">IOException</span> <span class="identifier">e</span><span class="braces">)</span> <span class="braces">{</span>
+                        <span class="reserved_word">return</span> <span class="reserved_word">new</span> <span class="identifier">NetworkResponse</span><span class="braces">(</span><span class="reserved_word">new</span> <span class="reserved_word">byte</span><span class="braces">[</span><span class="numeric">1</span><span class="braces">]</span>, <span class="identifier">HTTP</span>.<span class="identifier">UTF_8</span><span class="braces">)</span><span class="symbol">;</span>
+                    <span class="braces">}</span>
+                <span class="braces">}</span>
+            <span class="braces">}</span><span class="symbol">;</span>
+        <span class="braces">}</span>
+        <span class="reserved_word">else</span> <span class="reserved_word">if</span> <span class="braces">(</span><span class="identifier">requestUrl</span>.<span class="identifier">startsWith</span><span class="braces">(</span><span class="identifier">RES_SDCARD</span><span class="braces">)</span><span class="braces">)</span> <span class="braces">{</span>
+            <span class="identifier">request</span> <span class="symbol">=</span> <span class="reserved_word">new</span> <span class="identifier">ImageRequest</span><span class="braces">(</span><span class="identifier">requestUrl</span>.<span class="identifier">substring</span><span class="braces">(</span><span class="identifier">RES_SDCARD</span>.<span class="identifier">length</span><span class="braces">(</span><span class="braces">)</span><span class="braces">)</span>, <span class="identifier">maxWidth</span>, <span class="identifier">maxHeight</span><span class="braces">)</span> <span class="braces">{</span>
+                @<span class="identifier">Override</span>
+                <span class="reserved_word">public</span> <span class="identifier">NetworkResponse</span> <span class="identifier">perform</span><span class="braces">(</span><span class="braces">)</span> <span class="braces">{</span>
+                    <span class="reserved_word">try</span> <span class="braces">{</span>
+                        <span class="reserved_word">return</span> <span class="reserved_word">new</span> <span class="identifier">NetworkResponse</span><span class="braces">(</span><span class="identifier">toBytes</span><span class="braces">(</span><span class="reserved_word">new</span> <span class="identifier">FileInputStream</span><span class="braces">(</span><span class="identifier">getUrl</span><span class="braces">(</span><span class="braces">)</span><span class="braces">)</span><span class="braces">)</span>, <span class="identifier">HTTP</span>.<span class="identifier">UTF_8</span><span class="braces">)</span><span class="symbol">;</span>
+                    <span class="braces">}</span> <span class="reserved_word">catch</span> <span class="braces">(</span><span class="identifier">IOException</span> <span class="identifier">e</span><span class="braces">)</span> <span class="braces">{</span>
+                        <span class="reserved_word">return</span> <span class="reserved_word">new</span> <span class="identifier">NetworkResponse</span><span class="braces">(</span><span class="reserved_word">new</span> <span class="reserved_word">byte</span><span class="braces">[</span><span class="numeric">1</span><span class="braces">]</span>, <span class="identifier">HTTP</span>.<span class="identifier">UTF_8</span><span class="braces">)</span><span class="symbol">;</span>
+                    <span class="braces">}</span>
+                <span class="braces">}</span>
+            <span class="braces">}</span><span class="symbol">;</span>
+        <span class="braces">}</span>
+        <span class="reserved_word">else</span> <span class="reserved_word">if</span> <span class="braces">(</span><span class="identifier">requestUrl</span>.<span class="identifier">startsWith</span><span class="braces">(</span><span class="identifier">RES_HTTP</span><span class="braces">)</span><span class="braces">)</span> <span class="braces">{</span>
+            <span class="identifier">request</span> <span class="symbol">=</span> <span class="reserved_word">new</span> <span class="identifier">ImageRequest</span><span class="braces">(</span><span class="identifier">requestUrl</span>, <span class="identifier">maxWidth</span>, <span class="identifier">maxHeight</span><span class="braces">)</span><span class="symbol">;</span>
+        <span class="braces">}</span>
+        <span class="reserved_word">else</span> <span class="braces">{</span>
+            <span class="reserved_word">return</span> <span class="reserved_word">null</span><span class="symbol">;</span>
+        <span class="braces">}</span>
+
+        <span class="identifier">makeRequest</span><span class="braces">(</span><span class="identifier">request</span><span class="braces">)</span><span class="symbol">;</span>
+        <span class="reserved_word">return</span> <span class="identifier">request</span><span class="symbol">;</span>
+    <span class="braces">}</span>
+
+    <span class="reserved_word">public</span> <span class="reserved_word">void</span> <span class="identifier">makeRequest</span><span class="braces">(</span><span class="identifier">ImageRequest</span> <span class="identifier">request</span><span class="braces">)</span> <span class="braces">{</span>
+        <span class="identifier">request</span>.<span class="identifier">setCacheExpireTime</span><span class="braces">(</span><span class="identifier">TimeUnit</span>.<span class="identifier">MINUTES</span>, <span class="numeric">30</span><span class="braces">)</span><span class="symbol">;</span>
+    <span class="braces">}</span>
+
+<span class="braces">}</span>
+
+<span class="comment">// 示例：读取http资源的调用方法</span>
+<span class="identifier">String</span> <span class="identifier">url</span> <span class="symbol">=</span> <span class="string">&quot;http://server.domain/sample.jpg&quot;</span><span class="symbol">;</span>
+<span class="identifier">ImageLoader</span>.<span class="identifier">get</span><span class="braces">(</span><span class="identifier">url</span>, <span class="identifier">listener</span><span class="braces">)</span><span class="symbol">;</span>
+
+<span class="comment">// 示例：读取assets资源的调用方法</span>
+<span class="identifier">String</span> <span class="identifier">url</span> <span class="symbol">=</span> <span class="identifier">SelfImageLoader</span>.<span class="identifier">RES_ASSETS</span> <span class="symbol">+</span> <span class="string">&quot;sample.jpg&quot;</span><span class="symbol">;</span>
+<span class="identifier">ImageLoader</span>.<span class="identifier">get</span><span class="braces">(</span><span class="identifier">url</span>, <span class="identifier">listener</span><span class="braces">)</span><span class="symbol">;</span>
+
+<span class="comment">// 示例：读取sdcard资源的调用方法</span>
+<span class="identifier">String</span> <span class="identifier">url</span> <span class="symbol">=</span> <span class="identifier">SelfImageLoader</span>.<span class="identifier">RES_SDCARD</span> <span class="symbol">+</span> <span class="string">&quot;/sdcard/sample.jpg&quot;</span><span class="symbol">;</span>
+<span class="identifier">ImageLoader</span>.<span class="identifier">get</span><span class="braces">(</span><span class="identifier">url</span>, <span class="identifier">listener</span><span class="braces">)</span><span class="symbol">;</span></pre> 
+  <p>这是一个实现兼容不同图片来源的解决方案，可在此基础上添加读取raw、drawable等不同目录下的图片，由于篇幅的限制不作举例，具体可查看演示程序中的代码。</p> 
+ </body>
+</html>
+    </div>
+</div>
+        </div>
+    </div>
+    <div class="footer">
+        <div class="aboutus">All pages are generated by <a href="https://github.com/neevek/minerl">Minerl</a></div>
+        <div class="findme">Find this project on <a href="https://github.com/vince-styling/netroid.github.com">GitHub</a></div>
+    </div>
+</body>
+</html>

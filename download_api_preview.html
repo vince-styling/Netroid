@@ -1,0 +1,189 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang='zh-CN' xml:lang='zh-CN' xmlns='http://www.w3.org/1999/xhtml'>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="robots" content="noindex, nofollow, none, noarchive">
+    <link rel="stylesheet" href="/css/site.css" type="text/css" media="screen">
+    <title>Download API(preview)</title>
+</head>
+<body>
+    <div class="container">
+        <div class="clearfix">
+            <div class="page-title">
+    <h1><a href="/">Download API(preview)</a></h1>
+    <h2>last modified : 2014-02-28 17:06</h2>
+</div>
+<div class="primary">
+    <div class="post-thumb">
+        <html>
+ <head></head>
+ <body>
+  <p>Netroid添加<code>FileDownloader</code>管理类用于实现文件下载的所有逻辑，支持无上限添加任务、任务等待、暂停、继续、取消等的常见操作， 并提供接口允许随时查看任务的运行状态，以下各主要接口的详细情况：</p> 
+  <pre><span class="comment">// 类似于ImageLoader的下载管理器，提供对任务的暂停、继续、放弃三种操作。</span>
+<span class="reserved_word">public</span> <span class="reserved_word">class</span> <span class="identifier">FileDownloader</span> <span class="braces">{</span>
+
+    <span class="comment">// 构造下载管理器类，指定最大任务数。</span>
+    <span class="comment">// @param maxTaskCount 同时运行的最大任务数。</span>
+    <span class="comment">// 注：如果最大任务数大于或等于RequestQueue中的线程数，将抛出IllegalArgumentException异常。</span>
+    <span class="reserved_word">public</span> <span class="identifier">FileDownloader</span><span class="braces">(</span><span class="identifier">RequestQueue</span> <span class="identifier">queue</span>, <span class="reserved_word">int</span> <span class="identifier">maxTaskCount</span><span class="braces">)</span><span class="symbol">;</span>
+
+    <span class="comment">// 添加一个任务，返回该任务的控制器。</span>
+    <span class="comment">// 注：可以一直调用这个方法添加新任务，超过任务上限后继续添加的新任务将进入等待队列。</span>
+    <span class="reserved_word">public</span> <span class="identifier">DownloadController</span> <span class="identifier">add</span><span class="braces">(</span><span class="identifier">String</span> <span class="identifier">storeFilePath</span>, <span class="identifier">String</span> <span class="identifier">url</span>, <span class="identifier">Listener</span><span class="symbol">&lt;</span><span class="identifier">Void</span><span class="symbol">&gt;</span> <span class="identifier">listener</span><span class="braces">)</span> <span class="braces">{</span>
+        <span class="identifier">FileDownloadRequest</span> <span class="identifier">request</span> <span class="symbol">=</span> <span class="reserved_word">new</span> <span class="identifier">FileDownloadRequest</span><span class="braces">(</span><span class="identifier">storeFilePath</span>, <span class="identifier">url</span>, <span class="reserved_word">null</span><span class="braces">)</span><span class="symbol">;</span>
+        <span class="identifier">DownloadController</span> <span class="identifier">controller</span> <span class="symbol">=</span> <span class="reserved_word">new</span> <span class="identifier">DownloadController</span><span class="braces">(</span><span class="identifier">request</span>, <span class="identifier">listener</span><span class="braces">)</span><span class="symbol">;</span>
+        <span class="identifier">RequestQueue</span>.<span class="identifier">add</span><span class="braces">(</span><span class="identifier">request</span><span class="braces">)</span><span class="symbol">;</span>
+        <span class="reserved_word">return</span> <span class="identifier">controller</span><span class="symbol">;</span>
+    <span class="braces">}</span>
+
+    <span class="reserved_word">public</span> <span class="reserved_word">class</span> <span class="identifier">DownloadController</span> <span class="braces">{</span>
+        <span class="reserved_word">private</span> <span class="identifier">FileDownloadRequest</span> <span class="identifier">mRequest</span><span class="symbol">;</span>
+
+        <span class="comment">// 状态回调监听器</span>
+        <span class="reserved_word">private</span> <span class="identifier">Listener</span><span class="symbol">&lt;</span><span class="identifier">Void</span><span class="symbol">&gt;</span> <span class="identifier">mListener</span><span class="symbol">;</span>
+
+        <span class="comment">// 下载状态</span>
+        <span class="reserved_word">private</span> <span class="reserved_word">int</span> <span class="identifier">mState</span><span class="symbol">;</span>
+        <span class="reserved_word">public</span> <span class="reserved_word">static</span> <span class="reserved_word">final</span> <span class="reserved_word">int</span> <span class="identifier">STATE_WAITING</span> <span class="symbol">=</span> <span class="numeric">0</span><span class="symbol">;</span>
+        <span class="reserved_word">public</span> <span class="reserved_word">static</span> <span class="reserved_word">final</span> <span class="reserved_word">int</span> <span class="identifier">STATE_DOWNLOADING</span> <span class="symbol">=</span> <span class="numeric">1</span><span class="symbol">;</span>
+        <span class="reserved_word">public</span> <span class="reserved_word">static</span> <span class="reserved_word">final</span> <span class="reserved_word">int</span> <span class="identifier">STATE_PAUSE</span> <span class="symbol">=</span> <span class="numeric">2</span><span class="symbol">;</span>
+        <span class="reserved_word">public</span> <span class="reserved_word">static</span> <span class="reserved_word">final</span> <span class="reserved_word">int</span> <span class="identifier">STATE_FINISH</span> <span class="symbol">=</span> <span class="numeric">3</span><span class="symbol">;</span>
+
+        <span class="reserved_word">public</span> <span class="identifier">DownloadController</span><span class="braces">(</span><span class="identifier">FileDownloadRequest</span> <span class="identifier">request</span>, <span class="identifier">Listener</span><span class="symbol">&lt;</span><span class="identifier">Void</span><span class="symbol">&gt;</span> <span class="identifier">listener</span><span class="braces">)</span> <span class="braces">{</span>
+            <span class="identifier">mListener</span> <span class="symbol">=</span> <span class="identifier">listener</span><span class="symbol">;</span>
+            <span class="identifier">mRequest</span> <span class="symbol">=</span> <span class="identifier">request</span><span class="symbol">;</span>
+
+            <span class="comment">// 通过代理Listener模式实现记录下载状态，并对回调接口进行特别的处理。</span>
+            <span class="comment">// 注：区别于普通Http操作，onFinish()、onSuccess()、onError()在请求被取消时都不会回调。</span>
+            <span class="identifier">request</span>.<span class="identifier">setListener</span><span class="braces">(</span><span class="reserved_word">new</span> <span class="identifier">Listener</span><span class="symbol">&lt;</span><span class="identifier">Void</span><span class="symbol">&gt;</span><span class="braces">(</span><span class="braces">)</span> <span class="braces">{</span>
+                <span class="reserved_word">boolean</span> <span class="identifier">isCanceled</span><span class="symbol">;</span>
+
+                @<span class="identifier">Override</span>
+                <span class="reserved_word">public</span> <span class="reserved_word">void</span> <span class="identifier">onPreExecute</span><span class="braces">(</span><span class="braces">)</span> <span class="braces">{</span>
+                    <span class="identifier">mListener</span>.<span class="identifier">onPreExecute</span><span class="braces">(</span><span class="braces">)</span><span class="symbol">;</span>
+                    <span class="identifier">mState</span> <span class="symbol">=</span> <span class="identifier">STATE_DOWNLOADING</span><span class="symbol">;</span>
+                <span class="braces">}</span>
+
+                @<span class="identifier">Override</span>
+                <span class="reserved_word">public</span> <span class="reserved_word">void</span> <span class="identifier">onFinish</span><span class="braces">(</span><span class="braces">)</span> <span class="braces">{</span>
+                    <span class="reserved_word">if</span> <span class="braces">(</span><span class="symbol">!</span><span class="identifier">isCanceled</span><span class="braces">)</span> <span class="identifier">mListener</span>.<span class="identifier">onFinish</span><span class="braces">(</span><span class="braces">)</span><span class="symbol">;</span>
+                    <span class="identifier">mState</span> <span class="symbol">=</span> <span class="identifier">STATE_FINISH</span><span class="symbol">;</span>
+                <span class="braces">}</span>
+
+                @<span class="identifier">Override</span>
+                <span class="reserved_word">public</span> <span class="reserved_word">void</span> <span class="identifier">onSuccess</span><span class="braces">(</span><span class="identifier">Void</span> <span class="identifier">response</span><span class="braces">)</span> <span class="braces">{</span>
+                    <span class="reserved_word">if</span> <span class="braces">(</span><span class="symbol">!</span><span class="identifier">isCanceled</span><span class="braces">)</span> <span class="identifier">mListener</span>.<span class="identifier">onSuccess</span><span class="braces">(</span><span class="identifier">response</span><span class="braces">)</span><span class="symbol">;</span>
+                <span class="braces">}</span>
+
+                @<span class="identifier">Override</span>
+                <span class="reserved_word">public</span> <span class="reserved_word">void</span> <span class="identifier">onError</span><span class="braces">(</span><span class="identifier">NetroidError</span> <span class="identifier">error</span><span class="braces">)</span> <span class="braces">{</span>
+                    <span class="reserved_word">if</span> <span class="braces">(</span><span class="symbol">!</span><span class="identifier">isCanceled</span><span class="braces">)</span> <span class="identifier">mListener</span>.<span class="identifier">onError</span><span class="braces">(</span><span class="identifier">error</span><span class="braces">)</span><span class="symbol">;</span>
+                <span class="braces">}</span>
+
+                @<span class="identifier">Override</span>
+                <span class="reserved_word">public</span> <span class="reserved_word">void</span> <span class="identifier">onCancel</span><span class="braces">(</span><span class="braces">)</span> <span class="braces">{</span>
+                    <span class="identifier">mListener</span>.<span class="identifier">onCancel</span><span class="braces">(</span><span class="braces">)</span><span class="symbol">;</span>
+                    <span class="identifier">mState</span> <span class="symbol">=</span> <span class="identifier">STATE_PAUSE</span><span class="symbol">;</span>
+                    <span class="identifier">isCanceled</span> <span class="symbol">=</span> <span class="reserved_word">true</span><span class="symbol">;</span>
+                <span class="braces">}</span>
+
+                @<span class="identifier">Override</span>
+                <span class="reserved_word">public</span> <span class="reserved_word">void</span> <span class="identifier">onProgressChange</span><span class="braces">(</span><span class="reserved_word">long</span> <span class="identifier">fileSize</span>, <span class="reserved_word">long</span> <span class="identifier">downloadedSize</span><span class="braces">)</span> <span class="braces">{</span>
+                    <span class="identifier">mListener</span>.<span class="identifier">onProgressChange</span><span class="braces">(</span><span class="identifier">fileSize</span>, <span class="identifier">downloadedSize</span><span class="braces">)</span><span class="symbol">;</span>
+                <span class="braces">}</span>
+            <span class="braces">}</span><span class="braces">)</span><span class="symbol">;</span>
+        <span class="braces">}</span>
+
+        <span class="comment">// 获取当前任务执行状态</span>
+        <span class="reserved_word">public</span> <span class="reserved_word">int</span> <span class="identifier">getState</span><span class="braces">(</span><span class="braces">)</span> <span class="braces">{</span>
+            <span class="reserved_word">return</span> <span class="identifier">mState</span><span class="symbol">;</span>
+        <span class="braces">}</span>
+
+        <span class="comment">// 如果任务处于下载中状态，则暂停任务，返回true，否则返回false。</span>
+        <span class="comment">// 任务队列中仍然保留该任务，防止执行继续操作后该任务到了队列底部。</span>
+        <span class="comment">// 注：由于实现了断点续传功能，所以暂停操作实际上是取消了此次请求。</span>
+        <span class="reserved_word">public</span> <span class="reserved_word">boolean</span> <span class="identifier">pause</span><span class="braces">(</span><span class="braces">)</span> <span class="braces">{</span>
+            <span class="reserved_word">if</span> <span class="braces">(</span><span class="identifier">mState</span> <span class="symbol">=</span><span class="symbol">=</span> <span class="identifier">STATE_DOWNLOADING</span><span class="braces">)</span> <span class="braces">{</span>
+                <span class="identifier">mState</span> <span class="symbol">=</span> <span class="identifier">STATE_PAUSE</span><span class="symbol">;</span>
+                <span class="identifier">mRequest</span>.<span class="identifier">cancel</span><span class="braces">(</span><span class="braces">)</span><span class="symbol">;</span>
+                <span class="reserved_word">return</span> <span class="reserved_word">true</span><span class="symbol">;</span>
+            <span class="braces">}</span>
+            <span class="reserved_word">return</span> <span class="reserved_word">false</span><span class="symbol">;</span>
+        <span class="braces">}</span>
+
+        <span class="comment">// 如果任务处于下载中状态，返回false，否则执行任务继续操作。</span>
+        <span class="comment">// 注：继续操作实际上是发起一个新的请求。</span>
+        <span class="reserved_word">public</span> <span class="reserved_word">boolean</span> <span class="identifier">resume</span><span class="braces">(</span><span class="braces">)</span> <span class="braces">{</span>
+            <span class="reserved_word">if</span> <span class="braces">(</span><span class="identifier">mState</span> <span class="symbol">=</span><span class="symbol">=</span> <span class="identifier">STATE_DOWNLOADING</span><span class="braces">)</span> <span class="reserved_word">return</span> <span class="reserved_word">false</span><span class="symbol">;</span>
+            <span class="reserved_word">return</span> <span class="identifier">FileDownloader</span>.<span class="reserved_word">this</span>.<span class="identifier">resume</span><span class="braces">(</span><span class="reserved_word">this</span><span class="braces">)</span><span class="symbol">;</span>
+        <span class="braces">}</span>
+
+        <span class="comment">// 放弃操作</span>
+        <span class="reserved_word">public</span> <span class="reserved_word">void</span> <span class="identifier">discard</span><span class="braces">(</span><span class="braces">)</span> <span class="braces">{</span>
+            <span class="identifier">FileDownloader</span>.<span class="reserved_word">this</span>.<span class="identifier">discard</span><span class="braces">(</span><span class="reserved_word">this</span><span class="braces">)</span><span class="symbol">;</span>
+        <span class="braces">}</span>
+    <span class="braces">}</span>
+
+    <span class="comment">// 根据Controller创建新的请求实例，更新任务队列。</span>
+    <span class="reserved_word">private</span> <span class="reserved_word">boolean</span> <span class="identifier">resume</span><span class="braces">(</span><span class="identifier">DownloadController</span> <span class="identifier">controller</span><span class="braces">)</span><span class="symbol">;</span>
+
+    <span class="comment">// 在任务队列中移除该任务。</span>
+    <span class="reserved_word">private</span> <span class="reserved_word">void</span> <span class="identifier">discard</span><span class="braces">(</span><span class="identifier">DownloadController</span> <span class="identifier">controller</span><span class="braces">)</span><span class="symbol">;</span>
+<span class="braces">}</span></pre> 
+  <p>使用方法也跟 <strong>ImageLoader</strong> 类似，用单例模式创建一个全局的实例，在初始化<code>RequestQueue</code>时进行构造：</p> 
+  <pre><span class="reserved_word">int</span> <span class="identifier">poolSize</span> <span class="symbol">=</span> <span class="identifier">RequestQueue</span>.<span class="identifier">DEFAULT_NETWORK_THREAD_POOL_SIZE</span><span class="symbol">;</span> <span class="comment">// 默认为4</span>
+<span class="identifier">RequestQueue</span> <span class="identifier">mQueue</span> <span class="symbol">=</span> <span class="reserved_word">new</span> <span class="identifier">RequestQueue</span><span class="braces">(</span><span class="identifier">Network</span>, <span class="identifier">poolSize</span><span class="braces">)</span><span class="symbol">;</span>
+<span class="identifier">FileDownloader</span> <span class="identifier">mDownloader</span> <span class="symbol">=</span> <span class="reserved_word">new</span> <span class="identifier">FileDownloader</span><span class="braces">(</span><span class="identifier">mQueue</span>, <span class="numeric">1</span><span class="braces">)</span><span class="symbol">;</span></pre> 
+  <p>调用 <strong>FileDownloader.add()</strong> 方法即可创建新任务：</p> 
+  <pre><span class="comment">// down.file是保存的文件名，这个文件只在下载成功后才存在，在下载过程中，</span>
+<span class="comment">// Netroid会在文件路径下创建一个临时文件，命名为：down.file.tmp，在下载成功后更名为down.file</span>
+<span class="identifier">mDownloader</span>.<span class="identifier">add</span><span class="braces">(</span><span class="string">&quot;/sdcard/netroid/down.file&quot;</span>, <span class="string">&quot;http://server.com/res/file_name.dmg&quot;</span>, <span class="reserved_word">new</span> <span class="identifier">Listener</span><span class="symbol">&lt;</span><span class="identifier">Void</span><span class="symbol">&gt;</span><span class="braces">(</span><span class="braces">)</span> <span class="braces">{</span>
+    <span class="comment">// 如果暂停或放弃了该任务，onFinish()不会回调</span>
+    @<span class="identifier">Override</span>
+    <span class="reserved_word">public</span> <span class="reserved_word">void</span> <span class="identifier">onFinish</span><span class="braces">(</span><span class="braces">)</span> <span class="braces">{</span>
+        <span class="identifier">Toast</span>.<span class="identifier">makeText</span><span class="braces">(</span><span class="string">&quot;下载完成&quot;</span><span class="braces">)</span>.<span class="identifier">show</span><span class="braces">(</span><span class="braces">)</span><span class="symbol">;</span>
+    <span class="braces">}</span>
+
+    <span class="comment">// 如果暂停或放弃了该任务，onSuccess()不会回调</span>
+    @<span class="identifier">Override</span>
+    <span class="reserved_word">public</span> <span class="reserved_word">void</span> <span class="identifier">onSuccess</span><span class="braces">(</span><span class="identifier">Void</span> <span class="identifier">response</span><span class="braces">)</span> <span class="braces">{</span>
+        <span class="identifier">Toast</span>.<span class="identifier">makeText</span><span class="braces">(</span><span class="string">&quot;下载成功&quot;</span><span class="braces">)</span>.<span class="identifier">show</span><span class="braces">(</span><span class="braces">)</span><span class="symbol">;</span>
+    <span class="braces">}</span>
+
+    <span class="comment">// 如果暂停或放弃了该任务，onError()不会回调</span>
+    @<span class="identifier">Override</span>
+    <span class="reserved_word">public</span> <span class="reserved_word">void</span> <span class="identifier">onError</span><span class="braces">(</span><span class="identifier">NetroidError</span> <span class="identifier">error</span><span class="braces">)</span> <span class="braces">{</span>
+        <span class="identifier">Toast</span>.<span class="identifier">makeText</span><span class="braces">(</span><span class="string">&quot;下载失败&quot;</span><span class="braces">)</span>.<span class="identifier">show</span><span class="braces">(</span><span class="braces">)</span><span class="symbol">;</span>
+    <span class="braces">}</span>
+
+    @<span class="identifier">Override</span>
+    <span class="reserved_word">public</span> <span class="reserved_word">void</span> <span class="identifier">onProgressChange</span><span class="braces">(</span><span class="reserved_word">long</span> <span class="identifier">fileSize</span>, <span class="reserved_word">long</span> <span class="identifier">downloadedSize</span><span class="braces">)</span> <span class="braces">{</span>
+        <span class="identifier">Toast</span>.<span class="identifier">makeText</span><span class="braces">(</span><span class="string">&quot;下载进度：&quot;</span> <span class="symbol">+</span> <span class="braces">(</span><span class="identifier">downloadedSize</span> / <span class="identifier">fileSize</span> <span class="symbol">*</span> <span class="numeric">100</span><span class="braces">)</span> <span class="symbol">+</span> <span class="string">&quot;%&quot;</span><span class="braces">)</span>.<span class="identifier">show</span><span class="braces">(</span><span class="braces">)</span><span class="symbol">;</span>
+    <span class="braces">}</span>
+<span class="braces">}</span><span class="braces">)</span><span class="symbol">;</span></pre> 
+  <p><strong>FileDownloader.add()</strong> 将返回 <code>DownloadController</code> 实例用于下载过程中的控制：</p> 
+  <pre><span class="identifier">DownloadController</span> <span class="identifier">controller</span><span class="symbol">;</span>
+
+<span class="comment">// 如果要查看该任务的状态</span>
+<span class="identifier">controller</span>.<span class="identifier">getState</span><span class="braces">(</span><span class="braces">)</span><span class="symbol">;</span>
+
+<span class="comment">// 如果要暂停该任务</span>
+<span class="identifier">controller</span>.<span class="identifier">pause</span><span class="braces">(</span><span class="braces">)</span><span class="symbol">;</span>
+
+<span class="comment">// 如果要继续该任务</span>
+<span class="identifier">controller</span>.<span class="identifier">resume</span><span class="braces">(</span><span class="braces">)</span><span class="symbol">;</span>
+
+<span class="comment">// 如果要放弃(删除)该任务</span>
+<span class="identifier">controller</span>.<span class="identifier">discard</span><span class="braces">(</span><span class="braces">)</span><span class="symbol">;</span></pre> 
+  <p>注：所有接口均属于架构预想，实施过程中可能会有调整。</p> 
+ </body>
+</html>
+    </div>
+</div>
+        </div>
+    </div>
+    <div class="footer">
+        All pages are generated by <a href="https://github.com/neevek/minerl">Minerl</a>
+    </div>
+</body>
+</html>

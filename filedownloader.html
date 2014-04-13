@@ -1,0 +1,102 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang='zh-CN' xml:lang='zh-CN' xmlns='http://www.w3.org/1999/xhtml'>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="robots" content="noindex, nofollow, none, noarchive">
+    <link rel="stylesheet" href="/css/site.css" type="text/css" media="screen">
+    <title>Netroid FileDownloader</title>
+</head>
+<body>
+    <div class="container">
+        <div class="clearfix">
+            <div class="page-title">
+    <h1><a href="/">Netroid FileDownloader</a></h1>
+    <h2>last modified : 2014-04-13 15:09</h2>
+</div>
+<div class="primary">
+    <div class="post-thumb">
+        <html>
+ <head></head>
+ <body>
+  <h1>大文件下载</h1> 
+  <p>Netroid实现的 <code>FileDownloader</code> 对断点续传方式的大文件下载提供了支持，其内部维护一个下载队列，所以在创建时需要指定最大并行任务数， 超出限制的任务将自动进入等待队列。在设置最大并行任务数后，开发者只需要往队列中不断添加任务，其它的事情均由 <strong>FileDownloader</strong> 完成。</p> 
+  <p>FileDownloader将在任务添加成功时返回 <code>DownloadController</code> 实例对象，这个对象提供了查看任务执行状态、暂停、继续、取消四项必需的操作功能， 开发者只需要持有这个对象，即可随时掌控任务的所有情况。</p> 
+  <p>FileDownloader的用法类似于 <strong>ImageLoader</strong>，用单例模式创建一个全局的实例，在初始化 <strong>RequestQueue</strong> 时构造：</p> 
+  <pre><span class="reserved_word">int</span> <span class="identifier">poolSize</span> <span class="symbol">=</span> <span class="identifier">RequestQueue</span>.<span class="identifier">DEFAULT_NETWORK_THREAD_POOL_SIZE</span><span class="symbol">;</span> <span class="comment">// 默认为4</span>
+<span class="identifier">RequestQueue</span> <span class="identifier">mQueue</span> <span class="symbol">=</span> <span class="reserved_word">new</span> <span class="identifier">RequestQueue</span><span class="braces">(</span><span class="identifier">Network</span>, <span class="identifier">poolSize</span><span class="braces">)</span><span class="symbol">;</span>
+<span class="comment">// 建议并行任务数上限不超过3，在手机带宽有限的条件下，并行任务数的扩大无法加快下载速度。</span>
+<span class="comment">// 注：如果并行任务数上限大于或等于RequestQueue中的总线程数，将被视为不合法而抛出异常。</span>
+<span class="identifier">FileDownloader</span> <span class="identifier">mDownloader</span> <span class="symbol">=</span> <span class="reserved_word">new</span> <span class="identifier">FileDownloader</span><span class="braces">(</span><span class="identifier">mQueue</span>, <span class="numeric">1</span><span class="braces">)</span><span class="symbol">;</span></pre> 
+  <p>调用 <strong>FileDownloader.add()</strong> 方法即可创建新任务：</p> 
+  <pre><span class="comment">// down.file是保存的文件名，这个文件只在下载成功后才存在，在下载过程中，</span>
+<span class="comment">// Netroid会在文件路径下创建一个临时文件，命名为：down.file.tmp，下载成功后更名为down.file。</span>
+<span class="identifier">FileDownloader</span>.<span class="identifier">DownloadController</span> <span class="identifier">controller</span> <span class="symbol">=</span> <span class="identifier">FileDownloader</span>.<span class="identifier">add</span><span class="braces">(</span>
+    <span class="string">&quot;/sdcard/netroid/down.file&quot;</span>, <span class="string">&quot;http://server.com/res/down.file&quot;</span>,
+    <span class="reserved_word">new</span> <span class="identifier">Listener</span><span class="symbol">&lt;</span><span class="identifier">Void</span><span class="symbol">&gt;</span><span class="braces">(</span><span class="braces">)</span> <span class="braces">{</span>
+        <span class="comment">// 注：如果暂停或放弃了该任务，onFinish()不会回调</span>
+        @<span class="identifier">Override</span>
+        <span class="reserved_word">public</span> <span class="reserved_word">void</span> <span class="identifier">onFinish</span><span class="braces">(</span><span class="braces">)</span> <span class="braces">{</span>
+            <span class="identifier">Toast</span>.<span class="identifier">makeText</span><span class="braces">(</span><span class="string">&quot;下载完成&quot;</span><span class="braces">)</span>.<span class="identifier">show</span><span class="braces">(</span><span class="braces">)</span><span class="symbol">;</span>
+        <span class="braces">}</span>
+
+        <span class="comment">// 注：如果暂停或放弃了该任务，onSuccess()不会回调</span>
+        @<span class="identifier">Override</span>
+        <span class="reserved_word">public</span> <span class="reserved_word">void</span> <span class="identifier">onSuccess</span><span class="braces">(</span><span class="identifier">Void</span> <span class="identifier">response</span><span class="braces">)</span> <span class="braces">{</span>
+            <span class="identifier">Toast</span>.<span class="identifier">makeText</span><span class="braces">(</span><span class="string">&quot;下载成功&quot;</span><span class="braces">)</span>.<span class="identifier">show</span><span class="braces">(</span><span class="braces">)</span><span class="symbol">;</span>
+        <span class="braces">}</span>
+
+        <span class="comment">// 注：如果暂停或放弃了该任务，onError()不会回调</span>
+        @<span class="identifier">Override</span>
+        <span class="reserved_word">public</span> <span class="reserved_word">void</span> <span class="identifier">onError</span><span class="braces">(</span><span class="identifier">NetroidError</span> <span class="identifier">error</span><span class="braces">)</span> <span class="braces">{</span>
+            <span class="identifier">Toast</span>.<span class="identifier">makeText</span><span class="braces">(</span><span class="string">&quot;下载失败&quot;</span><span class="braces">)</span>.<span class="identifier">show</span><span class="braces">(</span><span class="braces">)</span><span class="symbol">;</span>
+        <span class="braces">}</span>
+
+        <span class="comment">// Listener添加了这个回调方法专门用于获取进度</span>
+        @<span class="identifier">Override</span>
+        <span class="reserved_word">public</span> <span class="reserved_word">void</span> <span class="identifier">onProgressChange</span><span class="braces">(</span><span class="reserved_word">long</span> <span class="identifier">fileSize</span>, <span class="reserved_word">long</span> <span class="identifier">downloadedSize</span><span class="braces">)</span> <span class="braces">{</span>
+            <span class="identifier">Toast</span>.<span class="identifier">makeText</span><span class="braces">(</span><span class="string">&quot;下载进度：&quot;</span> <span class="symbol">+</span> <span class="braces">(</span><span class="identifier">downloadedSize</span> <span class="symbol">*</span> <span class="numeric">1.0f</span> / <span class="identifier">fileSize</span> <span class="symbol">*</span> <span class="numeric">100</span><span class="braces">)</span> <span class="symbol">+</span> <span class="string">&quot;%&quot;</span><span class="braces">)</span>.<span class="identifier">show</span><span class="braces">(</span><span class="braces">)</span><span class="symbol">;</span>
+        <span class="braces">}</span>
+<span class="braces">}</span><span class="braces">)</span><span class="symbol">;</span>
+
+<span class="comment">// 查看该任务的状态</span>
+<span class="identifier">controller</span>.<span class="identifier">getState</span><span class="braces">(</span><span class="braces">)</span><span class="symbol">;</span>
+<span class="comment">// 任务的状态分别是：</span>
+<span class="identifier">STATUS_WAITING</span>：         <span class="comment">// 等待中</span>
+<span class="identifier">STATUS_DOWNLOADING</span>：     <span class="comment">// 下载中</span>
+<span class="identifier">STATUS_PAUSE</span>：           <span class="comment">// 已暂停</span>
+<span class="identifier">STATUS_SUCCESS</span>：         <span class="comment">// 已成功（标识下载已经正常完成并成功）</span>
+<span class="identifier">STATUS_DISCARD</span>：         <span class="comment">// 已取消（放弃）</span>
+
+<span class="comment">// 暂停该任务</span>
+<span class="identifier">controller</span>.<span class="identifier">pause</span><span class="braces">(</span><span class="braces">)</span><span class="symbol">;</span>
+
+<span class="comment">// 继续该任务</span>
+<span class="identifier">controller</span>.<span class="identifier">resume</span><span class="braces">(</span><span class="braces">)</span><span class="symbol">;</span>
+
+<span class="comment">// 放弃(删除)该任务</span>
+<span class="identifier">controller</span>.<span class="identifier">discard</span><span class="braces">(</span><span class="braces">)</span><span class="symbol">;</span></pre> 
+  <h2>任务优先级：</h2> 
+  <p>任务的优先级由添加的先后顺序来确定，当某项任务执行结束或暂停时，<strong>FileDownloader</strong> 将从头开始扫描整个队列，重新执行处于等待状态的任务：</p> 
+  <pre>假设队列中有如下四个任务，并行任务上限为 <span class="numeric">1</span>：
+<span class="identifier">A</span> <span class="identifier">waiting</span>
+<span class="identifier">B</span> <span class="identifier">waiting</span>
+<span class="identifier">C</span> <span class="identifier">downloading</span>
+<span class="identifier">D</span> <span class="identifier">waiting</span>
+当 <span class="identifier">C</span> 执行完成后，<span class="identifier">A</span> 将部署并执行，而 <span class="identifier">D</span> 要等待 <span class="identifier">A</span>、<span class="identifier">B</span> 执行完成后才可以执行。</pre> 
+  <h2>实现方式：</h2> 
+  <p>Netroid添加了 <code>FileDownloadRequest</code> 来实现断点下载功能，核心的实现逻辑都包括在这个请求内。 由于文件下载操作将会相对较长时间地占用线程资源，为了避免所有线程均处于繁忙状态而导致无法执行其它高优先级的Http操作， 建议不要使用这个类单独发起下载请求，应当与 <strong>FileDownloader</strong> 一起使用。</p> 
+  <p>由于文件下载操作的特殊性，不适宜进行缓存处理，为了避免错误地设置，<strong>FileDownloadRequest</strong> 内部直接禁用了缓存， 所以调用 <strong>FileDownloadRequest.setCacheExpireTime()</strong> 来指定缓存过期时间将不生效。</p> 
+  <p>注：在测试中发现大文件下载可能出现连接超时的问题，所以 <strong>FileDownloadRequest</strong> 的重试次数设置了一个比较大的值(200)，以避免下载失败。</p> 
+  <p>注：<strong>FileDownloadRequest</strong> 的优先级为最低，在等待队列中，优先级更高的操作将更快执行。</p> 
+ </body>
+</html>
+    </div>
+</div>
+        </div>
+    </div>
+    <div class="footer">
+        <div class="aboutus">All pages are generated by <a href="https://github.com/neevek/minerl">Minerl</a></div>
+        <div class="findme">Find this project on <a href="https://github.com/vince-styling/netroid.github.com">GitHub</a></div>
+    </div>
+</body>
+</html>

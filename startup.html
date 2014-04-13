@@ -1,0 +1,126 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang='zh-CN' xml:lang='zh-CN' xmlns='http://www.w3.org/1999/xhtml'>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="robots" content="noindex, nofollow, none, noarchive">
+    <link rel="stylesheet" href="/css/site.css" type="text/css" media="screen">
+    <title>Netroid Startup</title>
+</head>
+<body>
+    <div class="container">
+        <div class="clearfix">
+            <div class="page-title">
+    <h1><a href="/">Netroid Startup</a></h1>
+    <h2>last modified : 2014-04-13 14:52</h2>
+</div>
+<div class="primary">
+    <div class="post-thumb">
+        <html>
+ <head></head>
+ <body>
+  <h1>开始使用</h1> 
+  <p>本文档帮助你快速并正确地集成Netroid到应用中。</p> 
+  <h3>添加依赖</h3> 
+  <p>下载<a href="/attach/netroid-sdk-1.2.0.jar">最新版本(1.2.0)</a>的jar，在工程中直接添加依赖。</p> 
+  <p>Netroid已经在YY内部的Maven库中构建，你也可以通过添加以下的依赖来引用：</p> 
+  <pre>...
+<span class="symbol">&lt;</span><span class="identifier">dependency</span><span class="symbol">&gt;</span>
+    <span class="symbol">&lt;</span><span class="identifier">groupId</span><span class="symbol">&gt;</span><span class="identifier">com</span>.<span class="identifier">yy</span>.<span class="identifier">android</span>.<span class="identifier">gameLibs</span><span class="symbol">&lt;</span>/<span class="identifier">groupId</span><span class="symbol">&gt;</span>
+    <span class="symbol">&lt;</span><span class="identifier">artifactId</span><span class="symbol">&gt;</span><span class="identifier">netroid</span><span class="symbol">-</span><span class="identifier">sdk</span><span class="symbol">&lt;</span>/<span class="identifier">artifactId</span><span class="symbol">&gt;</span>
+    <span class="symbol">&lt;</span><span class="identifier">version</span><span class="symbol">&gt;</span><span class="numeric">1.2</span><span class="numeric">.0</span><span class="symbol">&lt;</span>/<span class="identifier">version</span><span class="symbol">&gt;</span>
+    <span class="symbol">&lt;</span><span class="identifier">type</span><span class="symbol">&gt;</span><span class="identifier">jar</span><span class="symbol">&lt;</span>/<span class="identifier">type</span><span class="symbol">&gt;</span>
+<span class="symbol">&lt;</span>/<span class="identifier">dependency</span><span class="symbol">&gt;</span>
+...</pre> 
+  <h3>添加权限</h3> 
+  <p>配置 <code>AndroidManifest.xml</code>，添加Netroid SDK需要的权限到 <code>&lt;manifest&gt;</code> 标签下：</p> 
+  <pre><span class="symbol">&lt;</span><span class="identifier">uses</span><span class="symbol">-</span><span class="identifier">permission</span> <span class="identifier">android</span><span class="symbol">:</span><span class="identifier">name</span><span class="symbol">=</span><span class="string">&quot;android.permission.INTERNET&quot;</span> /<span class="symbol">&gt;</span>
+<span class="symbol">&lt;</span><span class="identifier">uses</span><span class="symbol">-</span><span class="identifier">permission</span> <span class="identifier">android</span><span class="symbol">:</span><span class="identifier">name</span><span class="symbol">=</span><span class="string">&quot;android.permission.WRITE_EXTERNAL_STORAGE&quot;</span> /<span class="symbol">&gt;</span></pre> 
+  <h3>初始化</h3> 
+  <p>由于Http在Android中属于基础服务组件，为了达到随处可用的目标，通常情况都采用单例模式进行初始化并集中管理：</p> 
+  <pre><span class="comment">// 在 Android Application 这个程序入口处进行Netroid的初始化</span>
+<span class="reserved_word">public</span> <span class="reserved_word">class</span> <span class="identifier">YourApplication</span> <span class="reserved_word">extends</span> <span class="identifier">Application</span> <span class="braces">{</span>
+
+    @<span class="identifier">Override</span>
+    <span class="reserved_word">public</span> <span class="reserved_word">void</span> <span class="identifier">onCreate</span><span class="braces">(</span><span class="braces">)</span> <span class="braces">{</span>
+        <span class="reserved_word">super</span>.<span class="identifier">onCreate</span><span class="braces">(</span><span class="braces">)</span><span class="symbol">;</span>
+        <span class="identifier">Netroid</span>.<span class="identifier">init</span><span class="braces">(</span><span class="reserved_word">this</span><span class="braces">)</span><span class="symbol">;</span>
+    <span class="braces">}</span>
+
+<span class="braces">}</span></pre> 
+  <p><code>Netroid</code> 是开发者实现的用于管理所有包括 <strong>RequestQueue</strong>、<strong>ImageLoader</strong>、<strong>FileDownloader</strong> 实例的核心类：</p> 
+  <pre><span class="reserved_word">public</span> <span class="reserved_word">class</span> <span class="identifier">Netroid</span> <span class="braces">{</span>
+
+    <span class="comment">// Netroid入口，私有该实例，提供方法对外服务。</span>
+    <span class="reserved_word">private</span> <span class="reserved_word">static</span> <span class="identifier">RequestQueue</span> <span class="identifier">mRequestQueue</span><span class="symbol">;</span>
+
+    <span class="comment">// 图片加载管理器，私有该实例，提供方法对外服务。</span>
+    <span class="reserved_word">private</span> <span class="reserved_word">static</span> <span class="identifier">ImageLoader</span> <span class="identifier">mImageLoader</span><span class="symbol">;</span>
+
+    <span class="comment">// 文件下载管理器，私有该实例，提供方法对外服务。</span>
+    <span class="reserved_word">private</span> <span class="reserved_word">static</span> <span class="identifier">FileDownloader</span> <span class="identifier">mFileDownloader</span><span class="symbol">;</span>
+
+    <span class="reserved_word">private</span> <span class="identifier">Netroid</span><span class="braces">(</span><span class="braces">)</span> <span class="braces">{</span><span class="braces">}</span>
+
+    <span class="reserved_word">public</span> <span class="reserved_word">static</span> <span class="reserved_word">void</span> <span class="identifier">init</span><span class="braces">(</span><span class="identifier">Context</span> <span class="identifier">ctx</span><span class="braces">)</span> <span class="braces">{</span>
+        <span class="reserved_word">if</span> <span class="braces">(</span><span class="identifier">mRequestQueue</span> <span class="symbol">!</span><span class="symbol">=</span> <span class="reserved_word">null</span><span class="braces">)</span> <span class="reserved_word">throw</span> <span class="reserved_word">new</span> <span class="identifier">IllegalStateException</span><span class="braces">(</span><span class="string">&quot;initialized&quot;</span><span class="braces">)</span><span class="symbol">;</span>
+
+        <span class="comment">// 创建Netroid主类，指定硬盘缓存方案</span>
+        <span class="identifier">Network</span> <span class="identifier">network</span> <span class="symbol">=</span> <span class="reserved_word">new</span> <span class="identifier">BasicNetwork</span><span class="braces">(</span><span class="reserved_word">new</span> <span class="identifier">HurlStack</span><span class="braces">(</span><span class="identifier">Const</span>.<span class="identifier">USER_AGENT</span>, <span class="reserved_word">null</span><span class="braces">)</span>, <span class="identifier">HTTP</span>.<span class="identifier">UTF_8</span><span class="braces">)</span><span class="symbol">;</span>
+        <span class="identifier">mRequestQueue</span> <span class="symbol">=</span> <span class="reserved_word">new</span> <span class="identifier">RequestQueue</span><span class="braces">(</span><span class="identifier">network</span>, <span class="numeric">4</span>, <span class="reserved_word">new</span> <span class="identifier">DiskCache</span><span class="braces">(</span>
+            <span class="reserved_word">new</span> <span class="identifier">File</span><span class="braces">(</span><span class="identifier">ctx</span>.<span class="identifier">getCacheDir</span><span class="braces">(</span><span class="braces">)</span>, <span class="identifier">Const</span>.<span class="identifier">HTTP_DISK_CACHE_DIR_NAME</span><span class="braces">)</span>, <span class="identifier">Const</span>.<span class="identifier">HTTP_DISK_CACHE_SIZE</span><span class="braces">)</span><span class="braces">)</span><span class="symbol">;</span>
+
+        <span class="comment">// 创建ImageLoader实例，指定内存缓存方案</span>
+        <span class="comment">// 注：SelfImageLoader的实现示例请查看图片加载的相关文档</span>
+        <span class="comment">// 注：ImageLoader及FileDownloader不是必须初始化的组件，如果没有用处，不需要创建实例</span>
+        <span class="identifier">mImageLoader</span> <span class="symbol">=</span> <span class="reserved_word">new</span> <span class="identifier">SelfImageLoader</span><span class="braces">(</span>
+            <span class="identifier">mRequestQueue</span>, <span class="reserved_word">new</span> <span class="identifier">BitmapImageCache</span><span class="braces">(</span><span class="identifier">Const</span>.<span class="identifier">HTTP_MEMORY_CACHE_SIZE</span><span class="braces">)</span><span class="braces">)</span><span class="symbol">;</span>
+
+        <span class="identifier">mFileDownloader</span> <span class="symbol">=</span> <span class="reserved_word">new</span> <span class="identifier">FileDownloader</span><span class="braces">(</span><span class="identifier">mRequestQueue</span>, <span class="numeric">1</span><span class="braces">)</span><span class="symbol">;</span>
+
+        <span class="identifier">mRequestQueue</span>.<span class="identifier">start</span><span class="braces">(</span><span class="braces">)</span><span class="symbol">;</span>
+    <span class="braces">}</span>
+
+    <span class="comment">// 示例做法：执行自定义请求以获得书籍列表</span>
+    <span class="reserved_word">public</span> <span class="reserved_word">static</span> <span class="reserved_word">void</span> <span class="identifier">getBookList</span><span class="braces">(</span><span class="reserved_word">int</span> <span class="identifier">pageNo</span>, <span class="identifier">Listener</span><span class="symbol">&lt;</span><span class="identifier">List</span><span class="symbol">&lt;</span><span class="identifier">Book</span><span class="symbol">&gt;</span><span class="symbol">&gt;</span> <span class="identifier">listener</span><span class="braces">)</span> <span class="braces">{</span>
+        <span class="identifier">mRequestQueue</span>.<span class="identifier">add</span><span class="braces">(</span><span class="reserved_word">new</span> <span class="identifier">BookListRequest</span><span class="braces">(</span><span class="string">&quot;http://server.com/book_list/&quot;</span> <span class="symbol">+</span> <span class="identifier">pageNo</span>, <span class="identifier">listener</span><span class="braces">)</span><span class="braces">)</span><span class="symbol">;</span>
+    <span class="braces">}</span>
+
+    <span class="comment">// 加载单张图片</span>
+    <span class="reserved_word">public</span> <span class="reserved_word">static</span> <span class="reserved_word">void</span> <span class="identifier">displayImage</span><span class="braces">(</span><span class="identifier">String</span> <span class="identifier">url</span>, <span class="identifier">ImageView</span> <span class="identifier">imageView</span><span class="braces">)</span> <span class="braces">{</span>
+        <span class="identifier">ImageLoader</span>.<span class="identifier">ImageListener</span> <span class="identifier">listener</span> <span class="symbol">=</span> <span class="identifier">ImageLoader</span>.<span class="identifier">getImageListener</span><span class="braces">(</span><span class="identifier">imageView</span>, <span class="numeric">0</span>, <span class="numeric">0</span><span class="braces">)</span><span class="symbol">;</span>
+        <span class="identifier">mImageLoader</span>.<span class="identifier">get</span><span class="braces">(</span><span class="identifier">url</span>, <span class="identifier">listener</span>, <span class="numeric">0</span>, <span class="numeric">0</span><span class="braces">)</span><span class="symbol">;</span>
+    <span class="braces">}</span>
+
+    <span class="comment">// 批量加载图片</span>
+    <span class="reserved_word">public</span> <span class="reserved_word">static</span> <span class="reserved_word">void</span> <span class="identifier">displayImage</span><span class="braces">(</span><span class="identifier">String</span> <span class="identifier">url</span>, <span class="identifier">NetworkImageView</span> <span class="identifier">imageView</span><span class="braces">)</span> <span class="braces">{</span>
+        <span class="identifier">imageView</span>.<span class="identifier">setImageUrl</span><span class="braces">(</span><span class="identifier">url</span>, <span class="identifier">mImageLoader</span><span class="braces">)</span><span class="symbol">;</span>
+    <span class="braces">}</span>
+
+    <span class="comment">// 执行文件下载请求</span>
+    <span class="reserved_word">public</span> <span class="reserved_word">static</span> <span class="identifier">FileDownloader</span>.<span class="identifier">DownloadController</span> <span class="identifier">addFileDownload</span><span class="braces">(</span><span class="identifier">String</span> <span class="identifier">storeFilePath</span>, <span class="identifier">String</span> <span class="identifier">url</span>, <span class="identifier">Listener</span><span class="symbol">&lt;</span><span class="identifier">Void</span><span class="symbol">&gt;</span> <span class="identifier">listener</span><span class="braces">)</span> <span class="braces">{</span>
+        <span class="reserved_word">return</span> <span class="identifier">mFileDownloader</span>.<span class="identifier">add</span><span class="braces">(</span><span class="identifier">storeFilePath</span>, <span class="identifier">url</span>, <span class="identifier">listener</span><span class="braces">)</span><span class="symbol">;</span>
+    <span class="braces">}</span>
+
+<span class="braces">}</span>
+
+<span class="reserved_word">public</span> <span class="reserved_word">class</span> <span class="identifier">Const</span> <span class="braces">{</span>
+    <span class="comment">// http parameters</span>
+    <span class="reserved_word">public</span> <span class="reserved_word">static</span> <span class="reserved_word">final</span> <span class="reserved_word">int</span> <span class="identifier">HTTP_MEMORY_CACHE_SIZE</span> <span class="symbol">=</span> <span class="numeric">2</span> <span class="symbol">*</span> <span class="numeric">1024</span> <span class="symbol">*</span> <span class="numeric">1024</span><span class="symbol">;</span> <span class="comment">// 2MB</span>
+    <span class="reserved_word">public</span> <span class="reserved_word">static</span> <span class="reserved_word">final</span> <span class="reserved_word">int</span> <span class="identifier">HTTP_DISK_CACHE_SIZE</span> <span class="symbol">=</span> <span class="numeric">50</span> <span class="symbol">*</span> <span class="numeric">1024</span> <span class="symbol">*</span> <span class="numeric">1024</span><span class="symbol">;</span> <span class="comment">// 50MB</span>
+    <span class="reserved_word">public</span> <span class="reserved_word">static</span> <span class="reserved_word">final</span> <span class="identifier">String</span> <span class="identifier">HTTP_DISK_CACHE_DIR_NAME</span> <span class="symbol">=</span> <span class="string">&quot;netroid&quot;</span><span class="symbol">;</span>
+    <span class="reserved_word">public</span> <span class="reserved_word">static</span> <span class="reserved_word">final</span> <span class="identifier">String</span> <span class="identifier">USER_AGENT</span> <span class="symbol">=</span> <span class="string">&quot;netroid.cn&quot;</span><span class="symbol">;</span>
+<span class="braces">}</span></pre> 
+  <p>至此，Netroid的所有初始化工作已经完成，你可以添加各种接口来执行请求，使用Netroid提供的强大服务！！</p> 
+  <p>开发者可查看<a href="/usecase.html">使用示例</a>来了解典型的代码写法，更多细节请查看<a href="/request.html">请求处理</a>的全面描述。</p> 
+ </body>
+</html>
+    </div>
+</div>
+        </div>
+    </div>
+    <div class="footer">
+        <div class="aboutus">All pages are generated by <a href="https://github.com/neevek/minerl">Minerl</a></div>
+        <div class="findme">Find this project on <a href="https://github.com/vince-styling/netroid.github.com">GitHub</a></div>
+    </div>
+</body>
+</html>
