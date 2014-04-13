@@ -1,16 +1,18 @@
 <?xml version="1.0"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project
+    xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-	    <groupId>com.yy.android.gameLibs</groupId>
-		<artifactId>netroid</artifactId>
-	    <version>1.2.0</version>
+        <groupId>com.duowan.android.netroid</groupId>
+        <artifactId>netroid-parent</artifactId>
+        <version>${netroid.version}</version>
     </parent>
 
-    <artifactId>netroid-sdk</artifactId>
-	<packaging>jar</packaging>
-    <name>netroid</name>
+    <artifactId>netroid</artifactId>
+    <packaging>jar</packaging>
 
     <dependencies>
         <dependency>

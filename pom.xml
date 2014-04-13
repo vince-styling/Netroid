@@ -1,39 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project
+    xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<groupId>com.yy.android.gameLibs</groupId>
-		<artifactId>gameLibs-parent</artifactId>
-		<version>1.0.2</version>
-	</parent>
-
-    <artifactId>netroid</artifactId>
+    <groupId>com.duowan.android.netroid</groupId>
+    <artifactId>netroid-parent</artifactId>
+    <version>${netroid.version}</version>
     <packaging>pom</packaging>
-	<version>1.2.0</version>
 
-    <name>Netroid (Parent)</name>
-    <description>Http Framework for Android</description>
     <url>http://netroid.cn/</url>
     <inceptionYear>2013</inceptionYear>
+    <description>Http Framework for Android</description>
+
+    <developers>
+        <developer>
+            <name>Vince Styling</name>
+            <url>http://vincestyling.com/</url>
+            <id>vince-styling</id>
+        </developer>
+    </developers>
 
     <modules>
-        <module>netroid-sdk</module>
-        <module>netroid-sample</module>
+        <module>library</module>
+        <module>sample</module>
     </modules>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>1.6</java.version>
-        <android.version>4.1.1.4</android.version>
+        <netroid.version>1.2.0</netroid.version>
         <android.platform>14</android.platform>
+        <android.version>4.1.1.4</android.version>
     </properties>
 
     <licenses>
         <license>
-            <name>Apache 2.0</name>
+            <name>Apache License Version 2.0</name>
             <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
         </license>
     </licenses>
 
@@ -43,6 +49,7 @@
                 <groupId>com.google.android</groupId>
                 <artifactId>android</artifactId>
                 <version>${android.version}</version>
+                <scope>provided</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -56,30 +63,19 @@
                 <configuration>
                     <source>${java.version}</source>
                     <target>${java.version}</target>
-                    <showWarnings>true</showWarnings>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>com.jayway.maven.plugins.android.generation2</groupId>
+                <artifactId>android-maven-plugin</artifactId>
+                <version>3.7.0</version>
+                <configuration>
+                    <sdk>
+                        <platform>${android.platform}</platform>
+                    </sdk>
                 </configuration>
             </plugin>
         </plugins>
-
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>com.jayway.maven.plugins.android.generation2</groupId>
-                    <artifactId>android-maven-plugin</artifactId>
-                    <version>3.5.3</version>
-                    <configuration>
-                        <sdk>
-                            <platform>${android.platform}</platform>
-                        </sdk>
-                    </configuration>
-                </plugin>
-
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-invoker-plugin</artifactId>
-                    <version>1.7</version>
-                </plugin>
-            </plugins>
-        </pluginManagement>
     </build>
 </project>
