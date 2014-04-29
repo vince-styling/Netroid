@@ -78,7 +78,12 @@ public class FileDownloadRequest extends Request<Void> {
 	@Override
 	public byte[] handleResponse(HttpResponse response, Delivery delivery) throws IOException, ServerError {
 		// The file actually size.
-		long fileSize = Long.parseLong(HttpUtils.getHeader(response, HTTP.CONTENT_LEN));
+		String contentLength = HttpUtils.getHeader(response, HTTP.CONTENT_LEN);
+		if (TextUtils.isEmpty(contentLength) || !TextUtils.isDigitsOnly(contentLength)) {
+			throw new IllegalStateException("Response doesn't contain the " + HTTP.CONTENT_LEN + " header[" + contentLength + "]!");
+		}
+
+		long fileSize = Long.parseLong(contentLength);
 		long downloadedSize = mTemporaryFile.length();
 
 		boolean isSupportRange = HttpUtils.isSupportRange(response);

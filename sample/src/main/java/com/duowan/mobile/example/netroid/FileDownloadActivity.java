@@ -42,6 +42,7 @@ public class FileDownloadActivity extends Activity implements View.OnClickListen
 		if (!downloadDir.exists()) downloadDir.mkdir();
 
 		mTaskList = new LinkedList<DownloadTask>();
+		mTaskList.add(new DownloadTask("Duowan20140427.apk", "http://download.game.yy.com/duowanapp/m/Duowan20140427.apk"));
 		mTaskList.add(new DownloadTask("Evernote_402491.dmg", "http://cdn1.evernote.com/mac/release/Evernote_402491.dmg"));
 		mTaskList.add(new DownloadTask("mysql-5.6.15-osx10.7-x86_64.dmg", "http://cdn.mysql.com/Downloads/MySQL-5.6/mysql-5.6.15-osx10.7-x86_64.dmg"));
 		mTaskList.add(new DownloadTask("apache-maven-3.1.1-bin.tar.gz", "http://apache.fayea.com/apache-mirror/maven/maven-3/3.1.1/binaries/apache-maven-3.1.1-bin.tar.gz"));
