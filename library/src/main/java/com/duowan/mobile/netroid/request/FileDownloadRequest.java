@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.RandomAccessFile;
 import java.util.concurrent.TimeUnit;
+import java.util.zip.GZIPInputStream;
 
 /**
  * Its purpose is provide a big file download impmenetation, suport continuous transmission
@@ -135,11 +136,15 @@ public class FileDownloadRequest extends Request<Void> {
 		HttpEntity entity = null;
 		try {
 			entity = response.getEntity();
-			InputStream inStream = entity.getContent();
-			byte[] buffer = new byte[8 * 1024]; // 8K buffer
+			InputStream in = entity.getContent();
+			// Determine the response gzip encoding, support for HttpClientStack download.
+			if (HttpUtils.isGzipContent(response) && !(in instanceof GZIPInputStream)) {
+				in = new GZIPInputStream(in);
+			}
+			byte[] buffer = new byte[6 * 1024]; // 6K buffer
 			int offset;
 
-			while ((offset = inStream.read(buffer)) != -1) {
+			while ((offset = in.read(buffer)) != -1) {
 				tmpFileRaf.write(buffer, 0, offset);
 
 				downloadedSize += offset;
