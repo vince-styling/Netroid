@@ -133,7 +133,7 @@ public class HttpClientStack implements HttpStack {
      * <p>Overwrite in subclasses to augment the request.</p>
      */
     protected void onPrepareRequest(HttpUriRequest request) throws IOException {
-        // Nothing.
+        request.addHeader("Accept-Encoding", "gzip");
 	}
 
 	/**

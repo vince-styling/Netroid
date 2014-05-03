@@ -396,7 +396,7 @@ public abstract class Request<T> implements Comparable<Request<T>> {
 	public byte[] handleResponse(HttpResponse response, Delivery delivery) throws IOException, ServerError {
 		// Some responses such as 204s do not have content.
 		if (response.getEntity() != null) {
-			return HttpUtils.entityToBytes(response.getEntity());
+			return HttpUtils.responseToBytes(response);
 		} else {
 			// Add 0 byte response as a way of honestly representing a no-content request.
 			return new byte[0];

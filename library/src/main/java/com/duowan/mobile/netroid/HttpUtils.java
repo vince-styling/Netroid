@@ -10,19 +10,26 @@ import org.apache.http.protocol.HTTP;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.zip.GZIPInputStream;
 
 public class HttpUtils {
 
 	/** Reads the contents of HttpEntity into a byte[]. */
-	public static byte[] entityToBytes(HttpEntity entity) throws IOException, ServerError {
+	public static byte[] responseToBytes(HttpResponse response) throws IOException, ServerError {
+		HttpEntity entity = response.getEntity();
 		PoolingByteArrayOutputStream bytes =
 				new PoolingByteArrayOutputStream(ByteArrayPool.get(), (int) entity.getContentLength());
 		byte[] buffer = null;
 		try {
 			InputStream in = entity.getContent();
+			if (isGzipContent(response) && !(in instanceof GZIPInputStream)) {
+				in = new GZIPInputStream(in);
+			}
+
 			if (in == null) {
 				throw new ServerError();
 			}
+
 			buffer = ByteArrayPool.get().getBuf(1024);
 			int count;
 			while ((count = in.read(buffer)) != -1) {
@@ -74,6 +81,10 @@ public class HttpUtils {
 		}
 		String value = getHeader(response, "Content-Range");
 		return value != null && value.startsWith("bytes");
+	}
+
+	public static boolean isGzipContent(HttpResponse response) {
+		return TextUtils.equals(getHeader(response, "Content-Encoding"), "gzip");
 	}
 
 }
