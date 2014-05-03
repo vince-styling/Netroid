@@ -48,6 +48,7 @@ public class FileDownloadRequest extends Request<Void> {
 		// Note: if the request header "Range" greater than the actual length that server-size have,
 		// the response header "Content-Range" will return "bytes */[actual length]", that's wrong.
 		addHeader("Range", "bytes=" + mTemporaryFile.length() + "-");
+//		addHeader("Accept-Encoding", "identity");
 	}
 
 	/** Ignore the response content, just rename the TemporaryFile to StoreFile. */
@@ -77,13 +78,15 @@ public class FileDownloadRequest extends Request<Void> {
 	 */
 	@Override
 	public byte[] handleResponse(HttpResponse response, Delivery delivery) throws IOException, ServerError {
-		// The file actually size.
+		// Content-Length might be negative when use HttpURLConnection because it default header Accept-Encoding is gzip,
+		// we can force set the Accept-Encoding as identity in prepare() method to slove this problem but also disable gzip response.
+		long fileSize = 0;
 		String contentLength = HttpUtils.getHeader(response, HTTP.CONTENT_LEN);
-		if (TextUtils.isEmpty(contentLength) || !TextUtils.isDigitsOnly(contentLength)) {
-			throw new IllegalStateException("Response doesn't contain the " + HTTP.CONTENT_LEN + " header[" + contentLength + "]!");
+		try {
+			fileSize = Long.parseLong(contentLength);
+		} catch (NumberFormatException e) {
+			NetroidLog.d("Response doesn't contain the %s header[%d]!", HTTP.CONTENT_LEN, contentLength);
 		}
-
-		long fileSize = Long.parseLong(contentLength);
 		long downloadedSize = mTemporaryFile.length();
 
 		boolean isSupportRange = HttpUtils.isSupportRange(response);
@@ -105,13 +108,10 @@ public class FileDownloadRequest extends Request<Void> {
 			}
 		}
 
-		// Don't go on if fileSize illegal.
-		if (fileSize < 1) throw new IOException("Response's Empty!");
-
 		// Compare the store file size(after download successes have) to server-side Content-Length.
 		// temporary file will rename to store file after download success, so we compare the
 		// Content-Length to ensure this request already download or not.
-		if (mStoreFile.length() == fileSize) {
+		if (fileSize > 0 && mStoreFile.length() == fileSize) {
 			// Rename the store file to temporary file, mock the download success. ^_^
 			mStoreFile.renameTo(mTemporaryFile);
 

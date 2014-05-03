@@ -42,6 +42,9 @@ public class FileDownloadActivity extends Activity implements View.OnClickListen
 		if (!downloadDir.exists()) downloadDir.mkdir();
 
 		mTaskList = new LinkedList<DownloadTask>();
+		mTaskList.add(new DownloadTask("rfc2965.txt", "http://www.ietf.org/rfc/rfc2965.txt"));
+		mTaskList.add(new DownloadTask("KingReaderAppV5.1.apk", "http://www.kingreader.com/dl/Android/KingReaderAppV5.1.apk"));
+		mTaskList.add(new DownloadTask("FBReaderJ_ice-cream-sandwich.apk", "http://fbreader.org/files/android/FBReaderJ_ice-cream-sandwich.apk"));
 		mTaskList.add(new DownloadTask("Duowan20140427.apk", "http://download.game.yy.com/duowanapp/m/Duowan20140427.apk"));
 		mTaskList.add(new DownloadTask("Evernote_402491.dmg", "http://cdn1.evernote.com/mac/release/Evernote_402491.dmg"));
 		mTaskList.add(new DownloadTask("mysql-5.6.15-osx10.7-x86_64.dmg", "http://cdn.mysql.com/Downloads/MySQL-5.6/mysql-5.6.15-osx10.7-x86_64.dmg"));
@@ -51,11 +54,9 @@ public class FileDownloadActivity extends Activity implements View.OnClickListen
 		mTaskList.add(new DownloadTask("netroid_request_handling_flowchart.png", "http://netroid.cn/netroid_request_handling_flowchart.png"));
 		mTaskList.add(new DownloadTask("91assistant_3.9_295.apk", "http://dl.sj.91.com/msoft/91assistant_3.9_295.apk"));
 		mTaskList.add(new DownloadTask("BaiduRoot_2001.apk", "http://bs.baidu.com/easyroot/BaiduRoot_2001.apk"));
-		mTaskList.add(new DownloadTask("KingReaderAppV5.1.apk", "http://www.kingreader.com/dl/Android/KingReaderAppV5.1.apk"));
 		mTaskList.add(new DownloadTask("Baidumusic_yinyuehexzfc.apk", "http://music.baidu.com/cms/mobile/static/apk/Baidumusic_yinyuehexzfc.apk"));
 		mTaskList.add(new DownloadTask("MacWeChat-zh_CN.dmg", "http://dldir1.qq.com/foxmail/Mac/WeChat-zh_CN.dmg"));
 		mTaskList.add(new DownloadTask("XamarinInstaller.dmg", "http://download.xamarin.com/Installer/Mac/XamarinInstaller.dmg"));
-		mTaskList.add(new DownloadTask("FBReaderJ_ice-cream-sandwich.apk", "http://fbreader.org/files/android/FBReaderJ_ice-cream-sandwich.apk"));
 
 		btnAddTask = (Button) findViewById(R.id.btnAddTask);
 		btnAddTask.setText("添加任务(" + mTaskList.size() + ")");
