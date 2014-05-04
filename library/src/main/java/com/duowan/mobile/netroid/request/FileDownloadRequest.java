@@ -49,6 +49,8 @@ public class FileDownloadRequest extends Request<Void> {
 		// Note: if the request header "Range" greater than the actual length that server-size have,
 		// the response header "Content-Range" will return "bytes */[actual length]", that's wrong.
 		addHeader("Range", "bytes=" + mTemporaryFile.length() + "-");
+
+//		Suppress the HttpStack accept gzip encoding, avoid the progress calculate wrong problem.
 //		addHeader("Accept-Encoding", "identity");
 	}
 

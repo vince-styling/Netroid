@@ -14,6 +14,7 @@ import com.duowan.mobile.netroid.Listener;
 import com.duowan.mobile.netroid.NetroidError;
 import com.duowan.mobile.netroid.NetroidLog;
 import com.duowan.mobile.netroid.RequestQueue;
+import com.duowan.mobile.netroid.request.FileDownloadRequest;
 import com.duowan.mobile.netroid.toolbox.FileDownloader;
 
 import java.io.File;
@@ -36,7 +37,18 @@ public class FileDownloadActivity extends Activity implements View.OnClickListen
 		setContentView(R.layout.file_downloader);
 
 		RequestQueue queue = Netroid.newRequestQueue(getApplicationContext(), null);
-		mDownloder = new FileDownloader(queue, 1);
+		mDownloder = new FileDownloader(queue, 1) {
+			@Override
+			public FileDownloadRequest buildRequest(String storeFilePath, String url) {
+				return new FileDownloadRequest(storeFilePath, url) {
+					@Override
+					public void prepare() {
+						addHeader("Accept-Encoding", "identity");
+						super.prepare();
+					}
+				};
+			}
+		};
 
 		File downloadDir = new File(mSaveDirPath);
 		if (!downloadDir.exists()) downloadDir.mkdir();

@@ -3,7 +3,7 @@ title: Netroid FileDownloader
 layout: index
 format: markdown
 slug: filedownloader.html
-lstModified: 2014-04-13 15:09
+lstModified: 2014-05-04 18:21
 ---
 
 # 大文件下载
@@ -50,6 +50,7 @@ FileDownloader的用法类似于 **ImageLoader**，用单例模式创建一个�
             // Listener添加了这个回调方法专门用于获取进度
             @Override
             public void onProgressChange(long fileSize, long downloadedSize) {
+                // 注：downloadedSize 有可能大于 fileSize，具体原因见下面的描述
                 Toast.makeText("下载进度：" + (downloadedSize * 1.0f / fileSize * 100) + "%").show();
             }
     });
@@ -95,3 +96,50 @@ Netroid添加了 `FileDownloadRequest` 来实现断点下载功能，核心的�
 注：在测试中发现大文件下载可能出现连接超时的问题，所以 **FileDownloadRequest** 的重试次数设置了一个比较大的值(200)，以避免下载失败。
 
 注：**FileDownloadRequest** 的优先级为最低，在等待队列中，优先级更高的操作将更快执行。
+
+## 疑难解决：
+
+进度计算可能会出现以下两种异常情况：
+
+> 1、文件总大小为0，但已下载大小大于0，导致进度计算出错或一直为0%。
+
+这种情况是因为服务端使用了Chunked Encoding返回数据，Netroid无法从响应头中获取到Content-Length，所以在进度回调时下载文件的总大小一直为零。
+有关Transfer-Encoding:chunked的原理，可参考[HttpWatch](http://www.httpwatch.com/httpgallery/chunked/)的详细介绍。
+
+> 2、文件已下载大小大于总大小，导致进度计算超出100%。
+
+这种情况是因为服务端返回了gzip格式的数据，但Netroid在接收到gzip数据时使用了GzipInputStream直接解压缩存放，
+导致计算出来的已下载大小是解压后的大小，但总大小因为是从Content-Length中取得的压缩大小，所以导致计算误差。
+
+### 问题原因：
+
+无论Netroid使用的 **HurlStack** 或 **HttpClientStack** 均在每次发送请求时添加了接收gzip编码的响应结果：
+
+    HttpRequest.addHeader("Accept-Encoding", "gzip");
+
+这个Header将通知服务端可返回通过gzip后的响应内容，客户端再进行解压存放，设置可接收gzip编码对于普通的请求操作来讲能够有效地节省流量，
+但对于文件下载组件来讲直接导致了上述第二个问题的发生，第一个问题也有可能是因为这个设置而导致服务端认为客户端可接收Chunked Encoding而引发的。
+
+如果你将要下载的文件属于gzip作用不大的文件，例如：jpg、apk、rar、dmg等经过压缩的二进制文件格式，你可以禁用接收gzip编码文件的操作，
+以解决上述两个问题。但如果你去下载一个纯文本文件，gzip压缩可显著地节省流量，是否该允许进度计算出错的问题存在，这其中的利弊需要开发者自己取舍。
+
+### 解决方案：
+
+Netroid允许开发者实现自己的文件下载逻辑，只需要重写 **FileDownloader.buildRequest()** 方法，返回继承自 `FileDownloadRequest` 的实例即可：
+
+    FileDownloader mDownloder = new FileDownloader(mQueue, 1) {
+        @Override
+        public FileDownloadRequest buildRequest(String storeFilePath, String url) {
+            return new FileDownloadRequest(storeFilePath, url) {
+                @Override
+                public void prepare() {
+                    addHeader("Accept-Encoding", "identity");
+                    // 父类的prepare()方法做了Range计算，不要忘记调用
+                    super.prepare();
+                }
+            };
+        }
+    };
+
+示例中返回一个重写了 **prepare()** 方法的 FileDownloadRequest 对象，在prepare()方法中设置Accept-Encoding为identity以代替Netroid默认的gzip设置。
+这个定制方式允许开发者选择是否启用gzip编码，从而解决进度计算的问题。

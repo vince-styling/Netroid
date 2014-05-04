@@ -142,8 +142,17 @@ public class FileDownloader {
 
 	private void throwIfNotOnMainThread() {
 		if (Looper.myLooper() != Looper.getMainLooper()) {
-			throw new IllegalStateException("ImageLoader must be invoked from the main thread.");
+			throw new IllegalStateException("FileDownloader must be invoked from the main thread.");
 		}
+	}
+
+	/**
+	 * This method can override by developer to change download behaviour,
+	 * such as add customize headers or handle the response himself. <br/>
+	 * Note : before you override this, make sure you are understood the {@link FileDownloadRequest} very well.
+	 */
+	public FileDownloadRequest buildRequest(String storeFilePath, String url) {
+		return new FileDownloadRequest(storeFilePath, url);
 	}
 
 	/**
@@ -181,7 +190,8 @@ public class FileDownloader {
 		private boolean deploy() {
 			if (mStatus != STATUS_WAITING) return false;
 
-			mRequest = new FileDownloadRequest(mStoreFilePath, mUrl);
+			mRequest = buildRequest(mStoreFilePath, mUrl);
+
 			// we create a Listener to wrapping that Listener which developer specified,
 			// for the onFinish(), onSuccess(), onError() won't call when request was cancel reason.
 			mRequest.setListener(new Listener<Void>() {
