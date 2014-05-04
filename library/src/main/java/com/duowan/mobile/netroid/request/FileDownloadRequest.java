@@ -81,15 +81,13 @@ public class FileDownloadRequest extends Request<Void> {
 	public byte[] handleResponse(HttpResponse response, Delivery delivery) throws IOException, ServerError {
 		// Content-Length might be negative when use HttpURLConnection because it default header Accept-Encoding is gzip,
 		// we can force set the Accept-Encoding as identity in prepare() method to slove this problem but also disable gzip response.
-		long fileSize = 0;
-		String contentLength = HttpUtils.getHeader(response, HTTP.CONTENT_LEN);
-		try {
-			fileSize = Long.parseLong(contentLength);
-		} catch (NumberFormatException e) {
-			NetroidLog.d("Response doesn't contain the %s header[%d]!", HTTP.CONTENT_LEN, contentLength);
+		HttpEntity entity = response.getEntity();
+		long fileSize = entity.getContentLength();
+		if (fileSize <= 0) {
+			NetroidLog.d("Response doesn't present Content-Length!");
 		}
-		long downloadedSize = mTemporaryFile.length();
 
+		long downloadedSize = mTemporaryFile.length();
 		boolean isSupportRange = HttpUtils.isSupportRange(response);
 		if (isSupportRange) {
 			fileSize += downloadedSize;
@@ -133,9 +131,7 @@ public class FileDownloadRequest extends Request<Void> {
 			downloadedSize = 0;
 		}
 
-		HttpEntity entity = null;
 		try {
-			entity = response.getEntity();
 			InputStream in = entity.getContent();
 			// Determine the response gzip encoding, support for HttpClientStack download.
 			if (HttpUtils.isGzipContent(response) && !(in instanceof GZIPInputStream)) {
