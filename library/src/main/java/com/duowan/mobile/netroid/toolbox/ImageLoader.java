@@ -479,7 +479,7 @@ public abstract class ImageLoader {
      * @param maxWidth The max-width of the output.
      * @param maxHeight The max-height of the output.
      */
-    private static String getCacheKey(String url, int maxWidth, int maxHeight) {
+    public static String getCacheKey(String url, int maxWidth, int maxHeight) {
 		return "#W" + maxWidth + "#H" + maxHeight + url;
 	}
 
