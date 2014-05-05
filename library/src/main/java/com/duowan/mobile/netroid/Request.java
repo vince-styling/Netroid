@@ -321,7 +321,7 @@ public abstract class Request<T> implements Comparable<Request<T>> {
      *
      * @throws AuthFailureError in the event of auth failure
      */
-    protected Map<String, String> getParams() throws AuthFailureError {
+	public Map<String, String> getParams() throws AuthFailureError {
         return null;
     }
 
@@ -337,7 +337,7 @@ public abstract class Request<T> implements Comparable<Request<T>> {
      *         byte array.</li>
      * </ol>
      */
-    protected String getParamsEncoding() {
+	public String getParamsEncoding() {
         return DEFAULT_PARAMS_ENCODING;
     }
 
@@ -361,7 +361,7 @@ public abstract class Request<T> implements Comparable<Request<T>> {
     /**
      * Converts <code>params</code> into an application/x-www-form-urlencoded encoded string.
      */
-    private byte[] encodeParameters(Map<String, String> params, String paramsEncoding) {
+    public static byte[] encodeParameters(Map<String, String> params, String paramsEncoding) {
         StringBuilder encodedParams = new StringBuilder();
         try {
             for (Map.Entry<String, String> entry : params.entrySet()) {

@@ -3,7 +3,7 @@ title: Netroid Request
 layout: index
 format: markdown
 slug: request.html
-lstModified: 2014-04-13 16:22
+lstModified: 2014-05-05 14:48
 ---
 
 # 请求处理
@@ -367,6 +367,63 @@ Netroid在每次请求重试前都会对请求是否已取消进行判断，目�
     }
 
 **handleResponse()** 方法是Netroid核心中用于处理返回结果的方法，开发者同样可以重写这个方法自己处理请求结果，具体做法可参考 **FileDownloadRequest** 中的示例。
+
+
+## 执行Post请求：
+
+默认情况下，所有的请求均为Get请求，执行带实体内容的Post、Put请求可通过以下两种方法来实现：
+
+> 1、重写 **Request.getParams()** 方法：
+
+    public class PostByParamsRequest extends StringRequest {
+        private Map<String, String> mParams;
+
+        // 传入Post参数的Map集合
+        public PostByParamsRequest(String url, Map<String, String> params, Listener<String> listener) {
+            super(Method.POST, url, listener);
+            mParams = params;
+        }
+
+        @Override
+        public Map<String, String> getParams() throws AuthFailureError {
+            return mParams;
+        }
+
+    }
+
+    RequestQueue.add(new PostByParamsRequest(url, params, listener));
+
+> 2、重写 **Request.getBody()** 方法：
+
+    public class PostByEncodeBodyRequest extends StringRequest {
+
+        public PostByEncodeBodyRequest(String url, Listener<String> listener) {
+            super(Method.POST, url, listener);
+        }
+
+        @Override
+        public byte[] getBody() throws AuthFailureError {
+            // 自己进行请求实体内容的编码，可进行加密等操作再返回，具体做法参照Request.getBody()的实现
+            return bytes;
+        }
+
+    }
+
+    RequestQueue.add(new PostByEncodeBodyRequest(url, listener));
+
+同样地，Netroid允许开发者指定Post参数的编码格式及Body-Content-Type，可通过重写以下两个方法定制：
+
+    public class Request {
+        // 指定参数的编码，默认为UTF-8
+        protected String getParamsEncoding() {
+            return DEFAULT_PARAMS_ENCODING;
+        }
+
+        // 指定Post的内容类型
+        public String getBodyContentType() {
+            return "application/x-www-form-urlencoded; charset=" + getParamsEncoding();
+        }
+    }
 
 
 ## 执行非http请求：
