@@ -19,7 +19,10 @@ import android.graphics.Bitmap;
 import android.os.Handler;
 import android.os.Looper;
 import android.widget.ImageView;
-import com.duowan.mobile.netroid.*;
+import com.duowan.mobile.netroid.Listener;
+import com.duowan.mobile.netroid.NetroidError;
+import com.duowan.mobile.netroid.Request;
+import com.duowan.mobile.netroid.RequestQueue;
 import com.duowan.mobile.netroid.request.ImageRequest;
 
 import java.util.HashMap;
@@ -194,7 +197,6 @@ public abstract class ImageLoader {
 		// Try to look up the request in the cache of remote images.
 		if (mCache != null) {
 			Bitmap cachedBitmap = mCache.getBitmap(cacheKey);
-			NetroidLog.e("Cache existing : " + cachedBitmap);
 			if (cachedBitmap != null) {
 				// Return the cached bitmap.
 				ImageContainer container = new ImageContainer(cachedBitmap, requestUrl, null, null);
@@ -215,7 +217,6 @@ public abstract class ImageLoader {
         BatchedImageRequest request = mInFlightRequests.get(cacheKey);
         if (request != null) {
             // If it is, add this request to the list of listeners.
-			NetroidLog.e("in-flight request, stay waiting");
 			request.addContainer(imageContainer);
             return imageContainer;
         }

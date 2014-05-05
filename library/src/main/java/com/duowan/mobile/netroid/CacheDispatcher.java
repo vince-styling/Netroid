@@ -110,8 +110,6 @@ public class CacheDispatcher extends Thread {
 					continue;
 				}
 
-				NetroidLog.e("shouldCache : " + request.shouldCache() + " isExpired : " + entry.isExpired());
-
                 // If it is completely expired, just send it to the network.
                 if (entry.isExpired()) {
 					request.addMarker("cache-hit-expired");
