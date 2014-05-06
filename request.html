@@ -11,7 +11,7 @@
         <div class="clearfix">
             <div class="page-title">
     <h1><a href="/">Netroid Request</a></h1>
-    <h2>last modified : 2014-04-13 16:22</h2>
+    <h2>last modified : 2014-05-05 14:48</h2>
 </div>
 <div class="primary">
     <div class="post-thumb">
@@ -337,6 +337,58 @@
     ...
 <span class="braces">}</span></pre> 
   <p><strong>handleResponse()</strong> 方法是Netroid核心中用于处理返回结果的方法，开发者同样可以重写这个方法自己处理请求结果，具体做法可参考 <strong>FileDownloadRequest</strong> 中的示例。</p> 
+  <h2 id="post">执行Post请求：</h2> 
+  <p>默认情况下，所有的请求均为Get请求，执行带实体内容的Post、Put请求可通过以下两种方法来实现：</p> 
+  <blockquote> 
+   <p>1、重写 <strong>Request.getParams()</strong> 方法：</p> 
+  </blockquote> 
+  <pre><span class="reserved_word">public</span> <span class="reserved_word">class</span> <span class="identifier">PostByParamsRequest</span> <span class="reserved_word">extends</span> <span class="identifier">StringRequest</span> <span class="braces">{</span>
+    <span class="reserved_word">private</span> <span class="identifier">Map</span><span class="symbol">&lt;</span><span class="identifier">String</span>, <span class="identifier">String</span><span class="symbol">&gt;</span> <span class="identifier">mParams</span><span class="symbol">;</span>
+
+    <span class="comment">// 传入Post参数的Map集合</span>
+    <span class="reserved_word">public</span> <span class="identifier">PostByParamsRequest</span><span class="braces">(</span><span class="identifier">String</span> <span class="identifier">url</span>, <span class="identifier">Map</span><span class="symbol">&lt;</span><span class="identifier">String</span>, <span class="identifier">String</span><span class="symbol">&gt;</span> <span class="identifier">params</span>, <span class="identifier">Listener</span><span class="symbol">&lt;</span><span class="identifier">String</span><span class="symbol">&gt;</span> <span class="identifier">listener</span><span class="braces">)</span> <span class="braces">{</span>
+        <span class="reserved_word">super</span><span class="braces">(</span><span class="identifier">Method</span>.<span class="identifier">POST</span>, <span class="identifier">url</span>, <span class="identifier">listener</span><span class="braces">)</span><span class="symbol">;</span>
+        <span class="identifier">mParams</span> <span class="symbol">=</span> <span class="identifier">params</span><span class="symbol">;</span>
+    <span class="braces">}</span>
+
+    @<span class="identifier">Override</span>
+    <span class="reserved_word">public</span> <span class="identifier">Map</span><span class="symbol">&lt;</span><span class="identifier">String</span>, <span class="identifier">String</span><span class="symbol">&gt;</span> <span class="identifier">getParams</span><span class="braces">(</span><span class="braces">)</span> <span class="reserved_word">throws</span> <span class="identifier">AuthFailureError</span> <span class="braces">{</span>
+        <span class="reserved_word">return</span> <span class="identifier">mParams</span><span class="symbol">;</span>
+    <span class="braces">}</span>
+
+<span class="braces">}</span>
+
+<span class="identifier">RequestQueue</span>.<span class="identifier">add</span><span class="braces">(</span><span class="reserved_word">new</span> <span class="identifier">PostByParamsRequest</span><span class="braces">(</span><span class="identifier">url</span>, <span class="identifier">params</span>, <span class="identifier">listener</span><span class="braces">)</span><span class="braces">)</span><span class="symbol">;</span></pre> 
+  <blockquote> 
+   <p>2、重写 <strong>Request.getBody()</strong> 方法：</p> 
+  </blockquote> 
+  <pre><span class="reserved_word">public</span> <span class="reserved_word">class</span> <span class="identifier">PostByEncodeBodyRequest</span> <span class="reserved_word">extends</span> <span class="identifier">StringRequest</span> <span class="braces">{</span>
+
+    <span class="reserved_word">public</span> <span class="identifier">PostByEncodeBodyRequest</span><span class="braces">(</span><span class="identifier">String</span> <span class="identifier">url</span>, <span class="identifier">Listener</span><span class="symbol">&lt;</span><span class="identifier">String</span><span class="symbol">&gt;</span> <span class="identifier">listener</span><span class="braces">)</span> <span class="braces">{</span>
+        <span class="reserved_word">super</span><span class="braces">(</span><span class="identifier">Method</span>.<span class="identifier">POST</span>, <span class="identifier">url</span>, <span class="identifier">listener</span><span class="braces">)</span><span class="symbol">;</span>
+    <span class="braces">}</span>
+
+    @<span class="identifier">Override</span>
+    <span class="reserved_word">public</span> <span class="reserved_word">byte</span><span class="braces">[</span><span class="braces">]</span> <span class="identifier">getBody</span><span class="braces">(</span><span class="braces">)</span> <span class="reserved_word">throws</span> <span class="identifier">AuthFailureError</span> <span class="braces">{</span>
+        <span class="comment">// 自己进行请求实体内容的编码，可进行加密等操作再返回，具体做法参照Request.getBody()的实现</span>
+        <span class="reserved_word">return</span> <span class="identifier">bytes</span><span class="symbol">;</span>
+    <span class="braces">}</span>
+
+<span class="braces">}</span>
+
+<span class="identifier">RequestQueue</span>.<span class="identifier">add</span><span class="braces">(</span><span class="reserved_word">new</span> <span class="identifier">PostByEncodeBodyRequest</span><span class="braces">(</span><span class="identifier">url</span>, <span class="identifier">listener</span><span class="braces">)</span><span class="braces">)</span><span class="symbol">;</span></pre> 
+  <p>同样地，Netroid允许开发者指定Post参数的编码格式及Body-Content-Type，可通过重写以下两个方法定制：</p> 
+  <pre><span class="reserved_word">public</span> <span class="reserved_word">class</span> <span class="identifier">Request</span> <span class="braces">{</span>
+    <span class="comment">// 指定参数的编码，默认为UTF-8</span>
+    <span class="reserved_word">protected</span> <span class="identifier">String</span> <span class="identifier">getParamsEncoding</span><span class="braces">(</span><span class="braces">)</span> <span class="braces">{</span>
+        <span class="reserved_word">return</span> <span class="identifier">DEFAULT_PARAMS_ENCODING</span><span class="symbol">;</span>
+    <span class="braces">}</span>
+
+    <span class="comment">// 指定Post的内容类型</span>
+    <span class="reserved_word">public</span> <span class="identifier">String</span> <span class="identifier">getBodyContentType</span><span class="braces">(</span><span class="braces">)</span> <span class="braces">{</span>
+        <span class="reserved_word">return</span> <span class="string">&quot;application/x-www-form-urlencoded; charset=&quot;</span> <span class="symbol">+</span> <span class="identifier">getParamsEncoding</span><span class="braces">(</span><span class="braces">)</span><span class="symbol">;</span>
+    <span class="braces">}</span>
+<span class="braces">}</span></pre> 
   <h2 id="http">执行非http请求：</h2> 
   <p>为了允许 <strong>ImageLoader</strong> 加载不同来源的图片文件，Netroid实现了执行非http操作的支持：</p> 
   <pre><span class="identifier">ImageRequest</span> <span class="identifier">request</span> <span class="symbol">=</span> <span class="reserved_word">new</span> <span class="identifier">ImageRequest</span><span class="braces">(</span><span class="string">&quot;sdcard:///sdcard/DCIM/Camera/IMG.jpg&quot;</span>, ...<span class="braces">)</span> <span class="braces">{</span>

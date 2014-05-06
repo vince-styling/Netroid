@@ -11,7 +11,7 @@
         <div class="clearfix">
             <div class="page-title">
     <h1><a href="/">Netroid FileDownloader</a></h1>
-    <h2>last modified : 2014-04-13 15:09</h2>
+    <h2>last modified : 2014-05-04 18:21</h2>
 </div>
 <div class="primary">
     <div class="post-thumb">
@@ -54,6 +54,7 @@
         <span class="comment">// Listener添加了这个回调方法专门用于获取进度</span>
         @<span class="identifier">Override</span>
         <span class="reserved_word">public</span> <span class="reserved_word">void</span> <span class="identifier">onProgressChange</span><span class="braces">(</span><span class="reserved_word">long</span> <span class="identifier">fileSize</span>, <span class="reserved_word">long</span> <span class="identifier">downloadedSize</span><span class="braces">)</span> <span class="braces">{</span>
+            <span class="comment">// 注：downloadedSize 有可能大于 fileSize，具体原因见下面的描述</span>
             <span class="identifier">Toast</span>.<span class="identifier">makeText</span><span class="braces">(</span><span class="string">&quot;下载进度：&quot;</span> <span class="symbol">+</span> <span class="braces">(</span><span class="identifier">downloadedSize</span> <span class="symbol">*</span> <span class="numeric">1.0f</span> / <span class="identifier">fileSize</span> <span class="symbol">*</span> <span class="numeric">100</span><span class="braces">)</span> <span class="symbol">+</span> <span class="string">&quot;%&quot;</span><span class="braces">)</span>.<span class="identifier">show</span><span class="braces">(</span><span class="braces">)</span><span class="symbol">;</span>
         <span class="braces">}</span>
 <span class="braces">}</span><span class="braces">)</span><span class="symbol">;</span>
@@ -88,6 +89,37 @@
   <p>由于文件下载操作的特殊性，不适宜进行缓存处理，为了避免错误地设置，<strong>FileDownloadRequest</strong> 内部直接禁用了缓存， 所以调用 <strong>FileDownloadRequest.setCacheExpireTime()</strong> 来指定缓存过期时间将不生效。</p> 
   <p>注：在测试中发现大文件下载可能出现连接超时的问题，所以 <strong>FileDownloadRequest</strong> 的重试次数设置了一个比较大的值(200)，以避免下载失败。</p> 
   <p>注：<strong>FileDownloadRequest</strong> 的优先级为最低，在等待队列中，优先级更高的操作将更快执行。</p> 
+  <h2>疑难解决：</h2> 
+  <p>进度计算可能会出现以下两种异常情况：</p> 
+  <blockquote> 
+   <p>1、文件总大小为0，但已下载大小大于0，导致进度计算出错或一直为0%。</p> 
+  </blockquote> 
+  <p>这种情况是因为服务端使用了Chunked Encoding返回数据，Netroid无法从响应头中获取到Content-Length，所以在进度回调时下载文件的总大小一直为零。 有关Transfer-Encoding:chunked的原理，可参考<a href="http://www.httpwatch.com/httpgallery/chunked/">HttpWatch</a>的详细介绍。</p> 
+  <blockquote> 
+   <p>2、文件已下载大小大于总大小，导致进度计算超出100%。</p> 
+  </blockquote> 
+  <p>这种情况是因为服务端返回了gzip格式的数据，但Netroid在接收到gzip数据时使用了GzipInputStream直接解压缩存放， 导致计算出来的已下载大小是解压后的大小，但总大小因为是从Content-Length中取得的压缩大小，所以导致计算误差。</p> 
+  <h3>问题原因：</h3> 
+  <p>无论Netroid使用的 <strong>HurlStack</strong> 或 <strong>HttpClientStack</strong> 均在每次发送请求时添加了接收gzip编码的响应结果：</p> 
+  <pre><span class="identifier">HttpRequest</span>.<span class="identifier">addHeader</span><span class="braces">(</span><span class="string">&quot;Accept-Encoding&quot;</span>, <span class="string">&quot;gzip&quot;</span><span class="braces">)</span><span class="symbol">;</span></pre> 
+  <p>这个Header将通知服务端可返回通过gzip后的响应内容，客户端再进行解压存放，设置可接收gzip编码对于普通的请求操作来讲能够有效地节省流量， 但对于文件下载组件来讲直接导致了上述第二个问题的发生，第一个问题也有可能是因为这个设置而导致服务端认为客户端可接收Chunked Encoding而引发的。</p> 
+  <p>如果你将要下载的文件属于gzip作用不大的文件，例如：jpg、apk、rar、dmg等经过压缩的二进制文件格式，你可以禁用接收gzip编码文件的操作， 以解决上述两个问题。但如果你去下载一个纯文本文件，gzip压缩可显著地节省流量，是否该允许进度计算出错的问题存在，这其中的利弊需要开发者自己取舍。</p> 
+  <h3>解决方案：</h3> 
+  <p>Netroid允许开发者实现自己的文件下载逻辑，只需要重写 <strong>FileDownloader.buildRequest()</strong> 方法，返回继承自 <code>FileDownloadRequest</code> 的实例即可：</p> 
+  <pre><span class="identifier">FileDownloader</span> <span class="identifier">mDownloder</span> <span class="symbol">=</span> <span class="reserved_word">new</span> <span class="identifier">FileDownloader</span><span class="braces">(</span><span class="identifier">mQueue</span>, <span class="numeric">1</span><span class="braces">)</span> <span class="braces">{</span>
+    @<span class="identifier">Override</span>
+    <span class="reserved_word">public</span> <span class="identifier">FileDownloadRequest</span> <span class="identifier">buildRequest</span><span class="braces">(</span><span class="identifier">String</span> <span class="identifier">storeFilePath</span>, <span class="identifier">String</span> <span class="identifier">url</span><span class="braces">)</span> <span class="braces">{</span>
+        <span class="reserved_word">return</span> <span class="reserved_word">new</span> <span class="identifier">FileDownloadRequest</span><span class="braces">(</span><span class="identifier">storeFilePath</span>, <span class="identifier">url</span><span class="braces">)</span> <span class="braces">{</span>
+            @<span class="identifier">Override</span>
+            <span class="reserved_word">public</span> <span class="reserved_word">void</span> <span class="identifier">prepare</span><span class="braces">(</span><span class="braces">)</span> <span class="braces">{</span>
+                <span class="identifier">addHeader</span><span class="braces">(</span><span class="string">&quot;Accept-Encoding&quot;</span>, <span class="string">&quot;identity&quot;</span><span class="braces">)</span><span class="symbol">;</span>
+                <span class="comment">// 父类的prepare()方法做了Range计算，不要忘记调用</span>
+                <span class="reserved_word">super</span>.<span class="identifier">prepare</span><span class="braces">(</span><span class="braces">)</span><span class="symbol">;</span>
+            <span class="braces">}</span>
+        <span class="braces">}</span><span class="symbol">;</span>
+    <span class="braces">}</span>
+<span class="braces">}</span><span class="symbol">;</span></pre> 
+  <p>示例中返回一个重写了 <strong>prepare()</strong> 方法的 FileDownloadRequest 对象，在prepare()方法中设置Accept-Encoding为identity以代替Netroid默认的gzip设置。 这个定制方式允许开发者选择是否启用gzip编码，从而解决进度计算的问题。</p> 
  </body>
 </html>
     </div>
