@@ -12,15 +12,15 @@ Feature
 
 As most android apps done, Netroid allow you to retrive data over http with background thread, exchange invoke result to main thread.
 
-### 2. Response cache base disk.
+#### 2. Response cache base disk.
 
 Netroid can cache your http response to disk and the cache expire time was configurable.
 
-### 3. Image loading solution.
+#### 3. Image loading solution.
 
 Provide a powerful solution of image load, used LruImageCache as bitmap memory cache.
 
-### 4. Big file download solution.
+#### 4. Big file download solution.
 
 Provide file download management, allows create, pause, continue, discard operation with download task, also download progress callback.
 
@@ -39,9 +39,10 @@ The main entry of Netroid is `RequestQueue` :
 Network network = new BasicNetwork(new HurlStack(Const.USER_AGENT, null), HTTP.UTF_8);
 RequestQueue mQueue = new RequestQueue(network, 4,
     new DiskCache(new File(ctx.getCacheDir(), Const.HTTP_DISK_CACHE_DIR_NAME), Const.HTTP_DISK_CACHE_SIZE));
+mQueue.start();
 ```
 
-we can perform a request simply add a request instance into RequestQueue :
+we can execute a request simply add a request instance into RequestQueue :
 
 ```java
 StringRequest request = new StringRequest(url, new Listener<String>() {
@@ -52,7 +53,7 @@ StringRequest request = new StringRequest(url, new Listener<String>() {
         mPrgsDialog = ProgressDialog.show(Activity.this, null, "loading...", true, true);
     }
 
-    // we should cacne the dialog with onFinish() callback
+    // cancel the dialog with onFinish() callback
     @Override
     public void onFinish() {
         mPrgsDialog.cancel();
@@ -89,8 +90,30 @@ Integration
 ===========
 
 Netroid has not yet to publish to Maven Centra Repository or Gradle, In order to use this library from you Android project,
-please place the [core](http://netroid.cn/attach/netroid-1.2.1.jar) jar file to your project, we'll publish as soon as possible.
+please place the [core jar](http://netroid.cn/attach/netroid-1.2.1.jar) file to your project, we'll publish as soon as possible.
 
 For more detail about what Netroid can do, pay attention to the [docs](http://netroid.cn/), that written by chinese.
 
-We provide the [sample apk](http://netroid.cn/attach/netroid-sample-1.2.1.apk), you can try all function without any source code.
+Sample Application
+==================
+
+We build the [sample apk](http://netroid.cn/attach/netroid-sample-1.2.1.apk), you can try all function without any source code.
+
+License
+=======
+
+```text
+Copyright 2013 Vince Styling
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+```
