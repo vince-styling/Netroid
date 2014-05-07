@@ -8,19 +8,19 @@ That purpose is make your android development easier than before, provide fast, 
 Feature
 =========
 
-> 1. Base async http interaction.
+### 1. Base async http interaction.
 
 As most android apps done, Netroid allow you to retrive data over http with background thread, exchange invoke result to main thread.
 
-> 2. Response cache base disk.
+### 2. Response cache base disk.
 
 Netroid can cache your http response to disk and the cache expire time was configurable.
 
-> 3. Image loading solution.
+### 3. Image loading solution.
 
 Provide a powerful solution of image load, used LruImageCache as bitmap memory cache.
 
-> 4. Big file download solution.
+### 4. Big file download solution.
 
 Provide file download management, allows create, pause, continue, discard operation with download task, also download progress callback.
 
@@ -35,49 +35,55 @@ Basic usage
 
 The main entry of Netroid is `RequestQueue` :
 
-    Network network = new BasicNetwork(new HurlStack(Const.USER_AGENT, null), HTTP.UTF_8);
-    RequestQueue mQueue = new RequestQueue(network, 4,
-        new DiskCache(new File(ctx.getCacheDir(), Const.HTTP_DISK_CACHE_DIR_NAME), Const.HTTP_DISK_CACHE_SIZE));
+```java
+Network network = new BasicNetwork(new HurlStack(Const.USER_AGENT, null), HTTP.UTF_8);
+RequestQueue mQueue = new RequestQueue(network, 4,
+    new DiskCache(new File(ctx.getCacheDir(), Const.HTTP_DISK_CACHE_DIR_NAME), Const.HTTP_DISK_CACHE_SIZE));
+```
 
 we can perform a request simply add a request instance into RequestQueue :
 
-    StringRequest request = new StringRequest(url, new Listener<String>() {
-        ProgressDialog mPrgsDialog;
+```java
+StringRequest request = new StringRequest(url, new Listener<String>() {
+    ProgressDialog mPrgsDialog;
 
-        @Override
-        public void onPreExecute() {
-            mPrgsDialog = ProgressDialog.show(Activity.this, null, "loading...", true, true);
-        }
+    @Override
+    public void onPreExecute() {
+        mPrgsDialog = ProgressDialog.show(Activity.this, null, "loading...", true, true);
+    }
 
-        // we should cacne the dialog with onFinish() callback
-        @Override
-        public void onFinish() {
-            mPrgsDialog.cancel();
-        }
+    // we should cacne the dialog with onFinish() callback
+    @Override
+    public void onFinish() {
+        mPrgsDialog.cancel();
+    }
 
-        @Override
-        public void onSuccess(String response) {
-            Toast.makeText(Activity.this, "response is ： " + response, 2000).show();
-        }
+    @Override
+    public void onSuccess(String response) {
+        Toast.makeText(Activity.this, "response is ： " + response, 2000).show();
+    }
 
-        @Override
-        public void onError(NetroidError error) {
-            Toast.makeText(Activity.this, error.getMessage(), 2000).show();
-        }
+    @Override
+    public void onError(NetroidError error) {
+        Toast.makeText(Activity.this, error.getMessage(), 2000).show();
+    }
 
-        @Override
-        public void onCancel() {
-            Toast.makeText(Activity.this, "request was cancel", 2000).show();
-        }
-    });
+    @Override
+    public void onCancel() {
+        Toast.makeText(Activity.this, "request was cancel", 2000).show();
+    }
+});
 
-    // add the request to RequestQueue, will execute quickly if has idle thread
-    mQueue.add(request);
+// add the request to RequestQueue, will execute quickly if has idle thread
+mQueue.add(request);
+```
 
 Do not forget add internet permission to the `AndroidManifest.xml` file :
 
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+```xml
+<uses-permission android:name="android.permission.INTERNET" />
+<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+```
 
 Integration
 ===========
