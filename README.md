@@ -89,8 +89,21 @@ Do not forget add internet permission to the `AndroidManifest.xml` file :
 Integration
 ===========
 
-Netroid has not yet to publish to Maven Centra Repository or Gradle, In order to use this library from you Android project,
-please place the [core jar](http://netroid.cn/attach/netroid-1.2.1.jar) file to your project, we'll publish as soon as possible.
+Download the [latest JAR](http://repository.sonatype.org/service/local/artifact/maven/redirect?r=central-proxy&g=com.duowan.android.netroid&a=netroid&v=LATEST)
+or grab via Maven:
+
+```xml
+<dependency>
+  <groupId>com.duowan.android.netroid</groupId>
+  <artifactId>netroid</artifactId>
+  <version>(insert latest version)</version>
+</dependency>
+```
+
+At this point latest version is `1.2.1`.
+
+Documentation
+===========
 
 For more detail about what Netroid can do, pay attention to the [docs](http://netroid.cn/), that written by chinese.
 
