@@ -100,6 +100,38 @@ Do not forget add internet permission to the `AndroidManifest.xml` file :
 <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 ```
 
+### ImageLoader
+
+similarly, **ImageLoader** should be singleton and also init with Application :
+
+```java
+public class YourApplication extends Application {
+
+    public void onCreate() {
+        super.onCreate();
+
+        RequestQueue mQueue = ...;
+
+        // SelfImageLoader is your implementation that extends by ImageLoader.
+        // you can create a memory cache policy within ImageLoader.
+        ImageLoader mImageLoader = new SelfImageLoader(
+            mQueue, new BitmapImageCache(Const.HTTP_MEMORY_CACHE_SIZE));
+    }
+
+    // the method you'll perform when you want to fill a single ImageView with network image.
+    public void displayImage(String url, ImageView imageView) {
+        ImageLoader.ImageListener listener = ImageLoader.getImageListener(imageView, 0, 0);
+        mImageLoader.get(url, listener, 0, 0);
+    }
+
+    // we bring you the NetworkImageView to load network images when it's inside of ListView or GridView.
+    public static void displayImage(String url, NetworkImageView imageView) {
+        imageView.setImageUrl(url, mImageLoader);
+    }
+
+}
+```
+
 Integration
 ===========
 
