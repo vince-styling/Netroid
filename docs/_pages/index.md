@@ -3,7 +3,7 @@ title: Netroid Introduction
 layout: index
 format: markdown
 slug: index.html
-lstModified: 2014-04-13 16:43
+lstModified: 2014-05-07 12:51
 ---
 
 # 简介：
@@ -49,7 +49,7 @@ Netroid中的各种内部组件及其使用方法的详细解释。
 
 了解Netroid所有接口的细节。
 
-也可直接点击下载[演示](/attach/netroid-sample-1.2.0.apk)程序查看运行效果。
+也可直接点击下载[演示](/attach/netroid-sample-1.2.1.apk)程序查看运行效果。
 
 
 # 修改日志

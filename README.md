@@ -83,7 +83,7 @@ Integration
 ===========
 
 Netroid has not yet to publish to Maven Centra Repository or Gradle, In order to use this library from you Android project,
-please place the [core](http://netroid.cn/attach/netroid-sdk-1.2.1.jar) jar file to your project, we'll publish as soon as possible.
+please place the [core](http://netroid.cn/attach/netroid-1.2.1.jar) jar file to your project, we'll publish as soon as possible.
 
 For more detail about what Netroid can do, pay attention to the [docs](http://netroid.cn/), that written by chinese.
 

@@ -3,7 +3,7 @@ title: Netroid Startup
 layout: index
 format: markdown
 slug: startup.html
-lstModified: 2014-04-13 14:52
+lstModified: 2014-05-07 18:16
 ---
 
 # 开始使用
@@ -12,16 +12,15 @@ lstModified: 2014-04-13 14:52
 
 ### 添加依赖
 
-下载[最新版本(1.2.0)](/attach/netroid-sdk-1.2.0.jar)的jar，在工程中直接添加依赖。
+下载[最新版本(1.2.1)](/attach/netroid-1.2.1.jar)的jar，在工程中直接添加依赖。
 
-Netroid已经在YY内部的Maven库中构建，你也可以通过添加以下的依赖来引用：
+Netroid已经发布于Maven库，你也可以通过添加以下的依赖来引用：
 
     ...
     <dependency>
-        <groupId>com.yy.android.gameLibs</groupId>
-        <artifactId>netroid-sdk</artifactId>
-        <version>1.2.0</version>
-        <type>jar</type>
+      <groupId>com.duowan.android.netroid</groupId>
+      <artifactId>netroid</artifactId>
+      <version>1.2.1</version>
     </dependency>
     ...
 
