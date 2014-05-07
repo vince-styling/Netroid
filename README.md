@@ -8,7 +8,7 @@ That purpose is make your android development easier than before, provide fast, 
 Feature
 =========
 
-### 1. Base async http interaction.
+#### 1. Base async http interaction.
 
 As most android apps done, Netroid allow you to retrive data over http with background thread, exchange invoke result to main thread.
 
@@ -33,16 +33,30 @@ after a new request comes, whether thread will be awake then perform http operat
 Basic usage
 ===========
 
-The main entry of Netroid is `RequestQueue` :
+The main entry of Netroid is `RequestQueue`, we highly recommnd you init it with `Application` and always let it stand with singleton :
 
 ```java
-Network network = new BasicNetwork(new HurlStack(Const.USER_AGENT, null), HTTP.UTF_8);
-RequestQueue mQueue = new RequestQueue(network, 4,
-    new DiskCache(new File(ctx.getCacheDir(), Const.HTTP_DISK_CACHE_DIR_NAME), Const.HTTP_DISK_CACHE_SIZE));
-mQueue.start();
+public class YourApplication extends Application {
+
+    public void onCreate() {
+        super.onCreate();
+
+        // you can choose HttpURLConnection or HttpClient to execute request.
+        Network network = new BasicNetwork(new HurlStack(Const.USER_AGENT, null), HTTP.UTF_8);
+
+        // you can specify parallel thread amount, here is 4.
+        // also instance the DiskBaseCache by your settings.
+        RequestQueue mQueue = new RequestQueue(network, 4,
+            new DiskCache(new File(ctx.getCacheDir(), Const.HTTP_DISK_CACHE_DIR_NAME), Const.HTTP_DISK_CACHE_SIZE));
+
+        // start and waiting requests.
+        mQueue.start();
+    }
+
+}
 ```
 
-we can execute a request simply add a request instance into RequestQueue :
+In anywhere, the only one you should do just take the `RequestQueue` instance, then simply add your request instance into RequestQueue :
 
 ```java
 StringRequest request = new StringRequest(url, new Listener<String>() {
