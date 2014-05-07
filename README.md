@@ -102,7 +102,7 @@ Do not forget add internet permission to the `AndroidManifest.xml` file :
 
 ### ImageLoader
 
-similarly, **ImageLoader** should be singleton and also init with Application :
+Similarly, **ImageLoader** should be singleton and also init with Application :
 
 ```java
 public class YourApplication extends Application {
@@ -125,12 +125,39 @@ public class YourApplication extends Application {
     }
 
     // we bring you the NetworkImageView to load network images when it's inside of ListView or GridView.
-    public static void displayImage(String url, NetworkImageView imageView) {
+    public void displayImage(String url, NetworkImageView imageView) {
         imageView.setImageUrl(url, mImageLoader);
     }
 
 }
 ```
+
+### FileDownloader
+
+As always singleton, **FileDownloader** would be the same :
+
+```java
+public class YourApplication extends Application {
+
+    public void onCreate() {
+        super.onCreate();
+
+        RequestQueue mQueue = ...;
+
+        // specify the parallel download task count, less than 3 is recommended.
+        FileDownloader mFileDownloader = new FileDownloader(mQueue, 1);
+    }
+
+    // add a new download task, take the DownloadController instance.
+    public FileDownloader.DownloadController addFileDownload(String storeFilePath, String url, Listener<Void> listener) {
+        return mFileDownloader.add(storeFilePath, url, listener);
+    }
+
+}
+```
+
+With **DownloadController**, you can get the task status such as waiting downloading, finish, also you can trun the task to
+pause, continue, discard status. the **Listener.onProgressChange()** will inform you the download progress.
 
 Integration
 ===========
