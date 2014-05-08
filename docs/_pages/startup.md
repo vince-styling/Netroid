@@ -3,26 +3,32 @@ title: Netroid Startup
 layout: index
 format: markdown
 slug: startup.html
-lstModified: 2014-05-07 18:16
+lstModified: 2014-05-08 11:56
 ---
 
 # 开始使用
 
 本文档帮助你快速并正确地集成Netroid到应用中。
 
-### 添加依赖
 
-下载[最新版本(1.2.1)](/attach/netroid-1.2.1.jar)的jar，在工程中直接添加依赖。
+### 开发集成
 
-Netroid已经发布于Maven库，你也可以通过添加以下的依赖来引用：
+方式一：下载[最新版本](http://repository.sonatype.org/service/local/artifact/maven/redirect?r=central-proxy&g=com.duowan.android.netroid&a=netroid&v=LATEST)的jar，在工程中直接添加依赖。
 
-    ...
+方式二：Netroid已经发布于 **Maven** 库，你可以通过添加以下的依赖来引用：
+
     <dependency>
       <groupId>com.duowan.android.netroid</groupId>
       <artifactId>netroid</artifactId>
-      <version>1.2.1</version>
+      <version>(insert latest version)</version>
     </dependency>
-    ...
+
+方式三：同样地，使用 **Gradle** 的开发者可以添加以下描述来引用：
+
+    compile 'com.duowan.android.netroid:netroid:(insert latest version)'
+
+#### 注：当前的最新版本是 `1.2.1`。
+
 
 ### 添加权限
 
