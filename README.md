@@ -163,7 +163,7 @@ Integration
 ===========
 
 Download the [latest JAR](http://repository.sonatype.org/service/local/artifact/maven/redirect?r=central-proxy&g=com.duowan.android.netroid&a=netroid&v=LATEST)
-or grab via Maven:
+or grab via **Maven** :
 
 ```xml
 <dependency>
@@ -171,6 +171,12 @@ or grab via Maven:
   <artifactId>netroid</artifactId>
   <version>(insert latest version)</version>
 </dependency>
+```
+
+For **Gradle** projects use :
+
+```groovy
+compile 'com.duowan.android.netroid:netroid:(insert latest version)'
 ```
 
 At this point latest version is `1.2.1`.
@@ -183,7 +189,7 @@ For more detail about what Netroid can do, pay attention to the [docs](http://ne
 Sample Application
 ==================
 
-We build the [sample apk](http://netroid.cn/attach/netroid-sample-1.2.1.apk), you can try all function without any source code.
+To be straightforward, we build the [sample apk](http://netroid.cn/attach/netroid-sample-1.2.1.apk), you can try all features without any source code.
 
 License
 =======
