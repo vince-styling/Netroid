@@ -2,7 +2,7 @@
 Netroid library for Android
 ===========================
 
-Netroid is a http library for Android that based on [Volley](https://www.captechconsulting.com/blog/raymond-robinson/google-io-2013-volley-image-cache-tutorial),
+Netroid is a http library for Android that based on [Volley](http://developer.android.com/training/volley/index.html),
 That purpose is make your android development easier than before, provide fast, handly, useful way to do async http operation by background thread.
 
 Feature

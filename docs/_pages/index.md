@@ -8,7 +8,7 @@ lstModified: 2014-05-07 12:51
 
 # 简介：
 
-Netroid是一个基于[Volley](https://www.captechconsulting.com/blog/raymond-robinson/google-io-2013-volley-image-cache-tutorial)
+Netroid是一个基于[Volley](http://developer.android.com/training/volley/index.html)
 实现的Android Http库。提供执行网络请求、缓存返回结果、批量图片加载、大文件断点下载的常见Http交互功能。致力于避免每个项目重复开发基础Http功能，实现显著地缩短开发周期的愿景。
 
 # 实现原理：
