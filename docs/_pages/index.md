@@ -1,10 +1,7 @@
----
 title: Netroid Introduction
-layout: index
-format: markdown
+decorator: index
 slug: index.html
-lstModified: 2014-05-07 12:51
----
+‡‡‡‡‡‡‡‡‡‡‡‡‡‡
 
 # 简介：
 
