@@ -16,8 +16,6 @@ JsonObjectRequest request = new JsonObjectRequest(url, null, new Listener<JSONOb
     }
 
     @Override
-    
-    
     public void onError(NetroidError error) {
         Toast.makeText(Activity.this, "error occurred : " + error.getMessage(), 2000).show();
     }
