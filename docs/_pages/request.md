@@ -7,7 +7,8 @@ slug: request.html
 
 Netroid提供了几个通用的请求实现类，包括：
 
-| ------------- |:-------------:| -------------:|
+| |
+| :------------- |
 | `StringRequest`提取响应结果为字符串的请求。 |
 | `JsonObjectRequest`提取响应结果为Json对象的请求。 |
 | `JsonArrayRequest`提取响应结果为Json数组的请求。 |

@@ -7,7 +7,8 @@ slug: understanding.html
 
 Netroid在启动时创建以下几个实例用于提供网络服务：
 
-| ------------- |:-------------:| -------------:|
+| |
+| :------------- |
 | `NetWork`用于执行Http请求的对象，有HttpUrlConnection、HttpClient两种执行方式，可以自行指定使用哪种方式。 |
 | `Network Thread Pool`调用Http请求执行对象(**NetWork**)的线程池，默认为四个线程(NetworkDispatcher)的容量，在初始化时可进行指定。每个线程由BlockingQueue.take()方法进行阻塞，然后一直处于等待状态，在新请求进入队列后马上开始执行。 |
 | `Cache Dispatcher`每个需要进行缓存操作的请求都将首先由这个线程执行，在缓存未过期时直接返回缓存数据，否则将请求放进 **Network Queue** 队列。 |
@@ -86,7 +87,9 @@ try {
 ## 缓存方案的用法：
 
 Netroid默认提供两种类型的Cache，均使用了Lru算法：
-| ------------- |:-------------:| -------------:|
+
+| |
+| :------------- |
 | `DiskCache`基于硬盘的持久化缓存，所有请求均可使用。 |
 | `BitmapImageCache`基于内存的图片缓存，专属于 **ImageLoader** 的缓存方案。 |
 
