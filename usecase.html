@@ -11,7 +11,7 @@
             
 <div class="page-title">
     <h1><a href="/">Netroid Usecase</a></h1>
-    <h2>last modified : 2014-08-17 15:40</h2>
+    <h2>last modified : 2014-08-18 20:33</h2>
 </div>
 <div class="primary">
     <div class="post-thumb">
@@ -33,9 +33,7 @@
 13
 14
 15
-16
-17
-18</pre></td><td class="code"><pre><span class="n">String</span> <span class="n">url</span> <span class="o">=</span> <span class="s">"http://server.domain/json_object.do"</span><span class="o">;</span>
+16</pre></td><td class="code"><pre><span class="n">String</span> <span class="n">url</span> <span class="o">=</span> <span class="s">"http://server.domain/json_object.do"</span><span class="o">;</span>
 <span class="n">JsonObjectRequest</span> <span class="n">request</span> <span class="o">=</span> <span class="k">new</span> <span class="n">JsonObjectRequest</span><span class="o">(</span><span class="n">url</span><span class="o">,</span> <span class="kc">null</span><span class="o">,</span> <span class="k">new</span> <span class="n">Listener</span><span class="o">&lt;</span><span class="n">JSONObject</span><span class="o">&gt;()</span> <span class="o">{</span>
     <span class="nd">@Override</span>
     <span class="kd">public</span> <span class="kt">void</span> <span class="n">onSuccess</span><span class="o">(</span><span class="n">JSONObject</span> <span class="n">response</span><span class="o">)</span> <span class="o">{</span>
@@ -43,8 +41,6 @@
     <span class="o">}</span>
 
     <span class="nd">@Override</span>
-
-
     <span class="kd">public</span> <span class="kt">void</span> <span class="n">onError</span><span class="o">(</span><span class="n">NetroidError</span> <span class="n">error</span><span class="o">)</span> <span class="o">{</span>
         <span class="n">Toast</span><span class="o">.</span><span class="na">makeText</span><span class="o">(</span><span class="n">Activity</span><span class="o">.</span><span class="na">this</span><span class="o">,</span> <span class="s">"error occurred : "</span> <span class="o">+</span> <span class="n">error</span><span class="o">.</span><span class="na">getMessage</span><span class="o">(),</span> <span class="mi">2000</span><span class="o">).</span><span class="na">show</span><span class="o">();</span>
     <span class="o">}</span>
