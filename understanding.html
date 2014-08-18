@@ -8,142 +8,214 @@
 <body>
     <div class="container">
         <div class="clearfix">
-            <div class="page-title">
+            
+<div class="page-title">
     <h1><a href="/">Netroid Understanding</a></h1>
-    <h2>last modified : 2014-04-12 16:29</h2>
+    <h2>last modified : 2014-08-18 18:13</h2>
 </div>
 <div class="primary">
     <div class="post-thumb">
-        <html>
- <head></head>
- <body>
-  <h1>运行原理</h1> 
-  <p>Netroid在启动时创建以下几个实例用于提供网络服务：</p> 
-  <table> 
-   <colgroup>
-    <col /> 
-    <col align="center" /> 
-    <col align="right" /> 
-   </colgroup>
-   <thead> 
-   </thead> 
-   <tbody> 
-    <tr> 
-     <td><code>NetWork</code>用于执行Http请求的对象，有HttpUrlConnection、HttpClient两种执行方式，可以自行指定使用哪种方式。</td> 
-    </tr> 
-    <tr> 
-     <td><code>Network Thread Pool</code>调用Http请求执行对象(<strong>NetWork</strong>)的线程池，默认为四个线程(NetworkDispatcher)的容量，在初始化时可进行指定。每个线程由BlockingQueue.take()方法进行阻塞，然后一直处于等待状态，在新请求进入队列后马上开始执行。</td> 
-    </tr> 
-    <tr> 
-     <td><code>Cache Dispatcher</code>每个需要进行缓存操作的请求都将首先由这个线程执行，在缓存未过期时直接返回缓存数据，否则将请求放进 <strong>Network Queue</strong> 队列。</td> 
-    </tr> 
-    <tr> 
-     <td><code>Cache Queue</code>需要执行缓存操作的Http请求对象队列，<strong>Cache Dispatcher</strong>通过获取到达这个队列的请求来执行缓存检测。</td> 
-    </tr> 
-    <tr> 
-     <td><code>Network Queue</code>需要执行网络操作的Http请求对象队列，<strong>Network Thread Pool</strong>通过获取到达这个队列的请求来执行实际的网络操作。</td> 
-    </tr> 
-    <tr> 
-     <td><code>Response Delivery</code>执行返回请求结果的功能，内部通过Handler.post(Runnable)来实现在UI线程上处理响应结果，区分请求成功和请求失败两种情况。</td> 
-    </tr> 
-   </tbody> 
-  </table> 
-  <p>在请求到达时，每个组件中将会依次对请求执行处理，流程如下：</p> 
-  <p><img src="/netroid_request_handling_flowchart.png" alt="Netroid Request Handling Flowchart" title="Netroid Request Handling Flowchart" id="netroidrequesthandlingflowchart" /></p> 
-  <h1>组件介绍</h1> 
-  <p>程序入口为<code>RequestQueue</code>类，提供以下几个主要的接口进行交互执行相关操作。</p> 
-  <pre><span class="reserved_word">public</span> <span class="reserved_word">interface</span> <span class="identifier">RequestQueue</span> <span class="braces">{</span>
-    <span class="comment">// 启动Netroid服务的入口</span>
-    <span class="reserved_word">public</span> <span class="reserved_word">void</span> <span class="identifier">start</span><span class="braces">(</span><span class="braces">)</span><span class="symbol">;</span>
+        <h1>运行原理</h1>
 
-    <span class="comment">// 停止Netroid服务</span>
-    <span class="reserved_word">public</span> <span class="reserved_word">void</span> <span class="identifier">stop</span><span class="braces">(</span><span class="braces">)</span><span class="symbol">;</span>
+<p>Netroid在启动时创建以下几个实例用于提供网络服务：</p>
 
-    <span class="comment">// 根据Request的Tag标记来停止某一同类型请求</span>
-    <span class="comment">// 注：Netroid只是做了退出的标记，请求不会马上被终止</span>
-    <span class="reserved_word">public</span> <span class="reserved_word">void</span> <span class="identifier">cancelAll</span><span class="braces">(</span><span class="identifier">Object</span> <span class="identifier">tag</span><span class="braces">)</span><span class="symbol">;</span>
+<table><thead>
+<tr>
+<th style="text-align: left"></th>
+</tr>
+</thead><tbody>
+<tr>
+<td style="text-align: left"><code>NetWork</code>用于执行Http请求的对象，有HttpUrlConnection、HttpClient两种执行方式，可以自行指定使用哪种方式。</td>
+</tr>
+<tr>
+<td style="text-align: left"><code>Network Thread Pool</code>调用Http请求执行对象(<strong>NetWork</strong>)的线程池，默认为四个线程(NetworkDispatcher)的容量，在初始化时可进行指定。每个线程由BlockingQueue.take()方法进行阻塞，然后一直处于等待状态，在新请求进入队列后马上开始执行。</td>
+</tr>
+<tr>
+<td style="text-align: left"><code>Cache Dispatcher</code>每个需要进行缓存操作的请求都将首先由这个线程执行，在缓存未过期时直接返回缓存数据，否则将请求放进 <strong>Network Queue</strong> 队列。</td>
+</tr>
+<tr>
+<td style="text-align: left"><code>Cache Queue</code>需要执行缓存操作的Http请求对象队列，<strong>Cache Dispatcher</strong>通过获取到达这个队列的请求来执行缓存检测。</td>
+</tr>
+<tr>
+<td style="text-align: left"><code>Network Queue</code>需要执行网络操作的Http请求对象队列，<strong>Network Thread Pool</strong>通过获取到达这个队列的请求来执行实际的网络操作。</td>
+</tr>
+<tr>
+<td style="text-align: left"><code>Response Delivery</code>执行返回请求结果的功能，内部通过Handler.post(Runnable)来实现在UI线程上处理响应结果，区分请求成功和请求失败两种情况。</td>
+</tr>
+</tbody></table>
 
-    <span class="comment">// 将一个创建好的请求实例添加到队列，由队列执行</span>
-    <span class="reserved_word">public</span> <span class="reserved_word">void</span> <span class="identifier">add</span><span class="braces">(</span><span class="identifier">Request</span> <span class="identifier">request</span><span class="braces">)</span><span class="symbol">;</span>
-<span class="braces">}</span></pre> 
-  <p>大多数情况下，<strong>RequestQueue</strong> 类需要接收三个简单的参数来进行初始化，分别是Http请求执行对象(Network)、Netroid线程池容量、请求的硬盘缓存方案：</p> 
-  <pre><span class="reserved_word">public</span> <span class="identifier">RequestQueue</span><span class="braces">(</span><span class="identifier">Network</span> <span class="identifier">network</span>, <span class="reserved_word">int</span> <span class="identifier">threadPoolSize</span>, <span class="identifier">DiskCache</span> <span class="identifier">cache</span><span class="braces">)</span><span class="symbol">;</span></pre> 
-  <h2 id="network">构造Network：</h2> 
-  <p><strong>BasicNetwork</strong> 是Netroid提供的 <strong>Network</strong> 接口实现类：</p> 
-  <pre><span class="comment">// 请求响应的编码由&quot;Content-Type&quot; Header决定，defaultCharset用于当服务端未返回编码方式时的默认选择</span>
-<span class="reserved_word">public</span> <span class="identifier">BasicNetwork</span><span class="braces">(</span><span class="identifier">HttpStack</span> <span class="identifier">httpStack</span>, <span class="identifier">String</span> <span class="identifier">defaultCharset</span><span class="braces">)</span><span class="symbol">;</span></pre> 
-  <p><code>HttpStack</code>接口实例用于指示网络请求的执行方式，Netroid提供了 <strong>HurlStack</strong>、<strong>HttpClientStack</strong> 两种默认实现， 对于这两种执行方式的选择，Volley建议GingerBread(API9)或以上的Android系统选择用HurlStack，参考写法如下：</p> 
-  <pre><span class="reserved_word">if</span> <span class="braces">(</span><span class="identifier">Build</span>.<span class="identifier">VERSION</span>.<span class="identifier">SDK_INT</span> <span class="symbol">&gt;</span><span class="symbol">=</span> <span class="identifier">Build</span>.<span class="identifier">VERSION_CODES</span>.<span class="identifier">GINGERBREAD</span><span class="braces">)</span> <span class="braces">{</span>
-    <span class="identifier">httpStack</span> <span class="symbol">=</span> <span class="reserved_word">new</span> <span class="identifier">HurlStack</span><span class="braces">(</span><span class="identifier">userAgent</span><span class="braces">)</span><span class="symbol">;</span>
-<span class="braces">}</span> <span class="reserved_word">else</span> <span class="braces">{</span>
-    <span class="comment">// Prior to Gingerbread, HttpUrlConnection was unreliable.</span>
-    <span class="comment">// See: http://android-developers.blogspot.com/2011/09/androids-http-clients.html</span>
-    <span class="identifier">httpStack</span> <span class="symbol">=</span> <span class="reserved_word">new</span> <span class="identifier">HttpClientStack</span><span class="braces">(</span><span class="identifier">userAgent</span><span class="braces">)</span><span class="symbol">;</span>
-<span class="braces">}</span></pre> 
-  <h4 id="androidhttpclientapi9httpclientstackbugandroid4.0hurlstack">注：由于Android中的HttpClient在API9之后的版本中不具备优势，HttpClientStack仍有相当多的Bug未解决，鉴于Android 4.0或以上的版本已经相当普及，所以没有投入精力去解决这些问题，建议开发者使用 <strong>HurlStack</strong>。</h4> 
-  <p>User-Agent是HttpStack接口的两个实现类中默认提供的 <strong>Header</strong> 设置，你可以根据自己的需要设置UA，也可以直接使用android package name作为UA：</p> 
-  <pre><span class="identifier">String</span> <span class="identifier">userAgent</span> <span class="symbol">=</span> <span class="string">&quot;netroid/0&quot;</span><span class="symbol">;</span>
-<span class="reserved_word">try</span> <span class="braces">{</span>
-    <span class="identifier">String</span> <span class="identifier">packageName</span> <span class="symbol">=</span> <span class="identifier">context</span>.<span class="identifier">getPackageName</span><span class="braces">(</span><span class="braces">)</span><span class="symbol">;</span>
-    <span class="identifier">PackageInfo</span> <span class="identifier">info</span> <span class="symbol">=</span> <span class="identifier">context</span>.<span class="identifier">getPackageManager</span><span class="braces">(</span><span class="braces">)</span>.<span class="identifier">getPackageInfo</span><span class="braces">(</span><span class="identifier">packageName</span>, <span class="numeric">0</span><span class="braces">)</span><span class="symbol">;</span>
-    <span class="identifier">userAgent</span> <span class="symbol">=</span> <span class="identifier">packageName</span> <span class="symbol">+</span> <span class="string">&quot;/&quot;</span> <span class="symbol">+</span> <span class="identifier">info</span>.<span class="identifier">versionCode</span><span class="symbol">;</span>
-<span class="braces">}</span> <span class="reserved_word">catch</span> <span class="braces">(</span><span class="identifier">NameNotFoundException</span> <span class="identifier">e</span><span class="braces">)</span> <span class="braces">{</span>
-<span class="braces">}</span></pre> 
-  <h2>缓存方案的用法：</h2> 
-  <p>Netroid默认提供两种类型的Cache，均使用了Lru算法：</p> 
-  <table> 
-   <colgroup>
-    <col /> 
-    <col align="center" /> 
-    <col align="right" /> 
-   </colgroup>
-   <thead> 
-   </thead> 
-   <tbody> 
-    <tr> 
-     <td><code>DiskCache</code>基于硬盘的持久化缓存，所有请求均可使用。</td> 
-    </tr> 
-    <tr> 
-     <td><code>BitmapImageCache</code>基于内存的图片缓存，专属于 <strong>ImageLoader</strong> 的缓存方案。</td> 
-    </tr> 
-   </tbody> 
-  </table> 
-  <p>Netroid在执行请求时默认不使用任何缓存，所以在初始化<code>RequestQueue</code>对象时，开发者必须手动构造硬盘缓存方案。 同样地，<strong>ImageLoader</strong> 也需要做相同的操作来指定内存缓存。</p> 
-  <p>这两种缓存方案需要开发者构建，所以你可以继承它们并加以扩展。但实际上Netroid提供的默认实现已经能够满足大部分的应用场景。典型的写法如下：</p> 
-  <pre><span class="comment">// 创建Netroid主类，指定硬盘缓存方案</span>
-<span class="identifier">mRequestQueue</span> <span class="symbol">=</span> <span class="reserved_word">new</span> <span class="identifier">RequestQueue</span><span class="braces">(</span>..., <span class="reserved_word">new</span> <span class="identifier">DiskCache</span><span class="braces">(</span><span class="reserved_word">new</span> <span class="identifier">File</span><span class="braces">(</span><span class="string">&quot;/sdcard/netroid/&quot;</span><span class="braces">)</span>, <span class="numeric">50</span> <span class="symbol">*</span> <span class="numeric">1024</span> <span class="symbol">*</span> <span class="numeric">1024</span><span class="braces">)</span><span class="braces">)</span><span class="symbol">;</span>
+<p>在请求到达时，每个组件中将会依次对请求执行处理，流程如下：</p>
 
-<span class="comment">// 创建ImageLoader实例，指定内存缓存方案</span>
-<span class="identifier">mImageLoader</span> <span class="symbol">=</span> <span class="reserved_word">new</span> <span class="identifier">SelfImageLoader</span><span class="braces">(</span><span class="identifier">mRequestQueue</span>, <span class="reserved_word">new</span> <span class="identifier">BitmapImageCache</span><span class="braces">(</span><span class="numeric">2</span> <span class="symbol">*</span> <span class="numeric">1024</span> <span class="symbol">*</span> <span class="numeric">1024</span><span class="braces">)</span><span class="braces">)</span><span class="symbol">;</span></pre> 
-  <p>所有的Http请求均可使用硬盘缓存方案，开发者必须在发起一个新的Http请求时通过 <strong>setCacheExpireTime(...)</strong> 指定过期时间，才能使缓存生效。</p> 
-  <pre><span class="identifier">String</span> <span class="identifier">url</span> <span class="symbol">=</span> <span class="string">&quot;http://server.domain/json_array.json&quot;</span><span class="symbol">;</span>
-<span class="identifier">JsonArrayRequest</span> <span class="identifier">request</span> <span class="symbol">=</span> <span class="reserved_word">new</span> <span class="identifier">JsonArrayRequest</span><span class="braces">(</span><span class="identifier">url</span>, <span class="reserved_word">new</span> <span class="identifier">Listener</span><span class="symbol">&lt;</span><span class="identifier">JSONArray</span><span class="symbol">&gt;</span><span class="braces">(</span><span class="braces">)</span> <span class="braces">{</span>
-    @<span class="identifier">Override</span>
-    <span class="reserved_word">public</span> <span class="reserved_word">void</span> <span class="identifier">onSuccess</span><span class="braces">(</span><span class="identifier">JSONArray</span> <span class="identifier">response</span><span class="braces">)</span> <span class="braces">{</span>
-        <span class="identifier">showResult</span><span class="braces">(</span><span class="identifier">response</span>.<span class="identifier">toString</span><span class="braces">(</span><span class="braces">)</span><span class="braces">)</span><span class="symbol">;</span>
-    <span class="braces">}</span>
+<p><img src="/netroid_request_handling_flowchart.png" alt="Netroid Request Handling Flowchart" title="Netroid Request Handling Flowchart"/></p>
 
-    @<span class="identifier">Override</span>
-    <span class="reserved_word">public</span> <span class="reserved_word">void</span> <span class="identifier">onError</span><span class="braces">(</span><span class="identifier">NetroidError</span> <span class="identifier">error</span><span class="braces">)</span> <span class="braces">{</span>
-        <span class="identifier">showError</span><span class="braces">(</span><span class="identifier">error</span><span class="braces">)</span><span class="symbol">;</span>
-    <span class="braces">}</span>
-<span class="braces">}</span><span class="braces">)</span><span class="symbol">;</span>
+<h1>组件介绍</h1>
 
-<span class="comment">// 设置为十天之后过期</span>
-<span class="identifier">request</span>.<span class="identifier">setCacheExpireTime</span><span class="braces">(</span><span class="identifier">TimeUnit</span>.<span class="identifier">DAYS</span>, <span class="numeric">10</span><span class="braces">)</span><span class="symbol">;</span>
-<span class="identifier">mQueue</span>.<span class="identifier">add</span><span class="braces">(</span><span class="identifier">request</span><span class="braces">)</span><span class="symbol">;</span></pre> 
-  <p>特殊情况下，你需要不读取缓存而是直接执行网络请求，然后再将返回结果保存进缓存，做强制刷新操作， Netroid提供了 <strong>setForceUpdate(true)</strong> 设置允许你实现这种需求：</p> 
-  <pre><span class="identifier">request</span>.<span class="identifier">setForceUpdate</span><span class="braces">(</span><span class="reserved_word">true</span><span class="braces">)</span><span class="symbol">;</span>
-<span class="identifier">request</span>.<span class="identifier">setCacheExpireTime</span><span class="braces">(</span><span class="identifier">TimeUnit</span>.<span class="identifier">DAYS</span>, <span class="numeric">10</span><span class="braces">)</span><span class="symbol">;</span></pre> 
-  <p>以上的写法指定Netroid将不检索缓存情况，马上执行网络请求操作，获得响应结果后放入硬盘缓存中，缓存的过期时间设置为十天。</p> 
- </body>
-</html>
+<p>程序入口为<code>RequestQueue</code>类，提供以下几个主要的接口进行交互执行相关操作。</p>
+<div class="highlight java"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14</pre></td><td class="code"><pre><span class="kd">public</span> <span class="kt">int</span><span class="n">erface</span> <span class="n">RequestQueue</span> <span class="o">{</span>
+    <span class="c1">// 启动Netroid服务的入口</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="n">start</span><span class="o">();</span>
+
+    <span class="c1">// 停止Netroid服务</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="n">stop</span><span class="o">();</span>
+
+    <span class="c1">// 根据Request的Tag标记来停止某一同类型请求</span>
+    <span class="c1">// 注：Netroid只是做了退出的标记，请求不会马上被终止</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="n">cancelAll</span><span class="o">(</span><span class="n">Object</span> <span class="n">tag</span><span class="o">);</span>
+
+    <span class="c1">// 将一个创建好的请求实例添加到队列，由队列执行</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="n">add</span><span class="o">(</span><span class="n">Request</span> <span class="n">request</span><span class="o">);</span>
+<span class="o">}</span>
+</pre></td></tr></tbody></table>
+</div>
+
+<p>大多数情况下，<strong>RequestQueue</strong> 类需要接收三个简单的参数来进行初始化，分别是Http请求执行对象(Network)、Netroid线程池容量、请求的硬盘缓存方案：</p>
+<div class="highlight java"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1</pre></td><td class="code"><pre><span class="kd">public</span> <span class="nf">RequestQueue</span><span class="p">(</span><span class="n">Network</span> <span class="n">network</span><span class="o">,</span> <span class="kt">int</span> <span class="n">threadPoolSize</span><span class="o">,</span> <span class="n">DiskCache</span> <span class="n">cache</span><span class="o">);</span>
+</pre></td></tr></tbody></table>
+</div>
+
+<h2>构造Network：</h2>
+
+<p><strong>BasicNetwork</strong> 是Netroid提供的 <strong>Network</strong> 接口实现类：</p>
+<div class="highlight java"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2</pre></td><td class="code"><pre><span class="c1">// 请求响应的编码由"Content-Type" Header决定，defaultCharset用于当服务端未返回编码方式时的默认选择</span>
+<span class="kd">public</span> <span class="nf">BasicNetwork</span><span class="p">(</span><span class="n">HttpStack</span> <span class="n">httpStack</span><span class="o">,</span> <span class="n">String</span> <span class="n">defaultCharset</span><span class="o">);</span>
+</pre></td></tr></tbody></table>
+</div>
+
+<p><code>HttpStack</code>接口实例用于指示网络请求的执行方式，Netroid提供了 <strong>HurlStack</strong>、<strong>HttpClientStack</strong> 两种默认实现，
+对于这两种执行方式的选择，Volley建议GingerBread(API9)或以上的Android系统选择用HurlStack，参考写法如下：</p>
+<div class="highlight java"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5
+6
+7</pre></td><td class="code"><pre><span class="k">if</span> <span class="o">(</span><span class="n">Build</span><span class="o">.</span><span class="na">VERSION</span><span class="o">.</span><span class="na">SDK_INT</span> <span class="o">&gt;=</span> <span class="n">Build</span><span class="o">.</span><span class="na">VERSION_CODES</span><span class="o">.</span><span class="na">GINGERBREAD</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">httpStack</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HurlStack</span><span class="o">(</span><span class="n">userAgent</span><span class="o">);</span>
+<span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+    <span class="c1">// Prior to Gingerbread, HttpUrlConnection was unreliable.</span>
+    <span class="c1">// See: http://android-developers.blogspot.com/2011/09/androids-http-clients.html</span>
+    <span class="n">httpStack</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HttpClientStack</span><span class="o">(</span><span class="n">userAgent</span><span class="o">);</span>
+<span class="o">}</span>
+</pre></td></tr></tbody></table>
+</div>
+
+<h4>注：由于Android中的HttpClient在API9之后的版本中不具备优势，HttpClientStack仍有相当多的Bug未解决，鉴于Android 4.0或以上的版本已经相当普及，所以没有投入精力去解决这些问题，建议开发者使用 <strong>HurlStack</strong>。</h4>
+
+<p>User-Agent是HttpStack接口的两个实现类中默认提供的 <strong>Header</strong> 设置，你可以根据自己的需要设置UA，也可以直接使用android package name作为UA：</p>
+<div class="highlight java"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5
+6
+7</pre></td><td class="code"><pre><span class="n">String</span> <span class="n">userAgent</span> <span class="o">=</span> <span class="s">"netroid/0"</span><span class="o">;</span>
+<span class="k">try</span> <span class="o">{</span>
+    <span class="n">String</span> <span class="n">packageName</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="na">getPackageName</span><span class="o">();</span>
+    <span class="n">PackageInfo</span> <span class="n">info</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="na">getPackageManager</span><span class="o">().</span><span class="na">getPackageInfo</span><span class="o">(</span><span class="n">packageName</span><span class="o">,</span> <span class="mi">0</span><span class="o">);</span>
+    <span class="n">userAgent</span> <span class="o">=</span> <span class="n">packageName</span> <span class="o">+</span> <span class="s">"/"</span> <span class="o">+</span> <span class="n">info</span><span class="o">.</span><span class="na">versionCode</span><span class="o">;</span>
+<span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">NameNotFoundException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+<span class="o">}</span>
+</pre></td></tr></tbody></table>
+</div>
+
+<h2>缓存方案的用法：</h2>
+
+<p>Netroid默认提供两种类型的Cache，均使用了Lru算法：</p>
+
+<table><thead>
+<tr>
+<th style="text-align: left"></th>
+</tr>
+</thead><tbody>
+<tr>
+<td style="text-align: left"><code>DiskCache</code>基于硬盘的持久化缓存，所有请求均可使用。</td>
+</tr>
+<tr>
+<td style="text-align: left"><code>BitmapImageCache</code>基于内存的图片缓存，专属于 <strong>ImageLoader</strong> 的缓存方案。</td>
+</tr>
+</tbody></table>
+
+<p>Netroid在执行请求时默认不使用任何缓存，所以在初始化<code>RequestQueue</code>对象时，开发者必须手动构造硬盘缓存方案。
+同样地，<strong>ImageLoader</strong> 也需要做相同的操作来指定内存缓存。</p>
+
+<p>这两种缓存方案需要开发者构建，所以你可以继承它们并加以扩展。但实际上Netroid提供的默认实现已经能够满足大部分的应用场景，典型的写法如下：</p>
+<div class="highlight java"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5</pre></td><td class="code"><pre><span class="c1">// 创建Netroid主类，指定硬盘缓存方案</span>
+<span class="n">mRequestQueue</span> <span class="o">=</span> <span class="k">new</span> <span class="n">RequestQueue</span><span class="o">(...,</span> <span class="k">new</span> <span class="n">DiskCache</span><span class="o">(</span><span class="k">new</span> <span class="n">File</span><span class="o">(</span><span class="s">"/sdcard/netroid/"</span><span class="o">),</span> <span class="mi">50</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024</span><span class="o">));</span>
+
+<span class="c1">// 创建ImageLoader实例，指定内存缓存方案</span>
+<span class="n">mImageLoader</span> <span class="o">=</span> <span class="k">new</span> <span class="n">SelfImageLoader</span><span class="o">(</span><span class="n">mRequestQueue</span><span class="o">,</span> <span class="k">new</span> <span class="n">BitmapImageCache</span><span class="o">(</span><span class="mi">2</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024</span><span class="o">));</span>
+</pre></td></tr></tbody></table>
+</div>
+
+<p>所有的Http请求均可使用硬盘缓存方案，开发者必须在发起一个新的Http请求时通过 <strong>setCacheExpireTime(...)</strong> 指定过期时间，才能使缓存生效。</p>
+<div class="highlight java"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16</pre></td><td class="code"><pre><span class="n">String</span> <span class="n">url</span> <span class="o">=</span> <span class="s">"http://server.domain/json_array.json"</span><span class="o">;</span>
+<span class="n">JsonArrayRequest</span> <span class="n">request</span> <span class="o">=</span> <span class="k">new</span> <span class="n">JsonArrayRequest</span><span class="o">(</span><span class="n">url</span><span class="o">,</span> <span class="k">new</span> <span class="n">Listener</span><span class="o">&lt;</span><span class="n">JSONArray</span><span class="o">&gt;()</span> <span class="o">{</span>
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="n">onSuccess</span><span class="o">(</span><span class="n">JSONArray</span> <span class="n">response</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">showResult</span><span class="o">(</span><span class="n">response</span><span class="o">.</span><span class="na">toString</span><span class="o">());</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="n">onError</span><span class="o">(</span><span class="n">NetroidError</span> <span class="n">error</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">showError</span><span class="o">(</span><span class="n">error</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">});</span>
+
+<span class="c1">// 设置为十天之后过期</span>
+<span class="n">request</span><span class="o">.</span><span class="na">setCacheExpireTime</span><span class="o">(</span><span class="n">TimeUnit</span><span class="o">.</span><span class="na">DAYS</span><span class="o">,</span> <span class="mi">10</span><span class="o">);</span>
+<span class="n">mQueue</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">request</span><span class="o">);</span>
+</pre></td></tr></tbody></table>
+</div>
+
+<p>特殊情况下，你需要不读取缓存而是直接执行网络请求，然后再将返回结果保存进缓存，做强制刷新操作，
+Netroid提供了 <strong>setForceUpdate(true)</strong> 设置允许你实现这种需求：</p>
+<div class="highlight java"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2</pre></td><td class="code"><pre><span class="n">request</span><span class="o">.</span><span class="na">setForceUpdate</span><span class="o">(</span><span class="kc">true</span><span class="o">);</span>
+<span class="n">request</span><span class="o">.</span><span class="na">setCacheExpireTime</span><span class="o">(</span><span class="n">TimeUnit</span><span class="o">.</span><span class="na">DAYS</span><span class="o">,</span> <span class="mi">10</span><span class="o">);</span>
+</pre></td></tr></tbody></table>
+</div>
+
+<p>以上的写法指定Netroid将不检索缓存情况，马上执行网络请求操作，获得响应结果后放入硬盘缓存中，缓存的过期时间设置为十天。</p>
+
     </div>
 </div>
         </div>
     </div>
     <div class="footer">
-        <div class="aboutus">All pages are generated by <a href="https://github.com/neevek/minerl">Minerl</a></div>
+        <div class="aboutus">All pages are generated by <a href="https://github.com/vince-styling/khaleesi">Khaleesi</a></div>
         <div class="findme">Find this project on <a href="https://github.com/vince-styling/Netroid">GitHub</a></div>
     </div>
 </body>

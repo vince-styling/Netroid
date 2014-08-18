@@ -8,410 +8,783 @@
 <body>
     <div class="container">
         <div class="clearfix">
-            <div class="page-title">
+            
+<div class="page-title">
     <h1><a href="/">Netroid Request</a></h1>
-    <h2>last modified : 2014-05-05 14:48</h2>
+    <h2>last modified : 2014-08-18 18:13</h2>
 </div>
 <div class="primary">
     <div class="post-thumb">
-        <html>
- <head></head>
- <body>
-  <h1>请求处理</h1> 
-  <p>Netroid提供了几个通用的请求实现类，包括：</p> 
-  <table> 
-   <colgroup>
-    <col /> 
-    <col align="center" /> 
-    <col align="right" /> 
-   </colgroup>
-   <thead> 
-   </thead> 
-   <tbody> 
-    <tr> 
-     <td><code>StringRequest</code>提取响应结果为字符串的请求。</td> 
-    </tr> 
-    <tr> 
-     <td><code>JsonObjectRequest</code>提取响应结果为Json对象的请求。</td> 
-    </tr> 
-    <tr> 
-     <td><code>JsonArrayRequest</code>提取响应结果为Json数组的请求。</td> 
-    </tr> 
-    <tr> 
-     <td><code>ImageRequest</code>提取响应结果为图片(Bitmap)的请求。</td> 
-    </tr> 
-   </tbody> 
-  </table> 
-  <p>这些不同的请求方式最核心的部分来自于实现<code>Request</code>基类的 <strong>parseNetworkResponse()</strong> 方法，各自对返回结果进行解析处理：</p> 
-  <pre><span class="comment">// 解析为字符串的实现示例</span>
-<span class="reserved_word">public</span> <span class="reserved_word">class</span> <span class="identifier">StringImplRequest</span> <span class="reserved_word">extends</span> <span class="identifier">Request</span><span class="symbol">&lt;</span><span class="identifier">String</span><span class="symbol">&gt;</span> <span class="braces">{</span>
-    <span class="comment">// NetworkResponse中包含返回结果的byte[]数组以及返回结果编码方式，通过对结果进行处理，构造成目标对象返回</span>
-    @<span class="identifier">Override</span>
-    <span class="reserved_word">protected</span> <span class="identifier">Response</span><span class="symbol">&lt;</span><span class="identifier">String</span><span class="symbol">&gt;</span> <span class="identifier">parseNetworkResponse</span><span class="braces">(</span><span class="identifier">NetworkResponse</span> <span class="identifier">response</span><span class="braces">)</span> <span class="braces">{</span>
-        <span class="identifier">String</span> <span class="identifier">parsed</span><span class="symbol">;</span>
-        <span class="reserved_word">try</span> <span class="braces">{</span>
-            <span class="identifier">parsed</span> <span class="symbol">=</span> <span class="reserved_word">new</span> <span class="identifier">String</span><span class="braces">(</span><span class="identifier">response</span>.<span class="identifier">data</span>, <span class="identifier">response</span>.<span class="identifier">charset</span><span class="braces">)</span><span class="symbol">;</span>
-        <span class="braces">}</span> <span class="reserved_word">catch</span> <span class="braces">(</span><span class="identifier">UnsupportedEncodingException</span> <span class="identifier">e</span><span class="braces">)</span> <span class="braces">{</span>
-            <span class="identifier">parsed</span> <span class="symbol">=</span> <span class="reserved_word">new</span> <span class="identifier">String</span><span class="braces">(</span><span class="identifier">response</span>.<span class="identifier">data</span><span class="braces">)</span><span class="symbol">;</span>
-        <span class="braces">}</span>
-        <span class="reserved_word">return</span> <span class="identifier">Response</span>.<span class="identifier">success</span><span class="braces">(</span><span class="identifier">parsed</span>, <span class="identifier">response</span><span class="braces">)</span><span class="symbol">;</span>
-    <span class="braces">}</span>
-<span class="braces">}</span>
+        <h1>请求处理</h1>
 
-<span class="comment">// 解析为Bitmap的实现示例</span>
-<span class="reserved_word">public</span> <span class="reserved_word">class</span> <span class="identifier">ImageImplRequest</span> <span class="reserved_word">extends</span> <span class="identifier">Request</span><span class="symbol">&lt;</span><span class="identifier">Bitmap</span><span class="symbol">&gt;</span> <span class="braces">{</span>
-    @<span class="identifier">Override</span>
-    <span class="reserved_word">protected</span> <span class="identifier">Response</span><span class="symbol">&lt;</span><span class="identifier">String</span><span class="symbol">&gt;</span> <span class="identifier">parseNetworkResponse</span><span class="braces">(</span><span class="identifier">NetworkResponse</span> <span class="identifier">response</span><span class="braces">)</span> <span class="braces">{</span>
-        <span class="identifier">Bitmap</span> <span class="identifier">bitmap</span><span class="symbol">;</span>
-        <span class="reserved_word">try</span> <span class="braces">{</span>
-            <span class="identifier">bitmap</span> <span class="symbol">=</span> <span class="identifier">BitmapFactory</span>.<span class="identifier">decodeByteArray</span><span class="braces">(</span><span class="identifier">response</span>.<span class="identifier">data</span>, <span class="numeric">0</span>, <span class="identifier">response</span>.<span class="identifier">data</span>.<span class="identifier">length</span><span class="braces">)</span><span class="symbol">;</span>
-        <span class="braces">}</span> <span class="reserved_word">catch</span> <span class="braces">(</span><span class="identifier">OutOfMemoryError</span> <span class="identifier">e</span><span class="braces">)</span> <span class="braces">{</span>
-            <span class="reserved_word">return</span> <span class="identifier">Response</span>.<span class="identifier">error</span><span class="braces">(</span><span class="reserved_word">new</span> <span class="identifier">ParseError</span><span class="braces">(</span><span class="identifier">e</span><span class="braces">)</span><span class="braces">)</span><span class="symbol">;</span>
-        <span class="braces">}</span>
-        <span class="reserved_word">return</span> <span class="identifier">Response</span>.<span class="identifier">success</span><span class="braces">(</span><span class="identifier">bitmap</span>, <span class="identifier">response</span><span class="braces">)</span><span class="symbol">;</span>
-    <span class="braces">}</span>
-<span class="braces">}</span></pre> 
-  <h2>事件监听：</h2> 
-  <p>每个请求均允许传入监听器用于处理不同的执行状态，Netroid实现了开始、完成、成功、重试、失败、取消、执行网络操作、应用缓存、下载进度九种状态回调功能：</p> 
-  <pre><span class="reserved_word">public</span> <span class="reserved_word">abstract</span> <span class="reserved_word">class</span> <span class="identifier">Listener</span><span class="symbol">&lt;</span><span class="identifier">T</span><span class="symbol">&gt;</span> <span class="braces">{</span>
+<p>Netroid提供了几个通用的请求实现类，包括：</p>
 
-    <span class="comment">// 在请求开始执行时回调，可做一些例如弹出ProgressDialog等等的UI操作来通知用户进行等待。</span>
-    <span class="comment">// 由于请求是异步线程操作，在队列过长的情况下无法保证这个方法在addRequest()后立即被调用。</span>
-    <span class="reserved_word">public</span> <span class="reserved_word">void</span> <span class="identifier">onPreExecute</span><span class="braces">(</span><span class="braces">)</span> <span class="braces">{</span><span class="braces">}</span>
+<table><thead>
+<tr>
+<th style="text-align: left"></th>
+</tr>
+</thead><tbody>
+<tr>
+<td style="text-align: left"><code>StringRequest</code>提取响应结果为字符串的请求。</td>
+</tr>
+<tr>
+<td style="text-align: left"><code>JsonObjectRequest</code>提取响应结果为Json对象的请求。</td>
+</tr>
+<tr>
+<td style="text-align: left"><code>JsonArrayRequest</code>提取响应结果为Json数组的请求。</td>
+</tr>
+<tr>
+<td style="text-align: left"><code>ImageRequest</code>提取响应结果为图片(Bitmap)的请求。</td>
+</tr>
+</tbody></table>
 
-    <span class="comment">// 无论请求的执行情况是成功还是失败，这个方法都会在执行完成时回调。</span>
-    <span class="comment">// 如果在onPreExecute()中做了一些UI提醒，建议在这个方法中取消。</span>
-    <span class="reserved_word">public</span> <span class="reserved_word">void</span> <span class="identifier">onFinish</span><span class="braces">(</span><span class="braces">)</span> <span class="braces">{</span><span class="braces">}</span>
+<p>这些不同的请求方式最核心的部分来自于实现<code>Request</code>基类的 <strong>parseNetworkResponse()</strong> 方法，各自对返回结果进行解析处理：</p>
+<div class="highlight java"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28</pre></td><td class="code"><pre><span class="c1">// 解析为字符串的实现示例</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">StringImplRequest</span> <span class="kd">extends</span> <span class="n">Request</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="o">{</span>
+    <span class="c1">// NetworkResponse中包含返回结果的byte[]数组以及返回结果编码方式，通过对结果进行处理，构造成目标对象返回</span>
+    <span class="nd">@Override</span>
+    <span class="kd">protected</span> <span class="n">Response</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">parseNetworkResponse</span><span class="o">(</span><span class="n">NetworkResponse</span> <span class="n">response</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">String</span> <span class="n">parsed</span><span class="o">;</span>
+        <span class="k">try</span> <span class="o">{</span>
+            <span class="n">parsed</span> <span class="o">=</span> <span class="k">new</span> <span class="n">String</span><span class="o">(</span><span class="n">response</span><span class="o">.</span><span class="na">data</span><span class="o">,</span> <span class="n">response</span><span class="o">.</span><span class="na">charset</span><span class="o">);</span>
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">UnsupportedEncodingException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">parsed</span> <span class="o">=</span> <span class="k">new</span> <span class="n">String</span><span class="o">(</span><span class="n">response</span><span class="o">.</span><span class="na">data</span><span class="o">);</span>
+        <span class="o">}</span>
+        <span class="k">return</span> <span class="n">Response</span><span class="o">.</span><span class="na">success</span><span class="o">(</span><span class="n">parsed</span><span class="o">,</span> <span class="n">response</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span>
 
-    <span class="comment">// 在请求成功时回调</span>
-    <span class="reserved_word">public</span> <span class="reserved_word">abstract</span> <span class="reserved_word">void</span> <span class="identifier">onSuccess</span><span class="braces">(</span><span class="identifier">T</span> <span class="identifier">response</span><span class="braces">)</span><span class="symbol">;</span>
+<span class="c1">// 解析为Bitmap的实现示例</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">ImageImplRequest</span> <span class="kd">extends</span> <span class="n">Request</span><span class="o">&lt;</span><span class="n">Bitmap</span><span class="o">&gt;</span> <span class="o">{</span>
+    <span class="nd">@Override</span>
+    <span class="kd">protected</span> <span class="n">Response</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">parseNetworkResponse</span><span class="o">(</span><span class="n">NetworkResponse</span> <span class="n">response</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">Bitmap</span> <span class="n">bitmap</span><span class="o">;</span>
+        <span class="k">try</span> <span class="o">{</span>
+            <span class="n">bitmap</span> <span class="o">=</span> <span class="n">BitmapFactory</span><span class="o">.</span><span class="na">decodeByteArray</span><span class="o">(</span><span class="n">response</span><span class="o">.</span><span class="na">data</span><span class="o">,</span> <span class="mi">0</span><span class="o">,</span> <span class="n">response</span><span class="o">.</span><span class="na">data</span><span class="o">.</span><span class="na">length</span><span class="o">);</span>
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">OutOfMemoryError</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">return</span> <span class="n">Response</span><span class="o">.</span><span class="na">error</span><span class="o">(</span><span class="k">new</span> <span class="n">ParseError</span><span class="o">(</span><span class="n">e</span><span class="o">));</span>
+        <span class="o">}</span>
+        <span class="k">return</span> <span class="n">Response</span><span class="o">.</span><span class="na">success</span><span class="o">(</span><span class="n">bitmap</span><span class="o">,</span> <span class="n">response</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></td></tr></tbody></table>
+</div>
 
-    <span class="comment">// 在请求失败时回调</span>
-    <span class="reserved_word">public</span> <span class="reserved_word">void</span> <span class="identifier">onError</span><span class="braces">(</span><span class="identifier">NetroidError</span> <span class="identifier">error</span><span class="braces">)</span> <span class="braces">{</span><span class="braces">}</span>
+<h2>事件监听：</h2>
 
-    <span class="comment">// 在请求真正被取消时回调。注：Request.cancel() 方法只是做取消的标记，</span>
-    <span class="comment">// 请求不会马上被终止，这个方法是在请求真正由于取消而终止时的回调通知。</span>
-    <span class="reserved_word">public</span> <span class="reserved_word">void</span> <span class="identifier">onCancel</span><span class="braces">(</span><span class="braces">)</span> <span class="braces">{</span><span class="braces">}</span>
+<p>每个请求均允许传入监听器用于处理不同的执行状态，Netroid实现了开始、完成、成功、重试、失败、取消、执行网络操作、应用缓存、下载进度九种状态回调功能：</p>
+<div class="highlight java"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36</pre></td><td class="code"><pre><span class="kd">public</span> <span class="kd">abstract</span> <span class="kd">class</span> <span class="nc">Listener</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="o">{</span>
+    <span class="c1">// 在请求开始执行时回调，可做一些例如弹出ProgressDialog等等的UI操作来通知用户进行等待。</span>
+    <span class="c1">// 由于请求是异步线程操作，在队列过长的情况下无法保证这个方法在addRequest()后立即被调用。</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="n">onPreExecute</span><span class="o">()</span> <span class="o">{}</span>
 
-    <span class="comment">// 如果请求选择使用缓存，但缓存不存在或过期时回调。这个方法相对于onUsedCache(), 意味着Netroid将会执行http操作。</span>
-    <span class="comment">// 场景解释：在缓存可用的情况下，onPreExecute()跟onFinish()的回调间隔时间非常短，如果在onPreExecute()</span>
-    <span class="comment">// 内弹出ProgressDialog来通知用户等待，可能会出现Dialog一闪而过的问题，因此提供这个回调方法作为替代。</span>
-    <span class="comment">// 这个方法的回调同时意味着请求将会由于执行http操作而有相对长时间的等待（视网络情况而定）。</span>
-    <span class="reserved_word">public</span> <span class="reserved_word">void</span> <span class="identifier">onNetworking</span><span class="braces">(</span><span class="braces">)</span> <span class="braces">{</span><span class="braces">}</span>
+    <span class="c1">// 无论请求的执行情况是成功还是失败，这个方法都会在执行完成时回调。</span>
+    <span class="c1">// 如果在onPreExecute()中做了一些UI提醒，建议在这个方法中取消。</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="n">onFinish</span><span class="o">()</span> <span class="o">{}</span>
 
-    <span class="comment">// 如果请求设置了使用Cache，Netroid在获取到可用缓存时会回调这个方法。</span>
-    <span class="comment">// 这个方法的回调意味着请求很快会使用缓存数据返回，不再执行实际的Http操作。</span>
-    <span class="reserved_word">public</span> <span class="reserved_word">void</span> <span class="identifier">onUsedCache</span><span class="braces">(</span><span class="braces">)</span> <span class="braces">{</span><span class="braces">}</span>
+    <span class="c1">// 在请求成功时回调</span>
+    <span class="kd">public</span> <span class="kd">abstract</span> <span class="kt">void</span> <span class="n">onSuccess</span><span class="o">(</span><span class="n">T</span> <span class="n">response</span><span class="o">);</span>
 
-    <span class="comment">// 这个方法用于在请求超时需要重试前回调，可对重试次数进行统计。</span>
-    <span class="comment">// 提示：可通过请求facebook等等被墙的网站来测试其可用性。</span>
-    <span class="reserved_word">public</span> <span class="reserved_word">void</span> <span class="identifier">onRetry</span><span class="braces">(</span><span class="braces">)</span> <span class="braces">{</span><span class="braces">}</span>
+    <span class="c1">// 在请求失败时回调</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="n">onError</span><span class="o">(</span><span class="n">NetroidError</span> <span class="n">error</span><span class="o">)</span> <span class="o">{}</span>
 
-    <span class="comment">// 这个回调方法提供给文件下载功能使用，用于计算下载进度</span>
-    <span class="reserved_word">public</span> <span class="reserved_word">void</span> <span class="identifier">onProgressChange</span><span class="braces">(</span><span class="reserved_word">long</span> <span class="identifier">fileSize</span>, <span class="reserved_word">long</span> <span class="identifier">downloadedSize</span><span class="braces">)</span> <span class="braces">{</span><span class="braces">}</span>
+    <span class="c1">// 在请求真正被取消时回调。注：Request.cancel() 方法只是做取消的标记，</span>
+    <span class="c1">// 请求不会马上被终止，这个方法是在请求真正由于取消而终止时的回调通知。</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="n">onCancel</span><span class="o">()</span> <span class="o">{}</span>
 
-<span class="braces">}</span></pre> 
-  <p><strong>Listener</strong>中的所有方法都会由UI线程负责调用，可方便地进行用户界面交互。除 <strong>onSuccess()</strong> 方法是抽象方法外，其它方法均可在不需要使用时不重写，避免冗余大量无用代码带来的阅读障碍。</p> 
-  <p>注：Listener对于Request来说不是必须的参数，如果你不关注请求的任何执行结果，完全可以不创建Listener对象：</p> 
-  <pre><span class="comment">// Listener参数为null</span>
-<span class="identifier">StringRequest</span> <span class="identifier">request</span> <span class="symbol">=</span> <span class="reserved_word">new</span> <span class="identifier">StringRequest</span><span class="braces">(</span><span class="identifier">Request</span>.<span class="identifier">Method</span>.<span class="identifier">GET</span>, <span class="identifier">url</span>, <span class="reserved_word">null</span><span class="braces">)</span><span class="symbol">;</span></pre> 
-  <p>如果你需要在请求前弹出Dialog提醒用户等待：</p> 
-  <pre><span class="identifier">String</span> <span class="identifier">url</span> <span class="symbol">=</span> <span class="string">&quot;http://facebook.com/&quot;</span><span class="symbol">;</span>
-<span class="identifier">JsonObjectRequest</span> <span class="identifier">request</span> <span class="symbol">=</span> <span class="reserved_word">new</span> <span class="identifier">JsonObjectRequest</span><span class="braces">(</span><span class="identifier">url</span>, <span class="reserved_word">null</span>, <span class="reserved_word">new</span> <span class="identifier">Listener</span><span class="symbol">&lt;</span><span class="identifier">JSONObject</span><span class="symbol">&gt;</span><span class="braces">(</span><span class="braces">)</span> <span class="braces">{</span>
-    <span class="identifier">ProgressDialog</span> <span class="identifier">mPrgsDialog</span><span class="symbol">;</span>
+    <span class="c1">// 如果请求选择使用缓存，但缓存不存在或过期时回调。这个方法相对于onUsedCache(), 意味着Netroid将会执行http操作。</span>
+    <span class="c1">// 场景解释：在缓存可用的情况下，onPreExecute()跟onFinish()的回调间隔时间非常短，如果在onPreExecute()</span>
+    <span class="c1">// 内弹出ProgressDialog来通知用户等待，可能会出现Dialog一闪而过的问题，因此提供这个回调方法作为替代。</span>
+    <span class="c1">// 这个方法的回调同时意味着请求将会由于执行http操作而有相对长时间的等待（视网络情况而定）。</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="n">onNetworking</span><span class="o">()</span> <span class="o">{}</span>
 
-    @<span class="identifier">Override</span>
-    <span class="reserved_word">public</span> <span class="reserved_word">void</span> <span class="identifier">onPreExecute</span><span class="braces">(</span><span class="braces">)</span> <span class="braces">{</span>
-        <span class="identifier">mPrgsDialog</span> <span class="symbol">=</span> <span class="identifier">ProgressDialog</span>.<span class="identifier">show</span><span class="braces">(</span><span class="identifier">Activity</span>.<span class="reserved_word">this</span>, <span class="reserved_word">null</span>, <span class="string">&quot;正在加载中&quot;</span>, <span class="reserved_word">true</span>, <span class="reserved_word">true</span>, <span class="reserved_word">new</span> <span class="identifier">DialogInterface</span>.<span class="identifier">OnCancelListener</span><span class="braces">(</span><span class="braces">)</span> <span class="braces">{</span>
-            @<span class="identifier">Override</span>
-            <span class="reserved_word">public</span> <span class="reserved_word">void</span> <span class="identifier">onCancel</span><span class="braces">(</span><span class="identifier">DialogInterface</span> <span class="identifier">dialog</span><span class="braces">)</span> <span class="braces">{</span>
-                <span class="comment">// 在用户关闭dialog时标记请求为取消状态</span>
-                <span class="identifier">RequestQueue</span>.<span class="identifier">cancelAll</span><span class="braces">(</span><span class="identifier">REQUESTS_TAG</span><span class="braces">)</span><span class="symbol">;</span>
-            <span class="braces">}</span>
-        <span class="braces">}</span><span class="braces">)</span><span class="symbol">;</span>
-    <span class="braces">}</span>
+    <span class="c1">// 如果请求设置了使用Cache，Netroid在获取到可用缓存时会回调这个方法。</span>
+    <span class="c1">// 这个方法的回调意味着请求很快会使用缓存数据返回，不再执行实际的Http操作。</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="n">onUsedCache</span><span class="o">()</span> <span class="o">{}</span>
 
-    <span class="comment">// 在onFinish()时cancel dialog</span>
-    @<span class="identifier">Override</span>
-    <span class="reserved_word">public</span> <span class="reserved_word">void</span> <span class="identifier">onFinish</span><span class="braces">(</span><span class="braces">)</span> <span class="braces">{</span>
-        <span class="identifier">mPrgsDialog</span>.<span class="identifier">cancel</span><span class="braces">(</span><span class="braces">)</span><span class="symbol">;</span>
-    <span class="braces">}</span>
+    <span class="c1">// 这个方法用于在请求超时需要重试前回调，可对重试次数进行统计。</span>
+    <span class="c1">// 提示：可通过请求facebook等等被墙的网站来测试其可用性。</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="n">onRetry</span><span class="o">()</span> <span class="o">{}</span>
 
-    @<span class="identifier">Override</span>
-    <span class="reserved_word">public</span> <span class="reserved_word">void</span> <span class="identifier">onSuccess</span><span class="braces">(</span><span class="identifier">JSONObject</span> <span class="identifier">response</span><span class="braces">)</span> <span class="braces">{</span>
-        <span class="identifier">Toast</span>.<span class="identifier">makeText</span><span class="braces">(</span><span class="identifier">Activity</span>.<span class="reserved_word">this</span>, <span class="string">&quot;请求结果：&quot;</span> <span class="symbol">+</span> <span class="identifier">response</span>, <span class="numeric">2000</span><span class="braces">)</span><span class="symbol">;</span>
-    <span class="braces">}</span>
+    <span class="c1">// 这个回调方法提供给文件下载功能使用，用于计算下载进度</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="n">onProgressChange</span><span class="o">(</span><span class="kt">long</span> <span class="n">fileSize</span><span class="o">,</span> <span class="kt">long</span> <span class="n">downloadedSize</span><span class="o">)</span> <span class="o">{}</span>
+<span class="o">}</span>
+</pre></td></tr></tbody></table>
+</div>
 
-    @<span class="identifier">Override</span>
-    <span class="reserved_word">public</span> <span class="reserved_word">void</span> <span class="identifier">onError</span><span class="braces">(</span><span class="identifier">NetroidError</span> <span class="identifier">error</span><span class="braces">)</span> <span class="braces">{</span>
-        <span class="identifier">Toast</span>.<span class="identifier">makeText</span><span class="braces">(</span><span class="identifier">Activity</span>.<span class="reserved_word">this</span>, <span class="string">&quot;请求失败&quot;</span>, <span class="numeric">2000</span><span class="braces">)</span><span class="symbol">;</span>
-    <span class="braces">}</span>
+<p><strong>Listener</strong>中的所有方法都会由UI线程负责调用，可方便地进行用户界面交互。除 <strong>onSuccess()</strong>
+方法是抽象方法外，其它方法均可在不需要使用时不重写，避免冗余大量无用代码带来的阅读障碍。</p>
 
-    @<span class="identifier">Override</span>
-    <span class="reserved_word">public</span> <span class="reserved_word">void</span> <span class="identifier">onCancel</span><span class="braces">(</span><span class="braces">)</span> <span class="braces">{</span>
-        <span class="identifier">Toast</span>.<span class="identifier">makeText</span><span class="braces">(</span><span class="identifier">Activity</span>.<span class="reserved_word">this</span>, <span class="string">&quot;请求已取消&quot;</span>, <span class="numeric">2000</span><span class="braces">)</span><span class="symbol">;</span>
-    <span class="braces">}</span>
-<span class="braces">}</span><span class="braces">)</span><span class="symbol">;</span></pre> 
-  <p>Netroid默认的请求重试次数是一次，超时时间是2500ms，可以通过 <strong>Request.setRetryPolicy()</strong> 进行设置。 Netroid在每次请求重试前都会对请求是否已取消进行判断，目的是当遇到网络或服务器缓慢等问题时能及时退出，避免余下的重试次数继续生效。 <strong>Listener.onRetry()</strong> 方法可用于在请求执行过程中统计重试次数或请求执行时间，在判定请求无法正常返回时取消请求：</p> 
-  <pre><span class="reserved_word">final</span> <span class="identifier">String</span> <span class="identifier">REQUESTS_TAG</span> <span class="symbol">=</span> <span class="string">&quot;Request-Demo&quot;</span><span class="symbol">;</span>
-<span class="identifier">String</span> <span class="identifier">url</span> <span class="symbol">=</span> <span class="string">&quot;http://facebook.com/&quot;</span><span class="symbol">;</span>
-<span class="identifier">JsonObjectRequest</span> <span class="identifier">request</span> <span class="symbol">=</span> <span class="reserved_word">new</span> <span class="identifier">JsonObjectRequest</span><span class="braces">(</span><span class="identifier">url</span>, <span class="reserved_word">null</span>, <span class="reserved_word">new</span> <span class="identifier">Listener</span><span class="symbol">&lt;</span><span class="identifier">JSONObject</span><span class="symbol">&gt;</span><span class="braces">(</span><span class="braces">)</span> <span class="braces">{</span>
-    <span class="reserved_word">long</span> <span class="identifier">startTimeMs</span><span class="symbol">;</span>
-    <span class="reserved_word">int</span> <span class="identifier">retryCount</span><span class="symbol">;</span>
+<p>注：Listener对于Request来说不是必须的参数，如果你不关注请求的任何执行结果，完全可以不创建Listener对象：</p>
+<div class="highlight java"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2</pre></td><td class="code"><pre><span class="c1">// Listener参数为null</span>
+<span class="n">StringRequest</span> <span class="n">request</span> <span class="o">=</span> <span class="k">new</span> <span class="n">StringRequest</span><span class="o">(</span><span class="n">Request</span><span class="o">.</span><span class="na">Method</span><span class="o">.</span><span class="na">GET</span><span class="o">,</span> <span class="n">url</span><span class="o">,</span> <span class="kc">null</span><span class="o">);</span>
+</pre></td></tr></tbody></table>
+</div>
 
-    @<span class="identifier">Override</span>
-    <span class="reserved_word">public</span> <span class="reserved_word">void</span> <span class="identifier">onPreExecute</span><span class="braces">(</span><span class="braces">)</span> <span class="braces">{</span>
-        <span class="identifier">startTimeMs</span> <span class="symbol">=</span> <span class="identifier">SystemClock</span>.<span class="identifier">elapsedRealtime</span><span class="braces">(</span><span class="braces">)</span><span class="symbol">;</span>
-        <span class="identifier">NetroidLog</span>.<span class="identifier">e</span><span class="braces">(</span><span class="identifier">REQUESTS_TAG</span><span class="braces">)</span><span class="symbol">;</span>
-    <span class="braces">}</span>
+<p>如果你需要在请求前弹出Dialog提醒用户等待：</p>
+<div class="highlight java"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36</pre></td><td class="code"><pre><span class="n">String</span> <span class="n">url</span> <span class="o">=</span> <span class="s">"http://facebook.com/"</span><span class="o">;</span>
+<span class="n">JsonObjectRequest</span> <span class="n">request</span> <span class="o">=</span> <span class="k">new</span> <span class="n">JsonObjectRequest</span><span class="o">(</span><span class="n">url</span><span class="o">,</span> <span class="kc">null</span><span class="o">,</span> <span class="k">new</span> <span class="n">Listener</span><span class="o">&lt;</span><span class="n">JSONObject</span><span class="o">&gt;()</span> <span class="o">{</span>
+    <span class="n">ProgressDialog</span> <span class="n">mPrgsDialog</span><span class="o">;</span>
 
-    @<span class="identifier">Override</span>
-    <span class="reserved_word">public</span> <span class="reserved_word">void</span> <span class="identifier">onFinish</span><span class="braces">(</span><span class="braces">)</span> <span class="braces">{</span>
-        <span class="comment">// 这里可以重新再执行这个请求</span>
-        <span class="identifier">RequestQueue</span>.<span class="identifier">add</span><span class="braces">(</span><span class="identifier">request</span><span class="braces">)</span><span class="symbol">;</span>
-        <span class="identifier">NetroidLog</span>.<span class="identifier">e</span><span class="braces">(</span><span class="identifier">REQUESTS_TAG</span><span class="braces">)</span><span class="symbol">;</span>
-    <span class="braces">}</span>
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="n">onPreExecute</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">mPrgsDialog</span> <span class="o">=</span> <span class="n">ProgressDialog</span><span class="o">.</span><span class="na">show</span><span class="o">(</span><span class="n">Activity</span><span class="o">.</span><span class="na">this</span><span class="o">,</span> <span class="kc">null</span><span class="o">,</span> <span class="s">"正在加载中"</span><span class="o">,</span> <span class="kc">true</span><span class="o">,</span> <span class="kc">true</span><span class="o">,</span> <span class="k">new</span> <span class="n">DialogInterface</span><span class="o">.</span><span class="na">OnCancelListener</span><span class="o">()</span> <span class="o">{</span>
+            <span class="nd">@Override</span>
+            <span class="kd">public</span> <span class="kt">void</span> <span class="n">onCancel</span><span class="o">(</span><span class="n">DialogInterface</span> <span class="n">dialog</span><span class="o">)</span> <span class="o">{</span>
+                <span class="c1">// 在用户关闭dialog时标记请求为取消状态</span>
+                <span class="n">RequestQueue</span><span class="o">.</span><span class="na">cancelAll</span><span class="o">(</span><span class="n">REQUESTS_TAG</span><span class="o">);</span>
+            <span class="o">}</span>
+        <span class="o">});</span>
+    <span class="o">}</span>
 
-    @<span class="identifier">Override</span>
-    <span class="reserved_word">public</span> <span class="reserved_word">void</span> <span class="identifier">onRetry</span><span class="braces">(</span><span class="braces">)</span> <span class="braces">{</span>
-        <span class="reserved_word">long</span> <span class="identifier">executedTime</span> <span class="symbol">=</span> <span class="identifier">SystemClock</span>.<span class="identifier">elapsedRealtime</span><span class="braces">(</span><span class="braces">)</span> <span class="symbol">-</span> <span class="identifier">startTimeMs</span><span class="symbol">;</span>
-        <span class="reserved_word">if</span> <span class="braces">(</span><span class="symbol">+</span><span class="symbol">+</span><span class="identifier">retryCount</span> <span class="symbol">&gt;</span> <span class="numeric">5</span> <span class="symbol">|</span><span class="symbol">|</span> <span class="identifier">executedTime</span> <span class="symbol">&gt;</span> <span class="numeric">30000</span><span class="braces">)</span> <span class="braces">{</span>
-            <span class="identifier">NetroidLog</span>.<span class="identifier">e</span><span class="braces">(</span><span class="string">&quot;retryCount : &quot;</span> <span class="symbol">+</span> <span class="identifier">retryCount</span> <span class="symbol">+</span> <span class="string">&quot; executedTime : &quot;</span> <span class="symbol">+</span> <span class="identifier">executedTime</span><span class="braces">)</span><span class="symbol">;</span>
-            <span class="identifier">mQueue</span>.<span class="identifier">cancelAll</span><span class="braces">(</span><span class="identifier">REQUESTS_TAG</span><span class="braces">)</span><span class="symbol">;</span>
-        <span class="braces">}</span> <span class="reserved_word">else</span> <span class="braces">{</span>
-            <span class="identifier">NetroidLog</span>.<span class="identifier">e</span><span class="braces">(</span><span class="identifier">REQUESTS_TAG</span><span class="braces">)</span><span class="symbol">;</span>
-        <span class="braces">}</span>
-    <span class="braces">}</span>
+    <span class="c1">// 在onFinish()时cancel dialog</span>
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="n">onFinish</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">mPrgsDialog</span><span class="o">.</span><span class="na">cancel</span><span class="o">();</span>
+    <span class="o">}</span>
 
-    @<span class="identifier">Override</span>
-    <span class="reserved_word">public</span> <span class="reserved_word">void</span> <span class="identifier">onCancel</span><span class="braces">(</span><span class="braces">)</span> <span class="braces">{</span>
-        <span class="identifier">NetroidLog</span>.<span class="identifier">e</span><span class="braces">(</span><span class="identifier">REQUESTS_TAG</span><span class="braces">)</span><span class="symbol">;</span>
-    <span class="braces">}</span>
-<span class="braces">}</span><span class="braces">)</span><span class="symbol">;</span>
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="n">onSuccess</span><span class="o">(</span><span class="n">JSONObject</span> <span class="n">response</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">Toast</span><span class="o">.</span><span class="na">makeText</span><span class="o">(</span><span class="n">Activity</span><span class="o">.</span><span class="na">this</span><span class="o">,</span> <span class="s">"请求结果："</span> <span class="o">+</span> <span class="n">response</span><span class="o">,</span> <span class="mi">2000</span><span class="o">);</span>
+    <span class="o">}</span>
 
-<span class="identifier">request</span>.<span class="identifier">setRetryPolicy</span><span class="braces">(</span><span class="reserved_word">new</span> <span class="identifier">DefaultRetryPolicy</span><span class="braces">(</span><span class="numeric">5000</span>, <span class="numeric">20</span>, <span class="identifier">DefaultRetryPolicy</span>.<span class="identifier">DEFAULT_BACKOFF_MULT</span><span class="braces">)</span><span class="braces">)</span><span class="symbol">;</span>
-<span class="identifier">request</span>.<span class="identifier">setTag</span><span class="braces">(</span><span class="identifier">REQUESTS_TAG</span><span class="braces">)</span><span class="symbol">;</span>
-<span class="identifier">RequestQueue</span>.<span class="identifier">add</span><span class="braces">(</span><span class="identifier">request</span><span class="braces">)</span><span class="symbol">;</span></pre> 
-  <p>示例中创建了一个超时时长为5000ms，重试20次的请求，在onPreExecute()时记录开始时间，在每次onRetry()时对重试次数及已运行时间进行判断，超出限制时取消这次请求。 有些情况下，第一次请求会重试多次，但只要再发起一次请求，就非常快能获取结果，所以示例中的onFinish()方法再次执行了这个请求，这里出现的死循环问题不作解决。 以下是运行过程中打印的日志：</p> 
-  <pre><span class="numeric">01</span><span class="symbol">-</span><span class="numeric">15</span> <span class="numeric">22</span><span class="symbol">:</span><span class="numeric">08</span><span class="symbol">:</span><span class="numeric">29.175</span><span class="symbol">:</span> <span class="identifier">ERROR</span>/<span class="identifier">Netroid</span><span class="braces">(</span><span class="numeric">22043</span><span class="braces">)</span><span class="symbol">:</span> <span class="braces">[</span><span class="numeric">1</span><span class="braces">]</span> <span class="numeric">4.</span><span class="identifier">onPreExecute</span><span class="symbol">:</span> <span class="identifier">Request</span><span class="symbol">-</span><span class="identifier">Demo</span>
-<span class="numeric">01</span><span class="symbol">-</span><span class="numeric">15</span> <span class="numeric">22</span><span class="symbol">:</span><span class="numeric">08</span><span class="symbol">:</span><span class="numeric">40.023</span><span class="symbol">:</span> <span class="identifier">ERROR</span>/<span class="identifier">Netroid</span><span class="braces">(</span><span class="numeric">22043</span><span class="braces">)</span><span class="symbol">:</span> <span class="braces">[</span><span class="numeric">1</span><span class="braces">]</span> <span class="numeric">4.</span><span class="identifier">onRetry</span><span class="symbol">:</span> <span class="identifier">Request</span><span class="symbol">-</span><span class="identifier">Demo</span>
-<span class="numeric">01</span><span class="symbol">-</span><span class="numeric">15</span> <span class="numeric">22</span><span class="symbol">:</span><span class="numeric">08</span><span class="symbol">:</span><span class="numeric">50.088</span><span class="symbol">:</span> <span class="identifier">ERROR</span>/<span class="identifier">Netroid</span><span class="braces">(</span><span class="numeric">22043</span><span class="braces">)</span><span class="symbol">:</span> <span class="braces">[</span><span class="numeric">1</span><span class="braces">]</span> <span class="numeric">4.</span><span class="identifier">onRetry</span><span class="symbol">:</span> <span class="identifier">Request</span><span class="symbol">-</span><span class="identifier">Demo</span>
-<span class="numeric">01</span><span class="symbol">-</span><span class="numeric">15</span> <span class="numeric">22</span><span class="symbol">:</span><span class="numeric">09</span><span class="symbol">:</span><span class="numeric">10.213</span><span class="symbol">:</span> <span class="identifier">ERROR</span>/<span class="identifier">Netroid</span><span class="braces">(</span><span class="numeric">22043</span><span class="braces">)</span><span class="symbol">:</span> <span class="braces">[</span><span class="numeric">1</span><span class="braces">]</span> <span class="numeric">4.</span><span class="identifier">onRetry</span><span class="symbol">:</span> <span class="identifier">retryCount</span> <span class="symbol">:</span> <span class="numeric">3</span> <span class="identifier">executedTime</span> <span class="symbol">:</span> <span class="numeric">35223</span>
-<span class="numeric">01</span><span class="symbol">-</span><span class="numeric">15</span> <span class="numeric">22</span><span class="symbol">:</span><span class="numeric">09</span><span class="symbol">:</span><span class="numeric">50.323</span><span class="symbol">:</span> <span class="identifier">ERROR</span>/<span class="identifier">Netroid</span><span class="braces">(</span><span class="numeric">22043</span><span class="braces">)</span><span class="symbol">:</span> <span class="braces">[</span><span class="numeric">1</span><span class="braces">]</span> <span class="numeric">4.</span><span class="identifier">onRetry</span><span class="symbol">:</span> <span class="identifier">retryCount</span> <span class="symbol">:</span> <span class="numeric">4</span> <span class="identifier">executedTime</span> <span class="symbol">:</span> <span class="numeric">75337</span>
-<span class="numeric">01</span><span class="symbol">-</span><span class="numeric">15</span> <span class="numeric">22</span><span class="symbol">:</span><span class="numeric">09</span><span class="symbol">:</span><span class="numeric">50.338</span><span class="symbol">:</span> <span class="identifier">ERROR</span>/<span class="identifier">Netroid</span><span class="braces">(</span><span class="numeric">22043</span><span class="braces">)</span><span class="symbol">:</span> <span class="braces">[</span><span class="numeric">1</span><span class="braces">]</span> <span class="numeric">4.</span><span class="identifier">onCancel</span><span class="symbol">:</span> <span class="identifier">Request</span><span class="symbol">-</span><span class="identifier">Demo</span>
-<span class="numeric">01</span><span class="symbol">-</span><span class="numeric">15</span> <span class="numeric">22</span><span class="symbol">:</span><span class="numeric">09</span><span class="symbol">:</span><span class="numeric">51.021</span><span class="symbol">:</span> <span class="identifier">ERROR</span>/<span class="identifier">Netroid</span><span class="braces">(</span><span class="numeric">22043</span><span class="braces">)</span><span class="symbol">:</span> <span class="braces">[</span><span class="numeric">1</span><span class="braces">]</span> <span class="numeric">4.</span><span class="identifier">onFinish</span><span class="symbol">:</span> <span class="identifier">Request</span><span class="symbol">-</span><span class="identifier">Demo</span></pre> 
-  <p>可以明显看出，在第三次重试时由于超出限定运行时间的原因已经调用了取消请求的方法，但仍然执行了第四次才真正取消，是因为回调操作与执行操作不在同一线程所致。 这个例子充分说明了调用取消方法后，请求并不能立即真正地终止，几乎所有Http库都无法安全地实现立即终止正在调用的请求。</p> 
-  <h2>验证返回结果：</h2> 
-  <p>通常情况下，请求成功与否依赖于服务端返回的状态码，200代表成功，Netroid将回调 <strong>Listener.onSuccess()</strong>方法。 但实际上我们往往需要对服务端的返回结果进行判断，以确认响应是否真正成功，在确认后将其中的某些字符串解析成特定的对象返回：</p> 
-  <pre><span class="reserved_word">public</span> <span class="reserved_word">class</span> <span class="identifier">BookListRequest</span><span class="symbol">&lt;</span><span class="identifier">List</span><span class="symbol">&lt;</span><span class="identifier">Book</span><span class="symbol">&gt;</span><span class="symbol">&gt;</span> <span class="reserved_word">extends</span> <span class="identifier">Request</span><span class="symbol">&lt;</span><span class="identifier">List</span><span class="symbol">&lt;</span><span class="identifier">Book</span><span class="symbol">&gt;</span><span class="symbol">&gt;</span> <span class="braces">{</span>
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="n">onError</span><span class="o">(</span><span class="n">NetroidError</span> <span class="n">error</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">Toast</span><span class="o">.</span><span class="na">makeText</span><span class="o">(</span><span class="n">Activity</span><span class="o">.</span><span class="na">this</span><span class="o">,</span> <span class="s">"请求失败"</span><span class="o">,</span> <span class="mi">2000</span><span class="o">);</span>
+    <span class="o">}</span>
 
-    <span class="reserved_word">public</span> <span class="identifier">BookListRequest</span><span class="braces">(</span><span class="identifier">String</span> <span class="identifier">url</span>, <span class="identifier">Listener</span><span class="symbol">&lt;</span><span class="identifier">List</span><span class="symbol">&lt;</span><span class="identifier">Book</span><span class="symbol">&gt;</span><span class="symbol">&gt;</span> <span class="identifier">listener</span><span class="braces">)</span> <span class="braces">{</span>
-        <span class="reserved_word">super</span><span class="braces">(</span><span class="identifier">url</span>, <span class="identifier">listener</span><span class="braces">)</span><span class="symbol">;</span>
-        <span class="identifier">setCacheExpireTime</span><span class="braces">(</span><span class="identifier">TimeUnit</span>.<span class="identifier">MINUTES</span>, <span class="numeric">20</span><span class="braces">)</span><span class="symbol">;</span>
-    <span class="braces">}</span>
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="n">onCancel</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">Toast</span><span class="o">.</span><span class="na">makeText</span><span class="o">(</span><span class="n">Activity</span><span class="o">.</span><span class="na">this</span><span class="o">,</span> <span class="s">"请求已取消"</span><span class="o">,</span> <span class="mi">2000</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">});</span>
+</pre></td></tr></tbody></table>
+</div>
 
-    @<span class="identifier">Override</span>
-    <span class="reserved_word">protected</span> <span class="identifier">Response</span><span class="symbol">&lt;</span><span class="identifier">List</span><span class="symbol">&lt;</span><span class="identifier">Book</span><span class="symbol">&gt;</span><span class="symbol">&gt;</span> <span class="identifier">parseNetworkResponse</span><span class="braces">(</span><span class="identifier">NetworkResponse</span> <span class="identifier">response</span><span class="braces">)</span> <span class="braces">{</span>
-        <span class="reserved_word">try</span> <span class="braces">{</span>
-            <span class="identifier">String</span> <span class="identifier">json</span> <span class="symbol">=</span> <span class="reserved_word">new</span> <span class="identifier">String</span><span class="braces">(</span><span class="identifier">response</span>.<span class="identifier">data</span>, <span class="identifier">response</span>.<span class="identifier">charset</span><span class="braces">)</span><span class="symbol">;</span>
-            <span class="identifier">List</span><span class="symbol">&lt;</span><span class="identifier">Book</span><span class="symbol">&gt;</span> <span class="identifier">data</span> <span class="symbol">=</span> <span class="identifier">convert</span><span class="braces">(</span><span class="identifier">json</span><span class="braces">)</span><span class="symbol">;</span>
-            <span class="comment">// 如果返回结果无效，则请求失败</span>
-            <span class="reserved_word">if</span> <span class="braces">(</span><span class="identifier">data</span> <span class="symbol">=</span><span class="symbol">=</span> <span class="reserved_word">null</span><span class="braces">)</span> <span class="braces">{</span>
-                <span class="reserved_word">return</span> <span class="identifier">Response</span>.<span class="identifier">error</span><span class="braces">(</span><span class="reserved_word">new</span> <span class="identifier">NetroidError</span><span class="braces">(</span><span class="string">&quot;cannot convert respond data.&quot;</span><span class="braces">)</span><span class="braces">)</span><span class="symbol">;</span>
-            <span class="braces">}</span>
-            <span class="reserved_word">return</span> <span class="identifier">Response</span>.<span class="identifier">success</span><span class="braces">(</span><span class="identifier">data</span>, <span class="identifier">response</span><span class="braces">)</span><span class="symbol">;</span>
-        <span class="braces">}</span> <span class="reserved_word">catch</span> <span class="braces">(</span><span class="identifier">Exception</span> <span class="identifier">e</span><span class="braces">)</span> <span class="braces">{</span>
-            <span class="reserved_word">return</span> <span class="identifier">Response</span>.<span class="identifier">error</span><span class="braces">(</span><span class="reserved_word">new</span> <span class="identifier">NetroidError</span><span class="braces">(</span><span class="identifier">e</span><span class="braces">)</span><span class="braces">)</span><span class="symbol">;</span>
-        <span class="braces">}</span>
-    <span class="braces">}</span>
+<p>Netroid默认的请求重试次数是一次，超时时间是2500ms，可以通过 <strong>Request.setRetryPolicy()</strong> 进行设置。
+Netroid在每次请求重试前都会对请求是否已取消进行判断，目的是当遇到网络或服务器缓慢等问题时能及时退出，避免余下的重试次数继续生效。
+<strong>Listener.onRetry()</strong> 方法可用于在请求执行过程中统计重试次数或请求执行时间，在判定请求无法正常返回时取消请求：</p>
+<div class="highlight java"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39</pre></td><td class="code"><pre><span class="kd">final</span> <span class="n">String</span> <span class="n">REQUESTS_TAG</span> <span class="o">=</span> <span class="s">"Request-Demo"</span><span class="o">;</span>
+<span class="n">String</span> <span class="n">url</span> <span class="o">=</span> <span class="s">"http://facebook.com/"</span><span class="o">;</span>
+<span class="n">JsonObjectRequest</span> <span class="n">request</span> <span class="o">=</span> <span class="k">new</span> <span class="n">JsonObjectRequest</span><span class="o">(</span><span class="n">url</span><span class="o">,</span> <span class="kc">null</span><span class="o">,</span> <span class="k">new</span> <span class="n">Listener</span><span class="o">&lt;</span><span class="n">JSONObject</span><span class="o">&gt;()</span> <span class="o">{</span>
+    <span class="kt">long</span> <span class="n">startTimeMs</span><span class="o">;</span>
+    <span class="kt">int</span> <span class="n">retryCount</span><span class="o">;</span>
 
-    <span class="comment">// 将服务端返回的json数据解析为列表对象</span>
-    <span class="reserved_word">protected</span> <span class="identifier">List</span><span class="symbol">&lt;</span><span class="identifier">Book</span><span class="symbol">&gt;</span> <span class="identifier">convert</span><span class="braces">(</span><span class="identifier">String</span> <span class="identifier">json</span><span class="braces">)</span> <span class="braces">{</span>
-        <span class="identifier">List</span><span class="symbol">&lt;</span><span class="identifier">Book</span><span class="symbol">&gt;</span> <span class="identifier">bookList</span> <span class="symbol">=</span> ...<span class="braces">(</span><span class="identifier">json</span><span class="braces">)</span><span class="symbol">;</span>
-        <span class="comment">// 判断返回的列表是否为空</span>
-        <span class="reserved_word">if</span> <span class="braces">(</span><span class="identifier">bookList</span> <span class="symbol">=</span><span class="symbol">=</span> <span class="reserved_word">null</span> <span class="symbol">|</span><span class="symbol">|</span> <span class="identifier">bookList</span>.<span class="identifier">size</span><span class="braces">(</span><span class="braces">)</span> <span class="symbol">=</span><span class="symbol">=</span> <span class="numeric">0</span><span class="braces">)</span> <span class="reserved_word">return</span> <span class="reserved_word">null</span><span class="symbol">;</span>
-        <span class="reserved_word">return</span> <span class="identifier">bookList</span><span class="symbol">;</span>
-    <span class="braces">}</span>
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="n">onPreExecute</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">startTimeMs</span> <span class="o">=</span> <span class="n">SystemClock</span><span class="o">.</span><span class="na">elapsedRealtime</span><span class="o">();</span>
+        <span class="n">NetroidLog</span><span class="o">.</span><span class="na">e</span><span class="o">(</span><span class="n">REQUESTS_TAG</span><span class="o">);</span>
+    <span class="o">}</span>
 
-<span class="braces">}</span></pre> 
-  <p>返回Json示例：</p> 
-  <pre><span class="braces">{</span>
-  <span class="string">&quot;status&quot;</span> <span class="symbol">:</span> <span class="numeric">200</span>,
-  <span class="string">&quot;message&quot;</span> <span class="symbol">:</span> <span class="string">&quot;&quot;</span>,
-  <span class="string">&quot;data&quot;</span> <span class="symbol">:</span> <span class="braces">{</span>
-    <span class="string">&quot;curPageNo&quot;</span> <span class="symbol">:</span> <span class="numeric">1</span>,
-    <span class="string">&quot;totalPageCount&quot;</span> <span class="symbol">:</span> <span class="numeric">85</span>,
-    <span class="string">&quot;totalItemCount&quot;</span> <span class="symbol">:</span> <span class="numeric">1681</span>,
-    <span class="string">&quot;list&quot;</span> <span class="symbol">:</span> <span class="braces">[</span> <span class="braces">{</span>
-      <span class="string">&quot;id&quot;</span> <span class="symbol">:</span> <span class="numeric">2967</span>,
-      <span class="string">&quot;name&quot;</span> <span class="symbol">:</span> <span class="string">&quot;渐爱，深爱&quot;</span>,
-      <span class="string">&quot;summary&quot;</span> <span class="symbol">:</span> <span class="string">&quot;在一个遥远的星空，两个不同的灵魂正在发生着剧烈的碰撞，随这种碰撞接踵而至的是璀璨的火花。一开始或许会&quot;</span>,
-      <span class="string">&quot;coverUrl&quot;</span> <span class="symbol">:</span> <span class="string">&quot;http://server.com/covers/cover_44525.jpg&quot;</span>,
-      <span class="string">&quot;updateStatus&quot;</span> <span class="symbol">:</span> <span class="numeric">1</span>,
-      <span class="string">&quot;capacity&quot;</span> <span class="symbol">:</span> <span class="numeric">8786340</span>,
-      <span class="string">&quot;lastUpdateTime&quot;</span> <span class="symbol">:</span> <span class="string">&quot;2013-12-30 09:46:51&quot;</span>
-    <span class="braces">}</span>, <span class="braces">{</span>
-      <span class="string">&quot;id&quot;</span> <span class="symbol">:</span> <span class="numeric">2643</span>,
-      <span class="string">&quot;name&quot;</span> <span class="symbol">:</span> <span class="string">&quot;乱盛夏倾光年&quot;</span>,
-      <span class="string">&quot;summary&quot;</span> <span class="symbol">:</span> <span class="string">&quot;一直都相信着：在这个世界上，有很多和我一样的女孩。她们看《热血高校》、看《艋舺》、看《古惑仔》、看《&quot;</span>,
-      <span class="string">&quot;coverUrl&quot;</span> <span class="symbol">:</span> <span class="string">&quot;http://server.com/covers/cover_46868.jpg&quot;</span>,
-      <span class="string">&quot;updateStatus&quot;</span> <span class="symbol">:</span> <span class="numeric">1</span>,
-      <span class="string">&quot;capacity&quot;</span> <span class="symbol">:</span> <span class="numeric">3445264</span>,
-      <span class="string">&quot;lastUpdateTime&quot;</span> <span class="symbol">:</span> <span class="string">&quot;2013-12-30 08:34:25&quot;</span>
-    <span class="braces">}</span> <span class="braces">]</span>
-  <span class="braces">}</span>
-<span class="braces">}</span></pre> 
-  <p>在上面的返回Json格式示例中，我们可以看到&quot;status&quot;字段，这个字段是服务端处理请求的状态码，如果状态码不是200，我们认为请求失败。 <strong>BookListRequest</strong> 的实现代码中，我们解析返回结果为List后，对List的size进行了判断，如果List为空时也认为请求失败。</p> 
-  <h2>优先层次：</h2> 
-  <p>同样地，Netroid允许设置请求的优先级层次，但需要继承并重写 <strong>getPriority()</strong> 方法，暂不提供 <strong>setPriority()</strong> 方法：</p> 
-  <pre><span class="reserved_word">public</span> <span class="reserved_word">class</span> <span class="identifier">SelfRequest</span> <span class="reserved_word">extends</span> <span class="identifier">Request</span><span class="symbol">&lt;</span><span class="identifier">Void</span><span class="symbol">&gt;</span> <span class="braces">{</span>
-    ...
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="n">onFinish</span><span class="o">()</span> <span class="o">{</span>
+        <span class="c1">// 这里可以重新再执行这个请求</span>
+        <span class="n">RequestQueue</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">request</span><span class="o">);</span>
+        <span class="n">NetroidLog</span><span class="o">.</span><span class="na">e</span><span class="o">(</span><span class="n">REQUESTS_TAG</span><span class="o">);</span>
+    <span class="o">}</span>
 
-    @<span class="identifier">Override</span>
-    <span class="reserved_word">public</span> <span class="identifier">Priority</span> <span class="identifier">getPriority</span><span class="braces">(</span><span class="braces">)</span> <span class="braces">{</span>
-        <span class="reserved_word">return</span> <span class="identifier">Priority</span>.<span class="identifier">NORMAL</span><span class="symbol">;</span>
-    <span class="braces">}</span>
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="n">onRetry</span><span class="o">()</span> <span class="o">{</span>
+        <span class="kt">long</span> <span class="n">executedTime</span> <span class="o">=</span> <span class="n">SystemClock</span><span class="o">.</span><span class="na">elapsedRealtime</span><span class="o">()</span> <span class="o">-</span> <span class="n">startTimeMs</span><span class="o">;</span>
+        <span class="k">if</span> <span class="o">(++</span><span class="n">retryCount</span> <span class="o">&gt;</span> <span class="mi">5</span> <span class="o">||</span> <span class="n">executedTime</span> <span class="o">&gt;</span> <span class="mi">30000</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">NetroidLog</span><span class="o">.</span><span class="na">e</span><span class="o">(</span><span class="s">"retryCount : "</span> <span class="o">+</span> <span class="n">retryCount</span> <span class="o">+</span> <span class="s">" executedTime : "</span> <span class="o">+</span> <span class="n">executedTime</span><span class="o">);</span>
+            <span class="n">mQueue</span><span class="o">.</span><span class="na">cancelAll</span><span class="o">(</span><span class="n">REQUESTS_TAG</span><span class="o">);</span>
+        <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+            <span class="n">NetroidLog</span><span class="o">.</span><span class="na">e</span><span class="o">(</span><span class="n">REQUESTS_TAG</span><span class="o">);</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
 
-    ...
-<span class="braces">}</span>
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="n">onCancel</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">NetroidLog</span><span class="o">.</span><span class="na">e</span><span class="o">(</span><span class="n">REQUESTS_TAG</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">});</span>
 
-<span class="comment">// 优先级的枚举值如下：</span>
-<span class="reserved_word">public</span> <span class="identifier">enum</span> <span class="identifier">Priority</span> <span class="braces">{</span>
-    <span class="identifier">LOW</span>,
-    <span class="identifier">NORMAL</span>,     <span class="comment">// 每个请求默认为normal级别</span>
-    <span class="identifier">HIGH</span>,
-    <span class="identifier">IMMEDIATE</span>
-<span class="braces">}</span></pre> 
-  <p>通常情况下，不建议改变请求的优先级顺序，对于需要执行批量任务的场景，建议设置优先级为 <strong>LOW</strong>， 这样在大量的任务提交到<code>RequestQueue</code>时不至于阻塞普通的交互，后续发起的单个请求可以优先执行。</p> 
-  <h2 id="header">请求Header：</h2> 
-  <p>在 <strong>RequestQueue</strong> 初始化并构造HttpStack实例时设置的User-Agent是一个全局默认的请求Header， 允许调用每个请求的 <strong>Request.addHeader(...)</strong> 方法添加更多的Header，通常的做法是在构造Request实例时进行设置：</p> 
-  <pre><span class="reserved_word">public</span> <span class="reserved_word">class</span> <span class="identifier">YourRequest</span> <span class="reserved_word">extends</span> <span class="identifier">Request</span> <span class="braces">{</span>
-    ...
-    <span class="reserved_word">public</span> <span class="identifier">YourRequest</span><span class="braces">(</span><span class="identifier">String</span> <span class="identifier">url</span>, <span class="identifier">Listener</span><span class="symbol">&lt;</span><span class="identifier">String</span><span class="symbol">&gt;</span> <span class="identifier">listener</span><span class="braces">)</span> <span class="braces">{</span>
-        <span class="reserved_word">super</span><span class="braces">(</span><span class="identifier">Method</span>.<span class="identifier">GET</span>, <span class="identifier">url</span>, <span class="identifier">listener</span><span class="braces">)</span><span class="symbol">;</span>
-        <span class="identifier">addHeader</span><span class="braces">(</span><span class="string">&quot;From&quot;</span>, <span class="string">&quot;client&quot;</span><span class="braces">)</span><span class="symbol">;</span>
-        <span class="identifier">addHeader</span><span class="braces">(</span><span class="string">&quot;Via&quot;</span>, <span class="string">&quot;netroid&quot;</span><span class="braces">)</span><span class="symbol">;</span>
-        <span class="identifier">addHeader</span><span class="braces">(</span><span class="string">&quot;Accept-Charset&quot;</span>, <span class="string">&quot;UTF-8&quot;</span><span class="braces">)</span><span class="symbol">;</span>
-        <span class="identifier">addHeader</span><span class="braces">(</span><span class="string">&quot;Origin&quot;</span>, <span class="string">&quot;http://netroid.cn/&quot;</span><span class="braces">)</span><span class="symbol">;</span>
-    <span class="braces">}</span>
-    ...
-<span class="braces">}</span></pre> 
-  <p>有时候可能你需要在每个请求里都添加一些默认Header，而每次都手动调用Request.addHeader(...)的做法显然太麻烦， 因此这种场景可以通过继承HttpStack的实例，拦截 <strong>performRequest</strong> 方法来达到目的：</p> 
-  <pre><span class="reserved_word">public</span> <span class="reserved_word">class</span> <span class="identifier">SelfHurlStack</span> <span class="reserved_word">extends</span> <span class="identifier">HurlStack</span> <span class="braces">{</span>
-    @<span class="identifier">Override</span>
-    <span class="reserved_word">public</span> <span class="identifier">HttpResponse</span> <span class="identifier">performRequest</span><span class="braces">(</span><span class="identifier">Request</span><span class="symbol">&lt;</span>?<span class="symbol">&gt;</span> <span class="identifier">request</span><span class="braces">)</span> <span class="reserved_word">throws</span> <span class="identifier">IOException</span>, <span class="identifier">AuthFailureError</span> <span class="braces">{</span>
+<span class="n">request</span><span class="o">.</span><span class="na">setRetryPolicy</span><span class="o">(</span><span class="k">new</span> <span class="n">DefaultRetryPolicy</span><span class="o">(</span><span class="mi">5000</span><span class="o">,</span> <span class="mi">20</span><span class="o">,</span> <span class="n">DefaultRetryPolicy</span><span class="o">.</span><span class="na">DEFAULT_BACKOFF_MULT</span><span class="o">));</span>
+<span class="n">request</span><span class="o">.</span><span class="na">setTag</span><span class="o">(</span><span class="n">REQUESTS_TAG</span><span class="o">);</span>
+<span class="n">RequestQueue</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">request</span><span class="o">);</span>
+</pre></td></tr></tbody></table>
+</div>
 
-        <span class="comment">// 为每个请求添加公共的Header</span>
-        <span class="identifier">request</span>.<span class="identifier">addHeader</span><span class="braces">(</span><span class="string">&quot;Via&quot;</span>, <span class="string">&quot;netroid&quot;</span><span class="braces">)</span><span class="symbol">;</span>
-        <span class="identifier">request</span>.<span class="identifier">addHeader</span><span class="braces">(</span><span class="string">&quot;Accept-Charset&quot;</span>, <span class="string">&quot;UTF-8&quot;</span><span class="braces">)</span><span class="symbol">;</span>
-        <span class="identifier">request</span>.<span class="identifier">addHeader</span><span class="braces">(</span><span class="string">&quot;Origin&quot;</span>, <span class="string">&quot;http://netroid.cn/&quot;</span><span class="braces">)</span><span class="symbol">;</span>
+<p>示例中创建了一个超时时长为5000ms，重试20次的请求，在onPreExecute()时记录开始时间，在每次onRetry()时对重试次数及已运行时间进行判断，超出限制时取消这次请求。
+有些情况下，第一次请求会重试多次，但只要再发起一次请求，就非常快能获取结果，所以示例中的onFinish()方法再次执行了这个请求，这里出现的死循环问题不作解决。
+以下是运行过程中打印的日志：</p>
+<div class="highlight plaintext"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5
+6
+7</pre></td><td class="code"><pre>01-15 22:08:29.175: ERROR/Netroid(22043): [1] 4.onPreExecute: Request-Demo
+01-15 22:08:40.023: ERROR/Netroid(22043): [1] 4.onRetry: Request-Demo
+01-15 22:08:50.088: ERROR/Netroid(22043): [1] 4.onRetry: Request-Demo
+01-15 22:09:10.213: ERROR/Netroid(22043): [1] 4.onRetry: retryCount : 3 executedTime : 35223
+01-15 22:09:50.323: ERROR/Netroid(22043): [1] 4.onRetry: retryCount : 4 executedTime : 75337
+01-15 22:09:50.338: ERROR/Netroid(22043): [1] 4.onCancel: Request-Demo
+01-15 22:09:51.021: ERROR/Netroid(22043): [1] 4.onFinish: Request-Demo
+</pre></td></tr></tbody></table>
+</div>
 
-        <span class="reserved_word">return</span> <span class="reserved_word">super</span>.<span class="identifier">performRequest</span><span class="braces">(</span><span class="identifier">request</span><span class="braces">)</span><span class="symbol">;</span>
-    <span class="braces">}</span>
-<span class="braces">}</span></pre> 
-  <p>构造请求对象或拦截 <strong>performRequest</strong> 方法来设置Header的做法可以添加一些在请求过程中持久化的Header，但例外的情况是， 如果你的Header是通过一定的逻辑运算而得到的，这两种做法均显得不合适。Netroid在请求超时后会重新执行一次或多次请求(可设置重试策略来控制次数)， 此时如果你的Header需要在重试前再次运算来更新，以上两种做法就满足不了需求，Netroid为此提供了 <strong>Request.prepare()</strong> 方法用于解决这个问题。</p> 
-  <pre><span class="reserved_word">public</span> <span class="reserved_word">class</span> <span class="identifier">Request</span><span class="symbol">&lt;</span><span class="identifier">T</span><span class="symbol">&gt;</span> <span class="braces">{</span>
-    ...
-    <span class="reserved_word">public</span> <span class="reserved_word">void</span> <span class="identifier">prepare</span><span class="braces">(</span><span class="braces">)</span> <span class="braces">{</span>
-        <span class="comment">// 下载场景时，每次重试均需要重新计算Range以确保断点续传的起始位置正确</span>
-        <span class="identifier">addHeader</span><span class="braces">(</span><span class="string">&quot;Range&quot;</span>, <span class="string">&quot;bytes=&quot;</span> <span class="symbol">+</span> <span class="identifier">TemporaryFile</span>.<span class="identifier">length</span><span class="braces">(</span><span class="braces">)</span> <span class="symbol">+</span> <span class="string">&quot;-&quot;</span><span class="braces">)</span><span class="symbol">;</span>
-    <span class="braces">}</span>
-    ...
-<span class="braces">}</span></pre> 
-  <p>这个方法的典型应用场景在断点下载，由于文件的体积或对方服务器限制超长连接的种种原因，有时并不能一次连接就实现下载所有数据，因此需要重试机制去解决这个问题。 上一次的下载实际上已经使临时文件有了一定的增长，所以必须在重试前更新Header来通知服务端起始位置，避免从旧位置开始下载，Netroid认为临时文件不合法而终止的错误。</p> 
-  <p>换句话说，<strong>prepare()</strong> 允许你在开始下载前构造那些需要通过一定的逻辑计算来确定的请求参数，以保证重新发起的请求的状态是最新的。</p> 
-  <h4 id="request.addheader...key-valuesremoveheader...">注：<strong>Request.addHeader(...)</strong> 方法不允许设置多个同名Key-Values，在设置前会执行 <strong>removeHeader(...)</strong> 删除之前的旧数据。</h4> 
-  <h2 id="header">响应Header：</h2> 
-  <p>开发者可以通过拦截 <strong>Request.handleResponse()</strong> 方法来获取响应的Header：</p> 
-  <pre><span class="reserved_word">public</span> <span class="reserved_word">class</span> <span class="identifier">YourRequest</span> <span class="reserved_word">extends</span> <span class="identifier">Request</span> <span class="braces">{</span>
-    ...
-    @<span class="identifier">Override</span>
-    <span class="reserved_word">public</span> <span class="reserved_word">byte</span><span class="braces">[</span><span class="braces">]</span> <span class="identifier">handleResponse</span><span class="braces">(</span><span class="identifier">HttpResponse</span> <span class="identifier">response</span>, <span class="identifier">Delivery</span> <span class="identifier">delivery</span><span class="braces">)</span> <span class="reserved_word">throws</span> <span class="identifier">IOException</span>, <span class="identifier">ServerError</span> <span class="braces">{</span>
-        <span class="identifier">Header</span><span class="braces">[</span><span class="braces">]</span> <span class="identifier">headers</span> <span class="symbol">=</span> <span class="identifier">response</span>.<span class="identifier">getAllHeaders</span><span class="braces">(</span><span class="braces">)</span><span class="symbol">;</span>
-        <span class="reserved_word">for</span> <span class="braces">(</span><span class="identifier">Header</span> <span class="identifier">header</span> <span class="symbol">:</span> <span class="identifier">headers</span><span class="braces">)</span> <span class="braces">{</span>
-            <span class="identifier">NetroidLog</span>.<span class="identifier">d</span><span class="braces">(</span><span class="identifier">header</span>.<span class="identifier">toString</span><span class="braces">(</span><span class="braces">)</span><span class="braces">)</span><span class="symbol">;</span>
-        <span class="braces">}</span>
-        <span class="reserved_word">return</span> <span class="reserved_word">super</span>.<span class="identifier">handleResponse</span><span class="braces">(</span><span class="identifier">response</span>, <span class="identifier">delivery</span><span class="braces">)</span><span class="symbol">;</span>
-    <span class="braces">}</span>
-    ...
-<span class="braces">}</span></pre> 
-  <p><strong>handleResponse()</strong> 方法是Netroid核心中用于处理返回结果的方法，开发者同样可以重写这个方法自己处理请求结果，具体做法可参考 <strong>FileDownloadRequest</strong> 中的示例。</p> 
-  <h2 id="post">执行Post请求：</h2> 
-  <p>默认情况下，所有的请求均为Get请求，执行带实体内容的Post、Put请求可通过以下两种方法来实现：</p> 
-  <blockquote> 
-   <p>1、重写 <strong>Request.getParams()</strong> 方法：</p> 
-  </blockquote> 
-  <pre><span class="reserved_word">public</span> <span class="reserved_word">class</span> <span class="identifier">PostByParamsRequest</span> <span class="reserved_word">extends</span> <span class="identifier">StringRequest</span> <span class="braces">{</span>
-    <span class="reserved_word">private</span> <span class="identifier">Map</span><span class="symbol">&lt;</span><span class="identifier">String</span>, <span class="identifier">String</span><span class="symbol">&gt;</span> <span class="identifier">mParams</span><span class="symbol">;</span>
+<p>可以明显看出，在第三次重试时由于超出限定运行时间的原因已经调用了取消请求的方法，但仍然执行了第四次才真正取消，是因为回调操作与执行操作不在同一线程所致。
+这个例子充分说明了调用取消方法后，请求并不能立即真正地终止，几乎所有Http库都无法安全地实现立即终止正在调用的请求。</p>
 
-    <span class="comment">// 传入Post参数的Map集合</span>
-    <span class="reserved_word">public</span> <span class="identifier">PostByParamsRequest</span><span class="braces">(</span><span class="identifier">String</span> <span class="identifier">url</span>, <span class="identifier">Map</span><span class="symbol">&lt;</span><span class="identifier">String</span>, <span class="identifier">String</span><span class="symbol">&gt;</span> <span class="identifier">params</span>, <span class="identifier">Listener</span><span class="symbol">&lt;</span><span class="identifier">String</span><span class="symbol">&gt;</span> <span class="identifier">listener</span><span class="braces">)</span> <span class="braces">{</span>
-        <span class="reserved_word">super</span><span class="braces">(</span><span class="identifier">Method</span>.<span class="identifier">POST</span>, <span class="identifier">url</span>, <span class="identifier">listener</span><span class="braces">)</span><span class="symbol">;</span>
-        <span class="identifier">mParams</span> <span class="symbol">=</span> <span class="identifier">params</span><span class="symbol">;</span>
-    <span class="braces">}</span>
+<h2>验证返回结果：</h2>
 
-    @<span class="identifier">Override</span>
-    <span class="reserved_word">public</span> <span class="identifier">Map</span><span class="symbol">&lt;</span><span class="identifier">String</span>, <span class="identifier">String</span><span class="symbol">&gt;</span> <span class="identifier">getParams</span><span class="braces">(</span><span class="braces">)</span> <span class="reserved_word">throws</span> <span class="identifier">AuthFailureError</span> <span class="braces">{</span>
-        <span class="reserved_word">return</span> <span class="identifier">mParams</span><span class="symbol">;</span>
-    <span class="braces">}</span>
+<p>通常情况下，请求成功与否依赖于服务端返回的状态码，200代表成功，Netroid将回调 <strong>Listener.onSuccess()</strong>方法。
+但实际上我们往往需要对服务端的返回结果进行判断，以确认响应是否真正成功，在确认后将其中的某些字符串解析成特定的对象返回：</p>
+<div class="highlight java"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31</pre></td><td class="code"><pre><span class="kd">public</span> <span class="kd">class</span> <span class="nc">BookListRequest</span><span class="o">&lt;</span><span class="n">List</span><span class="o">&lt;</span><span class="n">Book</span><span class="o">&gt;&gt;</span> <span class="kd">extends</span> <span class="n">Request</span><span class="o">&lt;</span><span class="n">List</span><span class="o">&lt;</span><span class="n">Book</span><span class="o">&gt;&gt;</span> <span class="o">{</span>
 
-<span class="braces">}</span>
+    <span class="kd">public</span> <span class="n">BookListRequest</span><span class="o">(</span><span class="n">String</span> <span class="n">url</span><span class="o">,</span> <span class="n">Listener</span><span class="o">&lt;</span><span class="n">List</span><span class="o">&lt;</span><span class="n">Book</span><span class="o">&gt;&gt;</span> <span class="n">listener</span><span class="o">)</span> <span class="o">{</span>
+        <span class="kd">super</span><span class="o">(</span><span class="n">url</span><span class="o">,</span> <span class="n">listener</span><span class="o">);</span>
+        <span class="n">setCacheExpireTime</span><span class="o">(</span><span class="n">TimeUnit</span><span class="o">.</span><span class="na">MINUTES</span><span class="o">,</span> <span class="mi">20</span><span class="o">);</span>
+    <span class="o">}</span>
 
-<span class="identifier">RequestQueue</span>.<span class="identifier">add</span><span class="braces">(</span><span class="reserved_word">new</span> <span class="identifier">PostByParamsRequest</span><span class="braces">(</span><span class="identifier">url</span>, <span class="identifier">params</span>, <span class="identifier">listener</span><span class="braces">)</span><span class="braces">)</span><span class="symbol">;</span></pre> 
-  <blockquote> 
-   <p>2、重写 <strong>Request.getBody()</strong> 方法：</p> 
-  </blockquote> 
-  <pre><span class="reserved_word">public</span> <span class="reserved_word">class</span> <span class="identifier">PostByEncodeBodyRequest</span> <span class="reserved_word">extends</span> <span class="identifier">StringRequest</span> <span class="braces">{</span>
+    <span class="nd">@Override</span>
+    <span class="kd">protected</span> <span class="n">Response</span><span class="o">&lt;</span><span class="n">List</span><span class="o">&lt;</span><span class="n">Book</span><span class="o">&gt;&gt;</span> <span class="n">parseNetworkResponse</span><span class="o">(</span><span class="n">NetworkResponse</span> <span class="n">response</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">try</span> <span class="o">{</span>
+            <span class="n">String</span> <span class="n">json</span> <span class="o">=</span> <span class="k">new</span> <span class="n">String</span><span class="o">(</span><span class="n">response</span><span class="o">.</span><span class="na">data</span><span class="o">,</span> <span class="n">response</span><span class="o">.</span><span class="na">charset</span><span class="o">);</span>
+            <span class="n">List</span><span class="o">&lt;</span><span class="n">Book</span><span class="o">&gt;</span> <span class="n">data</span> <span class="o">=</span> <span class="n">convert</span><span class="o">(</span><span class="n">json</span><span class="o">);</span>
+            <span class="c1">// 如果返回结果无效，则请求失败</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">data</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+                <span class="k">return</span> <span class="n">Response</span><span class="o">.</span><span class="na">error</span><span class="o">(</span><span class="k">new</span> <span class="n">NetroidError</span><span class="o">(</span><span class="s">"cannot convert respond data."</span><span class="o">));</span>
+            <span class="o">}</span>
+            <span class="k">return</span> <span class="n">Response</span><span class="o">.</span><span class="na">success</span><span class="o">(</span><span class="n">data</span><span class="o">,</span> <span class="n">response</span><span class="o">);</span>
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">Exception</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">return</span> <span class="n">Response</span><span class="o">.</span><span class="na">error</span><span class="o">(</span><span class="k">new</span> <span class="n">NetroidError</span><span class="o">(</span><span class="n">e</span><span class="o">));</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
 
-    <span class="reserved_word">public</span> <span class="identifier">PostByEncodeBodyRequest</span><span class="braces">(</span><span class="identifier">String</span> <span class="identifier">url</span>, <span class="identifier">Listener</span><span class="symbol">&lt;</span><span class="identifier">String</span><span class="symbol">&gt;</span> <span class="identifier">listener</span><span class="braces">)</span> <span class="braces">{</span>
-        <span class="reserved_word">super</span><span class="braces">(</span><span class="identifier">Method</span>.<span class="identifier">POST</span>, <span class="identifier">url</span>, <span class="identifier">listener</span><span class="braces">)</span><span class="symbol">;</span>
-    <span class="braces">}</span>
+    <span class="c1">// 将服务端返回的json数据解析为列表对象</span>
+    <span class="kd">protected</span> <span class="n">List</span><span class="o">&lt;</span><span class="n">Book</span><span class="o">&gt;</span> <span class="n">convert</span><span class="o">(</span><span class="n">String</span> <span class="n">json</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">List</span><span class="o">&lt;</span><span class="n">Book</span><span class="o">&gt;</span> <span class="n">bookList</span> <span class="o">=</span> <span class="o">...(</span><span class="n">json</span><span class="o">);</span>
+        <span class="c1">// 判断返回的列表是否为空</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">bookList</span> <span class="o">==</span> <span class="kc">null</span> <span class="o">||</span> <span class="n">bookList</span><span class="o">.</span><span class="na">size</span><span class="o">()</span> <span class="o">==</span> <span class="mi">0</span><span class="o">)</span> <span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
+        <span class="k">return</span> <span class="n">bookList</span><span class="o">;</span>
+    <span class="o">}</span>
 
-    @<span class="identifier">Override</span>
-    <span class="reserved_word">public</span> <span class="reserved_word">byte</span><span class="braces">[</span><span class="braces">]</span> <span class="identifier">getBody</span><span class="braces">(</span><span class="braces">)</span> <span class="reserved_word">throws</span> <span class="identifier">AuthFailureError</span> <span class="braces">{</span>
-        <span class="comment">// 自己进行请求实体内容的编码，可进行加密等操作再返回，具体做法参照Request.getBody()的实现</span>
-        <span class="reserved_word">return</span> <span class="identifier">bytes</span><span class="symbol">;</span>
-    <span class="braces">}</span>
+<span class="o">}</span>
+</pre></td></tr></tbody></table>
+</div>
 
-<span class="braces">}</span>
+<p>返回Json示例：</p>
+<div class="highlight json"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26</pre></td><td class="code"><pre><span class="p">{</span><span class="w">
+  </span><span class="s2">"status"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="mi">200</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"message"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"data"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="s2">"curPageNo"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"totalPageCount"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="mi">85</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"totalItemCount"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="mi">1681</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"list"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"id"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="mi">2967</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"name"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"渐爱，深爱"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"summary"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"在一个遥远的星空，两个不同的灵魂正在发生着剧烈的碰撞，随这种碰撞接踵而至的是璀璨的火花。一开始或许会"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"coverUrl"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"http://server.com/covers/cover_44525.jpg"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"updateStatus"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"capacity"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="mi">8786340</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"lastUpdateTime"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"2013-12-30 09:46:51"</span><span class="w">
+    </span><span class="p">},</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"id"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="mi">2643</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"name"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"乱盛夏倾光年"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"summary"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"一直都相信着：在这个世界上，有很多和我一样的女孩。她们看《热血高校》、看《艋舺》、看《古惑仔》、看《"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"coverUrl"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"http://server.com/covers/cover_46868.jpg"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"updateStatus"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"capacity"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="mi">3445264</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"lastUpdateTime"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"2013-12-30 08:34:25"</span><span class="w">
+    </span><span class="p">}</span><span class="w"> </span><span class="p">]</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></pre></td></tr></tbody></table>
+</div>
 
-<span class="identifier">RequestQueue</span>.<span class="identifier">add</span><span class="braces">(</span><span class="reserved_word">new</span> <span class="identifier">PostByEncodeBodyRequest</span><span class="braces">(</span><span class="identifier">url</span>, <span class="identifier">listener</span><span class="braces">)</span><span class="braces">)</span><span class="symbol">;</span></pre> 
-  <p>同样地，Netroid允许开发者指定Post参数的编码格式及Body-Content-Type，可通过重写以下两个方法定制：</p> 
-  <pre><span class="reserved_word">public</span> <span class="reserved_word">class</span> <span class="identifier">Request</span> <span class="braces">{</span>
-    <span class="comment">// 指定参数的编码，默认为UTF-8</span>
-    <span class="reserved_word">protected</span> <span class="identifier">String</span> <span class="identifier">getParamsEncoding</span><span class="braces">(</span><span class="braces">)</span> <span class="braces">{</span>
-        <span class="reserved_word">return</span> <span class="identifier">DEFAULT_PARAMS_ENCODING</span><span class="symbol">;</span>
-    <span class="braces">}</span>
+<p>在上面的返回Json格式示例中，我们可以看到&quot;status&quot;字段，这个字段是服务端处理请求的状态码，如果状态码不是200，我们认为请求失败。
+<strong>BookListRequest</strong> 的实现代码中，我们解析返回结果为List后，对List的size进行了判断，如果List为空时也认为请求失败。</p>
 
-    <span class="comment">// 指定Post的内容类型</span>
-    <span class="reserved_word">public</span> <span class="identifier">String</span> <span class="identifier">getBodyContentType</span><span class="braces">(</span><span class="braces">)</span> <span class="braces">{</span>
-        <span class="reserved_word">return</span> <span class="string">&quot;application/x-www-form-urlencoded; charset=&quot;</span> <span class="symbol">+</span> <span class="identifier">getParamsEncoding</span><span class="braces">(</span><span class="braces">)</span><span class="symbol">;</span>
-    <span class="braces">}</span>
-<span class="braces">}</span></pre> 
-  <h2 id="http">执行非http请求：</h2> 
-  <p>为了允许 <strong>ImageLoader</strong> 加载不同来源的图片文件，Netroid实现了执行非http操作的支持：</p> 
-  <pre><span class="identifier">ImageRequest</span> <span class="identifier">request</span> <span class="symbol">=</span> <span class="reserved_word">new</span> <span class="identifier">ImageRequest</span><span class="braces">(</span><span class="string">&quot;sdcard:///sdcard/DCIM/Camera/IMG.jpg&quot;</span>, ...<span class="braces">)</span> <span class="braces">{</span>
-    <span class="comment">// 核心代码在于重写perform方法，返回NetworkResponse实例</span>
-    @<span class="identifier">Override</span>
-    <span class="reserved_word">public</span> <span class="identifier">NetworkResponse</span> <span class="identifier">perform</span><span class="braces">(</span><span class="braces">)</span> <span class="braces">{</span>
-        <span class="reserved_word">try</span> <span class="braces">{</span>
-            <span class="reserved_word">return</span> <span class="reserved_word">new</span> <span class="identifier">NetworkResponse</span><span class="braces">(</span><span class="identifier">toBytes</span><span class="braces">(</span><span class="reserved_word">new</span> <span class="identifier">FileInputStream</span><span class="braces">(</span><span class="identifier">getUrl</span><span class="braces">(</span><span class="braces">)</span><span class="braces">)</span><span class="braces">)</span>, <span class="identifier">HTTP</span>.<span class="identifier">UTF_8</span><span class="braces">)</span><span class="symbol">;</span>
-        <span class="braces">}</span> <span class="reserved_word">catch</span> <span class="braces">(</span><span class="identifier">IOException</span> <span class="identifier">e</span><span class="braces">)</span> <span class="braces">{</span>
-            <span class="reserved_word">return</span> <span class="reserved_word">new</span> <span class="identifier">NetworkResponse</span><span class="braces">(</span><span class="reserved_word">new</span> <span class="reserved_word">byte</span><span class="braces">[</span><span class="numeric">1</span><span class="braces">]</span>, <span class="identifier">HTTP</span>.<span class="identifier">UTF_8</span><span class="braces">)</span><span class="symbol">;</span>
-        <span class="braces">}</span>
-    <span class="braces">}</span>
-<span class="braces">}</span><span class="symbol">;</span></pre> 
-  <p>Netroid的线程池在应用程序中应该扮演一个高度可复用的组件，您不仅仅可用于执行Http操作，还可以执行DB操作、IO操作、数据运算等等复杂的逻辑。 这些代码如果在UI线程上执行，将占用宝贵的界面响应资源，导致&quot;Application Not Responding&quot; (ANR) dialog弹出的问题，严重影响应用程序的用户体验。</p> 
-  <p>现在，你只需要重写 <strong>Request.perform()</strong> 方法，就能够非常方便地将所有阻塞UI线程的非UI操作置于后端， 同时还能在有需要的情况下应用Netroid的缓存方案，这对于简化开发进程来讲是很有好处的。</p> 
-  <h4 id="dbsharedpreferencesioandroid">注：DB、SharedPreferences操作实际上就是IO操作，具体可查看Android开发者官网的文章。</h4> 
- </body>
-</html>
+<h2>优先层次：</h2>
+
+<p>同样地，Netroid允许设置请求的优先级层次，但需要继承并重写 <strong>getPriority()</strong> 方法，暂不提供 <strong>setPriority()</strong> 方法：</p>
+<div class="highlight java"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18</pre></td><td class="code"><pre><span class="kd">public</span> <span class="kd">class</span> <span class="nc">SelfRequest</span> <span class="kd">extends</span> <span class="n">Request</span><span class="o">&lt;</span><span class="n">Void</span><span class="o">&gt;</span> <span class="o">{</span>
+    <span class="o">...</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="n">Priority</span> <span class="n">getPriority</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">Priority</span><span class="o">.</span><span class="na">NORMAL</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="o">...</span>
+<span class="o">}</span>
+
+<span class="c1">// 优先级的枚举值如下：</span>
+<span class="kd">public</span> <span class="kd">enum</span> <span class="n">Priority</span> <span class="o">{</span>
+    <span class="n">LOW</span><span class="o">,</span>
+    <span class="n">NORMAL</span><span class="o">,</span>     <span class="c1">// 每个请求默认为normal级别</span>
+    <span class="n">HIGH</span><span class="o">,</span>
+    <span class="n">IMMEDIATE</span>
+<span class="o">}</span>
+</pre></td></tr></tbody></table>
+</div>
+
+<p>通常情况下，不建议改变请求的优先级顺序，对于需要执行批量任务的场景，建议设置优先级为 <strong>LOW</strong>，
+这样在大量的任务提交到<code>RequestQueue</code>时不至于阻塞普通的交互，后续发起的单个请求可以优先执行。</p>
+
+<h2>请求Header：</h2>
+
+<p>在 <strong>RequestQueue</strong> 初始化并构造HttpStack实例时设置的User-Agent是一个全局默认的请求Header，
+允许调用每个请求的 <strong>Request.addHeader(...)</strong> 方法添加更多的Header，通常的做法是在构造Request实例时进行设置：</p>
+<div class="highlight java"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11</pre></td><td class="code"><pre><span class="kd">public</span> <span class="kd">class</span> <span class="nc">YourRequest</span> <span class="kd">extends</span> <span class="n">Request</span> <span class="o">{</span>
+    <span class="o">...</span>
+    <span class="kd">public</span> <span class="n">YourRequest</span><span class="o">(</span><span class="n">String</span> <span class="n">url</span><span class="o">,</span> <span class="n">Listener</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">listener</span><span class="o">)</span> <span class="o">{</span>
+        <span class="kd">super</span><span class="o">(</span><span class="n">Method</span><span class="o">.</span><span class="na">GET</span><span class="o">,</span> <span class="n">url</span><span class="o">,</span> <span class="n">listener</span><span class="o">);</span>
+        <span class="n">addHeader</span><span class="o">(</span><span class="s">"From"</span><span class="o">,</span> <span class="s">"client"</span><span class="o">);</span>
+        <span class="n">addHeader</span><span class="o">(</span><span class="s">"Via"</span><span class="o">,</span> <span class="s">"netroid"</span><span class="o">);</span>
+        <span class="n">addHeader</span><span class="o">(</span><span class="s">"Accept-Charset"</span><span class="o">,</span> <span class="s">"UTF-8"</span><span class="o">);</span>
+        <span class="n">addHeader</span><span class="o">(</span><span class="s">"Origin"</span><span class="o">,</span> <span class="s">"http://netroid.cn/"</span><span class="o">);</span>
+    <span class="o">}</span>
+    <span class="o">...</span>
+<span class="o">}</span>
+</pre></td></tr></tbody></table>
+</div>
+
+<p>有时候可能你需要在每个请求里都添加一些默认Header，而每次都手动调用Request.addHeader(...)的做法显然太麻烦，
+因此这种场景可以通过继承HttpStack的实例，拦截 <strong>performRequest</strong> 方法来达到目的：</p>
+<div class="highlight java"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12</pre></td><td class="code"><pre><span class="kd">public</span> <span class="kd">class</span> <span class="nc">SelfHurlStack</span> <span class="kd">extends</span> <span class="n">HurlStack</span> <span class="o">{</span>
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="n">HttpResponse</span> <span class="n">performRequest</span><span class="o">(</span><span class="n">Request</span><span class="o">&lt;?&gt;</span> <span class="n">request</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span><span class="o">,</span> <span class="n">AuthFailureError</span> <span class="o">{</span>
+
+        <span class="c1">// 为每个请求添加公共的Header</span>
+        <span class="n">request</span><span class="o">.</span><span class="na">addHeader</span><span class="o">(</span><span class="s">"Via"</span><span class="o">,</span> <span class="s">"netroid"</span><span class="o">);</span>
+        <span class="n">request</span><span class="o">.</span><span class="na">addHeader</span><span class="o">(</span><span class="s">"Accept-Charset"</span><span class="o">,</span> <span class="s">"UTF-8"</span><span class="o">);</span>
+        <span class="n">request</span><span class="o">.</span><span class="na">addHeader</span><span class="o">(</span><span class="s">"Origin"</span><span class="o">,</span> <span class="s">"http://netroid.cn/"</span><span class="o">);</span>
+
+        <span class="k">return</span> <span class="kd">super</span><span class="o">.</span><span class="na">performRequest</span><span class="o">(</span><span class="n">request</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></td></tr></tbody></table>
+</div>
+
+<p>构造请求对象或拦截 <strong>performRequest</strong> 方法来设置Header的做法可以添加一些在请求过程中持久化的Header，但例外的情况是，
+如果你的Header是通过一定的逻辑运算而得到的，这两种做法均显得不合适。Netroid在请求超时后会重新执行一次或多次请求(可设置重试策略来控制次数)，
+此时如果你的Header需要在重试前再次运算来更新，以上两种做法就满足不了需求，Netroid为此提供了 <strong>Request.prepare()</strong> 方法用于解决这个问题。</p>
+<div class="highlight java"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8</pre></td><td class="code"><pre><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Request</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="o">{</span>
+    <span class="o">...</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="n">prepare</span><span class="o">()</span> <span class="o">{</span>
+        <span class="c1">// 下载场景时，每次重试均需要重新计算Range以确保断点续传的起始位置正确</span>
+        <span class="n">addHeader</span><span class="o">(</span><span class="s">"Range"</span><span class="o">,</span> <span class="s">"bytes="</span> <span class="o">+</span> <span class="n">TemporaryFile</span><span class="o">.</span><span class="na">length</span><span class="o">()</span> <span class="o">+</span> <span class="s">"-"</span><span class="o">);</span>
+    <span class="o">}</span>
+    <span class="o">...</span>
+<span class="o">}</span>
+</pre></td></tr></tbody></table>
+</div>
+
+<p>这个方法的典型应用场景在断点下载，由于文件的体积或对方服务器限制超长连接的种种原因，有时并不能一次连接就实现下载所有数据，因此需要重试机制去解决这个问题。
+上一次的下载实际上已经使临时文件有了一定的增长，所以必须在重试前更新Header来通知服务端起始位置，避免从旧位置开始下载，Netroid认为临时文件不合法而终止的错误。</p>
+
+<p>换句话说，<strong>prepare()</strong> 允许你在开始下载前构造那些需要通过一定的逻辑计算来确定的请求参数，以保证重新发起的请求的状态是最新的。</p>
+
+<h4>注：<strong>Request.addHeader(...)</strong> 方法不允许设置多个同名Key-Values，在设置前会执行 <strong>removeHeader(...)</strong> 删除之前的旧数据。</h4>
+
+<h2>响应Header：</h2>
+
+<p>开发者可以通过拦截 <strong>Request.handleResponse()</strong> 方法来获取响应的Header：</p>
+<div class="highlight java"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12</pre></td><td class="code"><pre><span class="kd">public</span> <span class="kd">class</span> <span class="nc">YourRequest</span> <span class="kd">extends</span> <span class="n">Request</span> <span class="o">{</span>
+    <span class="o">...</span>
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">byte</span><span class="o">[]</span> <span class="n">handleResponse</span><span class="o">(</span><span class="n">HttpResponse</span> <span class="n">response</span><span class="o">,</span> <span class="n">Delivery</span> <span class="n">delivery</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span><span class="o">,</span> <span class="n">ServerError</span> <span class="o">{</span>
+        <span class="n">Header</span><span class="o">[]</span> <span class="n">headers</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="na">getAllHeaders</span><span class="o">();</span>
+        <span class="k">for</span> <span class="o">(</span><span class="n">Header</span> <span class="n">header</span> <span class="o">:</span> <span class="n">headers</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">NetroidLog</span><span class="o">.</span><span class="na">d</span><span class="o">(</span><span class="n">header</span><span class="o">.</span><span class="na">toString</span><span class="o">());</span>
+        <span class="o">}</span>
+        <span class="k">return</span> <span class="kd">super</span><span class="o">.</span><span class="na">handleResponse</span><span class="o">(</span><span class="n">response</span><span class="o">,</span> <span class="n">delivery</span><span class="o">);</span>
+    <span class="o">}</span>
+    <span class="o">...</span>
+<span class="o">}</span>
+</pre></td></tr></tbody></table>
+</div>
+
+<p><strong>handleResponse()</strong> 方法是Netroid核心中用于处理返回结果的方法，开发者同样可以重写这个方法自己处理请求结果，具体做法可参考 <strong>FileDownloadRequest</strong> 中的示例。</p>
+
+<h2>执行Post请求：</h2>
+
+<p>默认情况下，所有的请求均为Get请求，执行带实体内容的Post、Put请求可通过以下两种方法来实现：</p>
+
+<blockquote>
+<p>1、重写 <strong>Request.getParams()</strong> 方法：</p>
+</blockquote>
+<div class="highlight java"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16</pre></td><td class="code"><pre><span class="kd">public</span> <span class="kd">class</span> <span class="nc">PostByParamsRequest</span> <span class="kd">extends</span> <span class="n">StringRequest</span> <span class="o">{</span>
+    <span class="kd">private</span> <span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">String</span><span class="o">&gt;</span> <span class="n">mParams</span><span class="o">;</span>
+
+    <span class="c1">// 传入Post参数的Map集合</span>
+    <span class="kd">public</span> <span class="n">PostByParamsRequest</span><span class="o">(</span><span class="n">String</span> <span class="n">url</span><span class="o">,</span> <span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">String</span><span class="o">&gt;</span> <span class="n">params</span><span class="o">,</span> <span class="n">Listener</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">listener</span><span class="o">)</span> <span class="o">{</span>
+        <span class="kd">super</span><span class="o">(</span><span class="n">Method</span><span class="o">.</span><span class="na">POST</span><span class="o">,</span> <span class="n">url</span><span class="o">,</span> <span class="n">listener</span><span class="o">);</span>
+        <span class="n">mParams</span> <span class="o">=</span> <span class="n">params</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">String</span><span class="o">&gt;</span> <span class="n">getParams</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">AuthFailureError</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">mParams</span><span class="o">;</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+
+<span class="n">RequestQueue</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="k">new</span> <span class="n">PostByParamsRequest</span><span class="o">(</span><span class="n">url</span><span class="o">,</span> <span class="n">params</span><span class="o">,</span> <span class="n">listener</span><span class="o">));</span>
+</pre></td></tr></tbody></table>
+</div>
+
+<blockquote>
+<p>2、重写 <strong>Request.getBody()</strong> 方法：</p>
+</blockquote>
+<div class="highlight java"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12</pre></td><td class="code"><pre><span class="kd">public</span> <span class="kd">class</span> <span class="nc">PostByEncodeBodyRequest</span> <span class="kd">extends</span> <span class="n">StringRequest</span> <span class="o">{</span>
+    <span class="kd">public</span> <span class="n">PostByEncodeBodyRequest</span><span class="o">(</span><span class="n">String</span> <span class="n">url</span><span class="o">,</span> <span class="n">Listener</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">listener</span><span class="o">)</span> <span class="o">{</span>
+        <span class="kd">super</span><span class="o">(</span><span class="n">Method</span><span class="o">.</span><span class="na">POST</span><span class="o">,</span> <span class="n">url</span><span class="o">,</span> <span class="n">listener</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">byte</span><span class="o">[]</span> <span class="n">getBody</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">AuthFailureError</span> <span class="o">{</span>
+        <span class="c1">// 自己进行请求实体内容的编码，可进行加密等操作再返回，具体做法参照Request.getBody()的实现</span>
+        <span class="k">return</span> <span class="kt">byte</span><span class="n">s</span><span class="o">;</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+<span class="n">RequestQueue</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="k">new</span> <span class="n">PostByEncodeBodyRequest</span><span class="o">(</span><span class="n">url</span><span class="o">,</span> <span class="n">listener</span><span class="o">));</span>
+</pre></td></tr></tbody></table>
+</div>
+
+<p>同样地，Netroid允许开发者指定Post参数的编码格式及Body-Content-Type，可通过重写以下两个方法定制：</p>
+<div class="highlight java"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11</pre></td><td class="code"><pre><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Request</span> <span class="o">{</span>
+    <span class="c1">// 指定参数的编码，默认为UTF-8</span>
+    <span class="kd">protected</span> <span class="n">String</span> <span class="n">getParamsEncoding</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">DEFAULT_PARAMS_ENCODING</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="c1">// 指定Post的内容类型</span>
+    <span class="kd">public</span> <span class="n">String</span> <span class="n">getBodyContentType</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="s">"application/x-www-form-urlencoded; charset="</span> <span class="o">+</span> <span class="n">getParamsEncoding</span><span class="o">();</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></td></tr></tbody></table>
+</div>
+
+<h2>执行非http请求：</h2>
+
+<p>为了允许 <strong>ImageLoader</strong> 加载不同来源的图片文件，Netroid实现了执行非http操作的支持：</p>
+<div class="highlight java"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11</pre></td><td class="code"><pre><span class="n">ImageRequest</span> <span class="n">request</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ImageRequest</span><span class="o">(</span><span class="s">"sdcard:///sdcard/DCIM/Camera/IMG.jpg"</span><span class="o">,</span> <span class="o">...)</span> <span class="o">{</span>
+    <span class="c1">// 核心代码在于重写perform方法，返回NetworkResponse实例</span>
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="n">NetworkResponse</span> <span class="n">perform</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">try</span> <span class="o">{</span>
+            <span class="k">return</span> <span class="k">new</span> <span class="n">NetworkResponse</span><span class="o">(</span><span class="n">toBytes</span><span class="o">(</span><span class="k">new</span> <span class="n">FileInputStream</span><span class="o">(</span><span class="n">getUrl</span><span class="o">())),</span> <span class="n">HTTP</span><span class="o">.</span><span class="na">UTF_8</span><span class="o">);</span>
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">IOException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">return</span> <span class="k">new</span> <span class="n">NetworkResponse</span><span class="o">(</span><span class="k">new</span> <span class="kt">byte</span><span class="o">[</span><span class="mi">1</span><span class="o">],</span> <span class="n">HTTP</span><span class="o">.</span><span class="na">UTF_8</span><span class="o">);</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+<span class="o">};</span>
+</pre></td></tr></tbody></table>
+</div>
+
+<p>Netroid的线程池在应用程序中应该扮演一个高度可复用的组件，您不仅仅可用于执行Http操作，还可以执行DB操作、IO操作、数据运算等等复杂的逻辑。
+这些代码如果在UI线程上执行，将占用宝贵的界面响应资源，导致&quot;Application Not Responding&quot; (ANR) dialog弹出的问题，严重影响应用程序的用户体验。</p>
+
+<p>现在，你只需要重写 <strong>Request.perform()</strong> 方法，就能够非常方便地将所有阻塞UI线程的非UI操作置于后端，
+同时还能在有需要的情况下应用Netroid的缓存方案，这对于简化开发进程来讲是很有好处的。</p>
+
+<h4>注：DB、SharedPreferences操作实际上就是IO操作，具体可查看Android开发者官网的文章。</h4>
+
     </div>
 </div>
         </div>
     </div>
     <div class="footer">
-        <div class="aboutus">All pages are generated by <a href="https://github.com/neevek/minerl">Minerl</a></div>
+        <div class="aboutus">All pages are generated by <a href="https://github.com/vince-styling/khaleesi">Khaleesi</a></div>
         <div class="findme">Find this project on <a href="https://github.com/vince-styling/Netroid">GitHub</a></div>
     </div>
 </body>
