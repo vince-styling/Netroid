@@ -8,72 +8,69 @@
 <body>
     <div class="container">
         <div class="clearfix">
-            
-<div class="page-title">
+            <div class="page-title">
     <h1><a href="/">Netroid ImageLoader</a></h1>
-    <h2>last modified : 2014-08-17 15:40</h2>
+    <h2>last modified : Wed 10 Sep 22:22 2014</h2>
 </div>
 <div class="primary">
     <div class="post-thumb">
-        <h1>图片加载</h1>
+        
+<h1 id="header-1">图片加载</h1>
 
 <p>使用Netroid提供的<code>ImageLoader</code>可以非常方便地实现图片加载功能，ImageLoader是一个抽象类，需要由开发者实现其中的创建请求方法：</p>
-<div class="highlight java"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+<div class="highlight java"><table><tr><td class="linenos"><pre>1
 2
-3</pre></td><td class="code"><pre><span class="kd">public</span> <span class="kd">abstract</span> <span class="kd">class</span> <span class="nc">ImageLoader</span> <span class="o">{</span>
-    <span class="kd">public</span> <span class="kd">abstract</span> <span class="n">ImageRequest</span> <span class="n">buildRequest</span><span class="o">(</span><span class="n">String</span> <span class="n">requestUrl</span><span class="o">,</span> <span class="kt">int</span> <span class="n">maxWidth</span><span class="o">,</span> <span class="kt">int</span> <span class="n">maxHeight</span><span class="o">);</span>
+3</pre></td><td><pre><span class="kd">public</span> <span class="kd">abstract</span> <span class="kd">class</span> <span class="nc">ImageLoader</span> <span class="o">{</span>
+    <span class="kd">public</span> <span class="kd">abstract</span> <span class="n">ImageRequest</span> <span class="nf">buildRequest</span><span class="o">(</span><span class="n">String</span> <span class="n">requestUrl</span><span class="o">,</span> <span class="kt">int</span> <span class="n">maxWidth</span><span class="o">,</span> <span class="kt">int</span> <span class="n">maxHeight</span><span class="o">);</span>
 <span class="o">}</span>
-</pre></td></tr></tbody></table>
-</div>
-
+</pre></div>
+</td></tr></table></div>
 <p>这样做的原因是在创建请求时需要指定硬盘缓存的过期时间，这些必须由开发者根据需要自行设置：</p>
-<div class="highlight java"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+<div class="highlight java"><table><tr><td class="linenos"><pre>1
 2
 3
 4
 5
 6
 7
-8</pre></td><td class="code"><pre><span class="kd">public</span> <span class="kd">class</span> <span class="nc">SelfImageLoader</span> <span class="kd">extends</span> <span class="n">ImageLoader</span> <span class="o">{</span>
+8</pre></td><td><pre><span class="kd">public</span> <span class="kd">class</span> <span class="nc">SelfImageLoader</span> <span class="kd">extends</span> <span class="n">ImageLoader</span> <span class="o">{</span>
     <span class="nd">@Override</span>
-    <span class="kd">public</span> <span class="n">ImageRequest</span> <span class="n">buildRequest</span><span class="o">(</span><span class="n">String</span> <span class="n">requestUrl</span><span class="o">,</span> <span class="kt">int</span> <span class="n">maxWidth</span><span class="o">,</span> <span class="kt">int</span> <span class="n">maxHeight</span><span class="o">)</span> <span class="o">{</span>
-        <span class="n">ImageRequest</span> <span class="n">request</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ImageRequest</span><span class="o">(</span><span class="n">requestUrl</span><span class="o">,</span> <span class="n">maxWidth</span><span class="o">,</span> <span class="n">maxHeight</span><span class="o">);</span>
+    <span class="kd">public</span> <span class="n">ImageRequest</span> <span class="nf">buildRequest</span><span class="o">(</span><span class="n">String</span> <span class="n">requestUrl</span><span class="o">,</span> <span class="kt">int</span> <span class="n">maxWidth</span><span class="o">,</span> <span class="kt">int</span> <span class="n">maxHeight</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">ImageRequest</span> <span class="n">request</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">ImageRequest</span><span class="o">(</span><span class="n">requestUrl</span><span class="o">,</span> <span class="n">maxWidth</span><span class="o">,</span> <span class="n">maxHeight</span><span class="o">);</span>
         <span class="n">request</span><span class="o">.</span><span class="na">setCacheExpireTime</span><span class="o">(</span><span class="n">TimeUnit</span><span class="o">.</span><span class="na">MINUTES</span><span class="o">,</span> <span class="mi">20</span><span class="o">);</span>
         <span class="k">return</span> <span class="n">request</span><span class="o">;</span>
     <span class="o">}</span>
 <span class="o">}</span>
-</pre></td></tr></tbody></table>
-</div>
-
-<h2>单张图片</h2>
+</pre></div>
+</td></tr></table></div>
+<h2 id="header-2">单张图片</h2>
 
 <p>单张图片的加载可以通过发起<code>ImageRequest</code>请求来实现，但为了应用内存缓存，推荐使用 <strong>ImageLoader</strong> 来完成：</p>
-<div class="highlight java"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+<div class="highlight java"><table><tr><td class="linenos"><pre>1
 2
 3
 4
 5
-6</pre></td><td class="code"><pre><span class="n">String</span> <span class="n">url</span> <span class="o">=</span> <span class="s">"http://server.domain/sample.jpg"</span><span class="o">;</span>
+6</pre></td><td><pre><span class="n">String</span> <span class="n">url</span> <span class="o">=</span> <span class="s">&quot;http://server.domain/sample.jpg&quot;</span><span class="o">;</span>
 <span class="n">ImageLoader</span><span class="o">.</span><span class="na">ImageListener</span> <span class="n">listener</span> <span class="o">=</span> <span class="n">ImageLoader</span><span class="o">.</span><span class="na">getImageListener</span><span class="o">(</span>
     <span class="n">ImageView</span><span class="o">,</span> <span class="n">R</span><span class="o">.</span><span class="na">drawable</span><span class="o">.</span><span class="na">defaultImageResId</span><span class="o">,</span> <span class="n">R</span><span class="o">.</span><span class="na">drawable</span><span class="o">.</span><span class="na">errorImageResId</span><span class="o">);</span>
 
 <span class="c1">// 允许设置最终显示位置的尺寸，ImageLoader将根据比例缩放图片，不设置或设置为0代表使用图片原始尺寸</span>
 <span class="n">imageLoader</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">url</span><span class="o">,</span> <span class="n">listener</span><span class="o">,</span> <span class="n">ImageView</span><span class="o">.</span><span class="na">getWidth</span><span class="o">(),</span> <span class="n">ImageView</span><span class="o">.</span><span class="na">getHeight</span><span class="o">());</span>
-</pre></td></tr></tbody></table>
-</div>
-
-<h2>批量图片</h2>
+</pre></div>
+</td></tr></table></div>
+<h2 id="header-3">批量图片</h2>
 
 <p>Netroid提供了<code>NetworkImageView</code>专门用于批量图片加载的场景：</p>
-<div class="highlight java"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
+<div class="highlight java"><table><tr><td class="linenos"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
 10
 11
 12
@@ -90,7 +87,7 @@
 23
 24
 25
-26</pre></td><td class="code"><pre><span class="kd">public</span> <span class="kd">class</span> <span class="nc">NetworkImageView</span> <span class="kd">extends</span> <span class="n">ImageView</span> <span class="o">{</span>
+26</pre></td><td><pre><span class="kd">public</span> <span class="kd">class</span> <span class="nc">NetworkImageView</span> <span class="kd">extends</span> <span class="n">ImageView</span> <span class="o">{</span>
     <span class="kd">private</span> <span class="n">String</span> <span class="n">mUrl</span><span class="o">;</span>
 
     <span class="c1">// 默认显示的图片</span>
@@ -100,7 +97,7 @@
     <span class="kd">private</span> <span class="kt">int</span> <span class="n">mErrorImageId</span><span class="o">;</span>
 
     <span class="c1">// 主方法入口</span>
-    <span class="kd">public</span> <span class="kt">void</span> <span class="n">setImageUrl</span><span class="o">(</span><span class="n">String</span> <span class="n">url</span><span class="o">,</span> <span class="n">ImageLoader</span> <span class="n">imageLoader</span><span class="o">)</span> <span class="o">{</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setImageUrl</span><span class="o">(</span><span class="n">String</span> <span class="n">url</span><span class="o">,</span> <span class="n">ImageLoader</span> <span class="n">imageLoader</span><span class="o">)</span> <span class="o">{</span>
         <span class="n">mUrl</span> <span class="o">=</span> <span class="n">url</span><span class="o">;</span>
         <span class="n">mImageLoader</span> <span class="o">=</span> <span class="n">imageLoader</span><span class="o">;</span>
         <span class="c1">// 这个方法将会对ImageView的尺寸是否有效、是否为同一张图片进行判断</span>
@@ -111,25 +108,24 @@
 
     <span class="c1">// 如果图片已经滑离屏幕，变为不可见，将执行取消请求的操作</span>
     <span class="nd">@Override</span>
-    <span class="kd">protected</span> <span class="kt">void</span> <span class="n">onDetachedFromWindow</span><span class="o">()</span> <span class="o">{</span>
+    <span class="kd">protected</span> <span class="kt">void</span> <span class="nf">onDetachedFromWindow</span><span class="o">()</span> <span class="o">{</span>
         <span class="k">if</span> <span class="o">(</span><span class="n">mImageContainer</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="n">mImageContainer</span><span class="o">.</span><span class="na">cancelRequest</span><span class="o">();</span>
         <span class="kd">super</span><span class="o">.</span><span class="na">onDetachedFromWindow</span><span class="o">();</span>
     <span class="o">}</span>
 <span class="o">}</span>
-</pre></td></tr></tbody></table>
-</div>
-
+</pre></div>
+</td></tr></table></div>
 <p>在 <strong>Adapter.getView()</strong> 中只需要简单的调用 <strong>NetworkImageView.setImageUrl()</strong> 即可完成所有事情：</p>
-<div class="highlight java"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10</pre></td><td class="code"><pre><span class="kd">public</span> <span class="n">View</span> <span class="nf">getView</span><span class="p">(</span><span class="kt">int</span> <span class="n">position</span><span class="o">,</span> <span class="n">View</span> <span class="n">convertView</span><span class="o">,</span> <span class="n">ViewGroup</span> <span class="n">parent</span><span class="o">)</span> <span class="o">{</span>
+<div class="highlight java"><table><tr><td class="linenos"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10</pre></td><td><pre><span class="kd">public</span> <span class="n">View</span> <span class="nf">getView</span><span class="o">(</span><span class="kt">int</span> <span class="n">position</span><span class="o">,</span> <span class="n">View</span> <span class="n">convertView</span><span class="o">,</span> <span class="n">ViewGroup</span> <span class="n">parent</span><span class="o">)</span> <span class="o">{</span>
     <span class="k">if</span> <span class="o">(</span><span class="n">convertView</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
         <span class="n">convertView</span> <span class="o">=</span> <span class="n">getLayoutInflater</span><span class="o">().</span><span class="na">inflate</span><span class="o">(</span><span class="n">R</span><span class="o">.</span><span class="na">layout</span><span class="o">.</span><span class="na">list_item</span><span class="o">,</span> <span class="kc">null</span><span class="o">);</span>
     <span class="o">}</span>
@@ -139,59 +135,52 @@
 
     <span class="k">return</span> <span class="n">convertView</span><span class="o">;</span>
 <span class="o">}</span>
-</pre></td></tr></tbody></table>
-</div>
+</pre></div>
+</td></tr></table></div>
+<p>ImageLoader内部对于批量加载做了很好的处理，开发者可以设定每个任务的延时执行时间，在列表快速滑动时，可最大限度避免已离开屏幕的失效请求占用线程资源。在请求执行前，会根据url对请求进行重复性判断，避免相同的url执行多次，在请求失效时会立即调用 <strong>Request.cancel()</strong> 方法尝试终止操作。</p>
 
-<p>ImageLoader内部对于批量加载做了很好的处理，开发者可以设定每个任务的延时执行时间，在列表快速滑动时，可最大限度避免已离开屏幕的失效请求占用线程资源。
-在请求执行前，会根据url对请求进行重复性判断，避免相同的url执行多次，在请求失效时会立即调用 <strong>Request.cancel()</strong> 方法尝试终止操作。</p>
+<p>注：在图片一次加载成功后不再改变的情况下，可以使用普通的ImageView，但在ListView、GridView这种场景时建议使用 <strong>NetworkImageView</strong>，特别是遇到GridView position 0多次getView的bug时，普通的ImageView将会导致图片错位的异常问题，这种情况在演示程序中有专门的解决方案。</p>
 
-<p>注：在图片一次加载成功后不再改变的情况下，可以使用普通的ImageView，但在ListView、GridView这种场景时建议使用 <strong>NetworkImageView</strong>，
-特别是遇到GridView position 0多次getView的bug时，普通的ImageView将会导致图片错位的异常问题，这种情况在演示程序中有专门的解决方案。</p>
+<h2 id="header-4">非Http图片</h2>
 
-<h2>非Http图片</h2>
+<p>默认情况下，ImageLoader只能加载网络图片并使用缓存方案，但在实际开发中你除此之外可能也需要读取assets、raw、drawable、sdcard目录中的图片资源，这种非Http的请求在原来的Volley架构中是无法实现的。</p>
 
-<p>默认情况下，ImageLoader只能加载网络图片并使用缓存方案，但在实际开发中你除此之外可能也需要读取assets、raw、drawable、sdcard
-目录中的图片资源，这种非Http的请求在原来的Volley架构中是无法实现的。</p>
-
-<p>为了避免重复开发，Netroid对此做了扩展，只需要重写 <strong>Request.perform()</strong> 方法，
-手动构造 <strong>NetworkResponse</strong> 对象，就可以模拟Http请求完成整个流程。</p>
-<div class="highlight java"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
+<p>为了避免重复开发，Netroid对此做了扩展，只需要重写 <strong>Request.perform()</strong> 方法，手动构造 <strong>NetworkResponse</strong> 对象，就可以模拟Http请求完成整个流程。</p>
+<div class="highlight java"><table><tr><td class="linenos"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
 10
-11</pre></td><td class="code"><pre><span class="n">ImageRequest</span> <span class="n">request</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ImageRequest</span><span class="o">(</span><span class="s">"image_file_name_in_assert_folder.jpg"</span><span class="o">,</span> <span class="o">...)</span> <span class="o">{</span>
+11</pre></td><td><pre><span class="n">ImageRequest</span> <span class="n">request</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">ImageRequest</span><span class="o">(</span><span class="s">&quot;image_file_name_in_assert_folder.jpg&quot;</span><span class="o">,</span> <span class="o">...)</span> <span class="o">{</span>
     <span class="c1">// 核心代码在于重写perform方法，返回NetworkResponse实例</span>
     <span class="nd">@Override</span>
-    <span class="kd">public</span> <span class="n">NetworkResponse</span> <span class="n">perform</span><span class="o">()</span> <span class="o">{</span>
+    <span class="kd">public</span> <span class="n">NetworkResponse</span> <span class="nf">perform</span><span class="o">()</span> <span class="o">{</span>
         <span class="k">try</span> <span class="o">{</span>
-            <span class="k">return</span> <span class="k">new</span> <span class="n">NetworkResponse</span><span class="o">(</span><span class="n">InputStreamToBytes</span><span class="o">(</span><span class="n">getAssets</span><span class="o">().</span><span class="na">open</span><span class="o">(</span><span class="n">getUrl</span><span class="o">())),</span> <span class="n">HTTP</span><span class="o">.</span><span class="na">UTF_8</span><span class="o">);</span>
+            <span class="k">return</span> <span class="k">new</span> <span class="nf">NetworkResponse</span><span class="o">(</span><span class="n">InputStreamToBytes</span><span class="o">(</span><span class="n">getAssets</span><span class="o">().</span><span class="na">open</span><span class="o">(</span><span class="n">getUrl</span><span class="o">())),</span> <span class="n">HTTP</span><span class="o">.</span><span class="na">UTF_8</span><span class="o">);</span>
         <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">IOException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
-            <span class="k">return</span> <span class="k">new</span> <span class="n">NetworkResponse</span><span class="o">(</span><span class="k">new</span> <span class="kt">byte</span><span class="o">[</span><span class="mi">1</span><span class="o">],</span> <span class="n">HTTP</span><span class="o">.</span><span class="na">UTF_8</span><span class="o">);</span>
+            <span class="k">return</span> <span class="k">new</span> <span class="nf">NetworkResponse</span><span class="o">(</span><span class="k">new</span> <span class="kt">byte</span><span class="o">[</span><span class="mi">1</span><span class="o">],</span> <span class="n">HTTP</span><span class="o">.</span><span class="na">UTF_8</span><span class="o">);</span>
         <span class="o">}</span>
     <span class="o">}</span>
 <span class="o">};</span>
-</pre></td></tr></tbody></table>
-</div>
-
-<p>在 <strong>perform()</strong> 方法中，只需要加载assets资源为字节数组返回即可，InputStreamToBytes()方法的实现在此不详细列出。
-这个扩展方案解决了无法加载本地资源的问题，得以继续应用Cache、ImageLoader的强大功能。</p>
+</pre></div>
+</td></tr></table></div>
+<p>在 <strong>perform()</strong> 方法中，只需要加载assets资源为字节数组返回即可，InputStreamToBytes()方法的实现在此不详细列出。这个扩展方案解决了无法加载本地资源的问题，得以继续应用Cache、ImageLoader的强大功能。</p>
 
 <p>ImageLoader通过重写 <strong>buildRequest()</strong> 方法来实现同时兼容sdcard、http、assets等不同的图片来源：</p>
-<div class="highlight java"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
+<div class="highlight java"><table><tr><td class="linenos"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
 10
 11
 12
@@ -250,48 +239,48 @@
 65
 66
 67
-68</pre></td><td class="code"><pre><span class="kd">public</span> <span class="kd">class</span> <span class="nc">SelfImageLoader</span> <span class="kd">extends</span> <span class="n">ImageLoader</span> <span class="o">{</span>
+68</pre></td><td><pre><span class="kd">public</span> <span class="kd">class</span> <span class="nc">SelfImageLoader</span> <span class="kd">extends</span> <span class="n">ImageLoader</span> <span class="o">{</span>
 
-    <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">RES_ASSETS</span> <span class="o">=</span> <span class="s">"assets://"</span><span class="o">;</span>
-    <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">RES_SDCARD</span> <span class="o">=</span> <span class="s">"sdcard://"</span><span class="o">;</span>
-    <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">RES_HTTP</span> <span class="o">=</span> <span class="s">"http://"</span><span class="o">;</span>
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">RES_ASSETS</span> <span class="o">=</span> <span class="s">&quot;assets://&quot;</span><span class="o">;</span>
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">RES_SDCARD</span> <span class="o">=</span> <span class="s">&quot;sdcard://&quot;</span><span class="o">;</span>
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">RES_HTTP</span> <span class="o">=</span> <span class="s">&quot;http://&quot;</span><span class="o">;</span>
 
     <span class="kd">private</span> <span class="n">AssetManager</span> <span class="n">mAssetManager</span><span class="o">;</span>
 
-    <span class="kd">public</span> <span class="n">SelfImageLoader</span><span class="o">(</span><span class="n">RequestQueue</span> <span class="n">queue</span><span class="o">,</span> <span class="n">AssetManager</span> <span class="n">assetManager</span><span class="o">)</span> <span class="o">{</span>
+    <span class="kd">public</span> <span class="nf">SelfImageLoader</span><span class="o">(</span><span class="n">RequestQueue</span> <span class="n">queue</span><span class="o">,</span> <span class="n">AssetManager</span> <span class="n">assetManager</span><span class="o">)</span> <span class="o">{</span>
         <span class="kd">super</span><span class="o">(</span><span class="n">queue</span><span class="o">);</span>
         <span class="n">mAssetManager</span> <span class="o">=</span> <span class="n">assetManager</span><span class="o">;</span>
     <span class="o">}</span>
 
     <span class="nd">@Override</span>
-    <span class="kd">public</span> <span class="n">ImageRequest</span> <span class="n">buildRequest</span><span class="o">(</span><span class="n">String</span> <span class="n">requestUrl</span><span class="o">,</span> <span class="kt">int</span> <span class="n">maxWidth</span><span class="o">,</span> <span class="kt">int</span> <span class="n">maxHeight</span><span class="o">)</span> <span class="o">{</span>
+    <span class="kd">public</span> <span class="n">ImageRequest</span> <span class="nf">buildRequest</span><span class="o">(</span><span class="n">String</span> <span class="n">requestUrl</span><span class="o">,</span> <span class="kt">int</span> <span class="n">maxWidth</span><span class="o">,</span> <span class="kt">int</span> <span class="n">maxHeight</span><span class="o">)</span> <span class="o">{</span>
         <span class="n">ImageRequest</span> <span class="n">request</span><span class="o">;</span>
         <span class="k">if</span> <span class="o">(</span><span class="n">requestUrl</span><span class="o">.</span><span class="na">startsWith</span><span class="o">(</span><span class="n">RES_ASSETS</span><span class="o">))</span> <span class="o">{</span>
-            <span class="n">request</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ImageRequest</span><span class="o">(</span><span class="n">requestUrl</span><span class="o">.</span><span class="na">substring</span><span class="o">(</span><span class="n">RES_ASSETS</span><span class="o">.</span><span class="na">length</span><span class="o">()),</span> <span class="n">maxWidth</span><span class="o">,</span> <span class="n">maxHeight</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">request</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">ImageRequest</span><span class="o">(</span><span class="n">requestUrl</span><span class="o">.</span><span class="na">substring</span><span class="o">(</span><span class="n">RES_ASSETS</span><span class="o">.</span><span class="na">length</span><span class="o">()),</span> <span class="n">maxWidth</span><span class="o">,</span> <span class="n">maxHeight</span><span class="o">)</span> <span class="o">{</span>
                 <span class="nd">@Override</span>
-                <span class="kd">public</span> <span class="n">NetworkResponse</span> <span class="n">perform</span><span class="o">()</span> <span class="o">{</span>
+                <span class="kd">public</span> <span class="n">NetworkResponse</span> <span class="nf">perform</span><span class="o">()</span> <span class="o">{</span>
                     <span class="k">try</span> <span class="o">{</span>
-                        <span class="k">return</span> <span class="k">new</span> <span class="n">NetworkResponse</span><span class="o">(</span><span class="n">toBytes</span><span class="o">(</span><span class="n">mAssetManager</span><span class="o">.</span><span class="na">open</span><span class="o">(</span><span class="n">getUrl</span><span class="o">())),</span> <span class="n">HTTP</span><span class="o">.</span><span class="na">UTF_8</span><span class="o">);</span>
+                        <span class="k">return</span> <span class="k">new</span> <span class="nf">NetworkResponse</span><span class="o">(</span><span class="n">toBytes</span><span class="o">(</span><span class="n">mAssetManager</span><span class="o">.</span><span class="na">open</span><span class="o">(</span><span class="n">getUrl</span><span class="o">())),</span> <span class="n">HTTP</span><span class="o">.</span><span class="na">UTF_8</span><span class="o">);</span>
                     <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">IOException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
-                        <span class="k">return</span> <span class="k">new</span> <span class="n">NetworkResponse</span><span class="o">(</span><span class="k">new</span> <span class="kt">byte</span><span class="o">[</span><span class="mi">1</span><span class="o">],</span> <span class="n">HTTP</span><span class="o">.</span><span class="na">UTF_8</span><span class="o">);</span>
+                        <span class="k">return</span> <span class="k">new</span> <span class="nf">NetworkResponse</span><span class="o">(</span><span class="k">new</span> <span class="kt">byte</span><span class="o">[</span><span class="mi">1</span><span class="o">],</span> <span class="n">HTTP</span><span class="o">.</span><span class="na">UTF_8</span><span class="o">);</span>
                     <span class="o">}</span>
                 <span class="o">}</span>
             <span class="o">};</span>
         <span class="o">}</span>
-        <span class="k">else</span> <span class="k">if</span> <span class="o">(</span><span class="n">requestUrl</span><span class="o">.</span><span class="na">startsWith</span><span class="o">(</span><span class="n">RES_SDCARD</span><span class="o">))</span> <span class="o">{</span>
-            <span class="n">request</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ImageRequest</span><span class="o">(</span><span class="n">requestUrl</span><span class="o">.</span><span class="na">substring</span><span class="o">(</span><span class="n">RES_SDCARD</span><span class="o">.</span><span class="na">length</span><span class="o">()),</span> <span class="n">maxWidth</span><span class="o">,</span> <span class="n">maxHeight</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">else</span> <span class="nf">if</span> <span class="o">(</span><span class="n">requestUrl</span><span class="o">.</span><span class="na">startsWith</span><span class="o">(</span><span class="n">RES_SDCARD</span><span class="o">))</span> <span class="o">{</span>
+            <span class="n">request</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">ImageRequest</span><span class="o">(</span><span class="n">requestUrl</span><span class="o">.</span><span class="na">substring</span><span class="o">(</span><span class="n">RES_SDCARD</span><span class="o">.</span><span class="na">length</span><span class="o">()),</span> <span class="n">maxWidth</span><span class="o">,</span> <span class="n">maxHeight</span><span class="o">)</span> <span class="o">{</span>
                 <span class="nd">@Override</span>
-                <span class="kd">public</span> <span class="n">NetworkResponse</span> <span class="n">perform</span><span class="o">()</span> <span class="o">{</span>
+                <span class="kd">public</span> <span class="n">NetworkResponse</span> <span class="nf">perform</span><span class="o">()</span> <span class="o">{</span>
                     <span class="k">try</span> <span class="o">{</span>
-                        <span class="k">return</span> <span class="k">new</span> <span class="n">NetworkResponse</span><span class="o">(</span><span class="n">toBytes</span><span class="o">(</span><span class="k">new</span> <span class="n">FileInputStream</span><span class="o">(</span><span class="n">getUrl</span><span class="o">())),</span> <span class="n">HTTP</span><span class="o">.</span><span class="na">UTF_8</span><span class="o">);</span>
+                        <span class="k">return</span> <span class="k">new</span> <span class="nf">NetworkResponse</span><span class="o">(</span><span class="n">toBytes</span><span class="o">(</span><span class="k">new</span> <span class="nf">FileInputStream</span><span class="o">(</span><span class="n">getUrl</span><span class="o">())),</span> <span class="n">HTTP</span><span class="o">.</span><span class="na">UTF_8</span><span class="o">);</span>
                     <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">IOException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
-                        <span class="k">return</span> <span class="k">new</span> <span class="n">NetworkResponse</span><span class="o">(</span><span class="k">new</span> <span class="kt">byte</span><span class="o">[</span><span class="mi">1</span><span class="o">],</span> <span class="n">HTTP</span><span class="o">.</span><span class="na">UTF_8</span><span class="o">);</span>
+                        <span class="k">return</span> <span class="k">new</span> <span class="nf">NetworkResponse</span><span class="o">(</span><span class="k">new</span> <span class="kt">byte</span><span class="o">[</span><span class="mi">1</span><span class="o">],</span> <span class="n">HTTP</span><span class="o">.</span><span class="na">UTF_8</span><span class="o">);</span>
                     <span class="o">}</span>
                 <span class="o">}</span>
             <span class="o">};</span>
         <span class="o">}</span>
-        <span class="k">else</span> <span class="k">if</span> <span class="o">(</span><span class="n">requestUrl</span><span class="o">.</span><span class="na">startsWith</span><span class="o">(</span><span class="n">RES_HTTP</span><span class="o">))</span> <span class="o">{</span>
-            <span class="n">request</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ImageRequest</span><span class="o">(</span><span class="n">requestUrl</span><span class="o">,</span> <span class="n">maxWidth</span><span class="o">,</span> <span class="n">maxHeight</span><span class="o">);</span>
+        <span class="k">else</span> <span class="nf">if</span> <span class="o">(</span><span class="n">requestUrl</span><span class="o">.</span><span class="na">startsWith</span><span class="o">(</span><span class="n">RES_HTTP</span><span class="o">))</span> <span class="o">{</span>
+            <span class="n">request</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">ImageRequest</span><span class="o">(</span><span class="n">requestUrl</span><span class="o">,</span> <span class="n">maxWidth</span><span class="o">,</span> <span class="n">maxHeight</span><span class="o">);</span>
         <span class="o">}</span>
         <span class="k">else</span> <span class="o">{</span>
             <span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
@@ -301,26 +290,25 @@
         <span class="k">return</span> <span class="n">request</span><span class="o">;</span>
     <span class="o">}</span>
 
-    <span class="kd">public</span> <span class="kt">void</span> <span class="n">makeRequest</span><span class="o">(</span><span class="n">ImageRequest</span> <span class="n">request</span><span class="o">)</span> <span class="o">{</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">makeRequest</span><span class="o">(</span><span class="n">ImageRequest</span> <span class="n">request</span><span class="o">)</span> <span class="o">{</span>
         <span class="n">request</span><span class="o">.</span><span class="na">setCacheExpireTime</span><span class="o">(</span><span class="n">TimeUnit</span><span class="o">.</span><span class="na">MINUTES</span><span class="o">,</span> <span class="mi">30</span><span class="o">);</span>
     <span class="o">}</span>
 
 <span class="o">}</span>
 
 <span class="c1">// 示例：读取http资源的调用方法</span>
-<span class="n">String</span> <span class="n">url</span> <span class="o">=</span> <span class="s">"http://server.domain/sample.jpg"</span><span class="o">;</span>
+<span class="n">String</span> <span class="n">url</span> <span class="o">=</span> <span class="s">&quot;http://server.domain/sample.jpg&quot;</span><span class="o">;</span>
 <span class="n">ImageLoader</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">url</span><span class="o">,</span> <span class="n">listener</span><span class="o">);</span>
 
 <span class="c1">// 示例：读取assets资源的调用方法</span>
-<span class="n">String</span> <span class="n">url</span> <span class="o">=</span> <span class="n">SelfImageLoader</span><span class="o">.</span><span class="na">RES_ASSETS</span> <span class="o">+</span> <span class="s">"sample.jpg"</span><span class="o">;</span>
+<span class="n">String</span> <span class="n">url</span> <span class="o">=</span> <span class="n">SelfImageLoader</span><span class="o">.</span><span class="na">RES_ASSETS</span> <span class="o">+</span> <span class="s">&quot;sample.jpg&quot;</span><span class="o">;</span>
 <span class="n">ImageLoader</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">url</span><span class="o">,</span> <span class="n">listener</span><span class="o">);</span>
 
 <span class="c1">// 示例：读取sdcard资源的调用方法</span>
-<span class="n">String</span> <span class="n">url</span> <span class="o">=</span> <span class="n">SelfImageLoader</span><span class="o">.</span><span class="na">RES_SDCARD</span> <span class="o">+</span> <span class="s">"/sdcard/sample.jpg"</span><span class="o">;</span>
+<span class="n">String</span> <span class="n">url</span> <span class="o">=</span> <span class="n">SelfImageLoader</span><span class="o">.</span><span class="na">RES_SDCARD</span> <span class="o">+</span> <span class="s">&quot;/sdcard/sample.jpg&quot;</span><span class="o">;</span>
 <span class="n">ImageLoader</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">url</span><span class="o">,</span> <span class="n">listener</span><span class="o">);</span>
-</pre></td></tr></tbody></table>
-</div>
-
+</pre></div>
+</td></tr></table></div>
 <p>这是一个实现兼容不同图片来源的解决方案，可在此基础上添加读取raw、drawable等不同目录下的图片，由于篇幅的限制不作举例，具体可查看演示程序中的代码。</p>
 
     </div>
@@ -328,8 +316,8 @@
         </div>
     </div>
     <div class="footer">
-        <div class="aboutus">All pages are generated by <a href="https://github.com/vince-styling/khaleesi">Khaleesi</a></div>
-        <div class="findme">Find this project on <a href="https://github.com/vince-styling/Netroid">GitHub</a></div>
+        <div class="aboutus">This site was generated by <a href="http://khaleesi.vincestyling.com/">Khaleesi</a>, hosted by <a href="https://pages.github.com/">Github Pages</a></div>
+        <div class="findme">Find this project in <a href="https://github.com/vince-styling/Netroid">GitHub</a></div>
     </div>
 </body>
 </html>

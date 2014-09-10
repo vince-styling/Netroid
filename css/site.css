@@ -26,7 +26,10 @@ ol, ul {
 
 body {
     border-top: 10px solid #f5f5f5;
-    font-family: Helvetica, Arial, sans-serif;
+}
+
+body, code {
+    font-family: "Droid Serif", Georgia, Times, serif;
 }
 
 a {
@@ -43,20 +46,18 @@ a img {
 }
 
 h1, h2, h3, h4, h5, h6 {
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-weight: normal;
     padding: 0;
 }
 
 .container {
-    width: 800px;
+    width: 900px;
     margin: 0 auto;
     padding: 0 0 20px 0;
 }
 
 
 .page-title {
-    font-family: "Droid Serif", Georgia, Times, serif;
     border-bottom: 2px solid #d5d5d5;
     clear:both;
     overflow:auto;
@@ -65,7 +66,6 @@ h1, h2, h3, h4, h5, h6 {
 
 .page-title h1 {
     font-size: 50px;
-    font-family: "Droid Serif", Georgia, Times, serif;
     text-shadow: 2px 2px #ddd;
     padding: 0;
     border-bottom: none;
@@ -80,16 +80,14 @@ h1, h2, h3, h4, h5, h6 {
 
 .page-title h2 {
     font-size: 14px;
-    font-family: "Droid Serif", Georgia, Times, serif;
 }
 
 .primary {
     float: left;
-    width: 800px;
+    width: 900px;
 }
 
 .primary .post-thumb p {
-    font-family: "微软雅黑", "宋体", "Droid Serif", Georgia, Times, serif;
     color: #333333;
     font-size: 15px;
     line-height: 25px;
@@ -102,7 +100,6 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .primary .post-thumb h1 {
-    font-family: "Droid Serif", Georgia, Times, serif;
     font-size: 30px;
     padding-bottom: 10px;
     margin-top: 24px;
@@ -116,7 +113,6 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .primary .post-thumb h2 {
-    font-family: "Droid Serif", Georgia, Times, serif;
     font-size: 19px;
     color: #d14;
     padding-top: 10px;
@@ -128,7 +124,6 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .primary .post-thumb h3 {
-    font-family: "Droid Serif", Georgia, Times, serif;
     font-size: 17px;
     color: #0c74a6;
     line-height: 25px;
@@ -136,7 +131,6 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .primary .post-thumb h4 {
-    font-family: "Droid Serif", Georgia, Times, serif;
     font-size: 13px;
     color: #333333;
     padding-bottom: 12px;
@@ -150,12 +144,10 @@ h1, h2, h3, h4, h5, h6 {
 
 .primary .post-thumb ul li {
     line-height: 28px;
-    font-family: "Droid Serif", Georgia, Times, serif;
     font-size: 16px;
 }
 
 .primary .post-thumb code {
-    font-family: "Droid Serif", Georgia, Times, serif;
     font-size: 15px;
     padding: 3px 4px;
     color: #d14;
@@ -176,14 +168,8 @@ h1, h2, h3, h4, h5, h6 {
     margin-bottom: 20px;
 }
 
-.primary .post-thumb table tr {
-    border-top: 1px solid #ccc;
-    background-color: #fff;
-}
-
 .primary .post-thumb table th,
 .primary .post-thumb table td {
-    font-family: "微软雅黑", "宋体", "Droid Serif", Georgia, Times, serif;
     border: 1px solid #ddd;
     padding: 6px 13px;
     vertical-align: middle;
@@ -210,7 +196,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .footer {
-    width: 800px;
+    width: 900px;
     margin: 0 auto;
     border-top: 2px solid #d5d5d5;
     font-size: 13px;
@@ -228,248 +214,296 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 
-.primary .post-thumb .highlight table {
-    margin-bottom: 0;
+.primary .post-thumb .highlight {
+    margin-bottom: 20px;
+    border-radius: 4px;
+    overflow: auto;
+    width: 100%;
 }
 
-.primary .post-thumb .highlight table tr {
-    border-top: none;
-    background-color: transparent;
+.primary .post-thumb .highlight pre {
+    font-family: "Source Code Pro", Consolas, Courier, monospace;
+    white-space: pre;
+    font-weight: 400;
+    font-size: 13px;
+    word-spacing: 0;
+    line-height: 22px;
+    padding: 12px;
+}
+
+.primary .post-thumb .highlight table {
+    border-collapse: collapse;
+    border-spacing: 0;
+    margin-bottom: 0;
 }
 
 .primary .post-thumb .highlight table td {
     border: none;
-    line-height: 21px;
-    padding: 12px;
+    padding: 0 0;
 }
 
-.primary .post-thumb .highlight table td pre {
-    font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
-    font-size: 13px;
-    border: none;
-}
-
-.primary .post-thumb .highlight table .gutter {
-    background-color: #fbfbfc;
+.primary .post-thumb .highlight .linenos {
     border-right: 1px solid #ddd;
     border-top-left-radius: 4px;
     border-bottom-left-radius: 4px;
-}
-.primary .post-thumb .highlight table .lineno {
-    line-height: 21px;
-    font-size: 12px;
+    background-color: #fbfbfc;
+    text-align: right;
     color: #bebec5;
 }
 
 .primary .post-thumb .highlight {
     background-color: #f8f8f8;
     border: 1px solid #ddd;
-    border-radius: 4px;
-    margin-bottom: 20px;
-    overflow: hidden;
+    color: #333333;
 }
 
 .primary .post-thumb .highlight .cm {
     color: #999988;
     font-style: italic;
 }
+
 .primary .post-thumb .highlight .cp {
     color: #999999;
-    font-weight: bold;
 }
+
 .primary .post-thumb .highlight .c1 {
     color: #999988;
     font-style: italic;
 }
+
 .primary .post-thumb .highlight .cs {
     color: #999999;
-    font-weight: bold;
     font-style: italic;
 }
+
 .primary .post-thumb .highlight .c, .primary .post-thumb .highlight .cd {
     color: #999988;
     font-style: italic;
 }
+
 .primary .post-thumb .highlight .err {
     color: #a61717;
     background-color: #e3d2d2;
 }
+
 .primary .post-thumb .highlight .gd {
     color: #000000;
     background-color: #ffdddd;
 }
+
 .primary .post-thumb .highlight .ge {
     color: #000000;
     font-style: italic;
 }
+
 .primary .post-thumb .highlight .gr {
     color: #aa0000;
 }
+
 .primary .post-thumb .highlight .gh {
     color: #999999;
 }
+
 .primary .post-thumb .highlight .gi {
     color: #000000;
     background-color: #ddffdd;
 }
+
 .primary .post-thumb .highlight .go {
     color: #888888;
 }
+
 .primary .post-thumb .highlight .gp {
     color: #555555;
 }
+
 .primary .post-thumb .highlight .gs {
-    font-weight: bold;
 }
+
 .primary .post-thumb .highlight .gu {
     color: #aaaaaa;
 }
+
 .primary .post-thumb .highlight .gt {
     color: #aa0000;
 }
+
 .primary .post-thumb .highlight .kc {
     color: #000000;
-    font-weight: bold;
 }
+
 .primary .post-thumb .highlight .kd {
     color: #000000;
-    font-weight: bold;
 }
+
 .primary .post-thumb .highlight .kn {
     color: #000000;
-    font-weight: bold;
 }
+
 .primary .post-thumb .highlight .kp {
     color: #000000;
-    font-weight: bold;
 }
+
 .primary .post-thumb .highlight .kr {
     color: #000000;
-    font-weight: bold;
 }
+
 .primary .post-thumb .highlight .kt {
     color: #445588;
-    font-weight: bold;
 }
+
 .primary .post-thumb .highlight .k, .primary .post-thumb .highlight .kv {
     color: #000000;
-    font-weight: bold;
 }
+
 .primary .post-thumb .highlight .mf {
     color: #009999;
 }
+
 .primary .post-thumb .highlight .mh {
     color: #009999;
 }
+
 .primary .post-thumb .highlight .il {
     color: #009999;
 }
+
 .primary .post-thumb .highlight .mi {
     color: #009999;
 }
+
 .primary .post-thumb .highlight .mo {
     color: #009999;
 }
+
 .primary .post-thumb .highlight .m, .primary .post-thumb .highlight .mb, .primary .post-thumb .highlight .mx {
     color: #009999;
 }
+
 .primary .post-thumb .highlight .sb {
     color: #d14;
 }
+
 .primary .post-thumb .highlight .sc {
     color: #d14;
 }
+
 .primary .post-thumb .highlight .sd {
     color: #d14;
 }
+
 .primary .post-thumb .highlight .s2 {
     color: #d14;
 }
+
 .primary .post-thumb .highlight .se {
     color: #d14;
 }
+
 .primary .post-thumb .highlight .sh {
     color: #d14;
 }
+
 .primary .post-thumb .highlight .si {
     color: #d14;
 }
+
 .primary .post-thumb .highlight .sx {
     color: #d14;
 }
+
 .primary .post-thumb .highlight .sr {
     color: #009926;
 }
+
 .primary .post-thumb .highlight .s1 {
     color: #d14;
 }
+
 .primary .post-thumb .highlight .ss {
     color: #990073;
 }
+
 .primary .post-thumb .highlight .s {
     color: #d14;
 }
+
 .primary .post-thumb .highlight .na {
     color: #008080;
 }
+
 .primary .post-thumb .highlight .bp {
     color: #999999;
 }
+
 .primary .post-thumb .highlight .nb {
     color: #0086B3;
 }
+
 .primary .post-thumb .highlight .nc {
     color: #445588;
-    font-weight: bold;
 }
+
 .primary .post-thumb .highlight .no {
     color: #008080;
 }
+
 .primary .post-thumb .highlight .nd {
     color: #3c5d5d;
-    font-weight: bold;
 }
+
 .primary .post-thumb .highlight .ni {
     color: #800080;
 }
+
 .primary .post-thumb .highlight .ne {
     color: #990000;
-    font-weight: bold;
 }
+
 .primary .post-thumb .highlight .nf {
     color: #990000;
-    font-weight: bold;
 }
+
 .primary .post-thumb .highlight .nl {
     color: #990000;
-    font-weight: bold;
 }
+
 .primary .post-thumb .highlight .nn {
     color: #555555;
 }
+
 .primary .post-thumb .highlight .nt {
     color: #000080;
 }
+
+.primary .post-thumb .highlight .n {
+    color: #333333;
+}
+
 .primary .post-thumb .highlight .vc {
     color: #008080;
 }
+
 .primary .post-thumb .highlight .vg {
     color: #008080;
 }
+
 .primary .post-thumb .highlight .vi {
     color: #008080;
 }
+
 .primary .post-thumb .highlight .nv {
     color: #008080;
 }
+
 .primary .post-thumb .highlight .ow {
     color: #000000;
-    font-weight: bold;
 }
+
 .primary .post-thumb .highlight .o {
     color: #000000;
-    font-weight: bold;
 }
+
 .primary .post-thumb .highlight .w {
     color: #bbbbbb;
 }
