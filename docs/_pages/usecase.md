@@ -1,5 +1,5 @@
 title: Netroid Usecase
-decorator: index
+decorator: post
 slug: usecase.html
 ‡‡‡‡‡‡‡‡‡‡‡‡‡‡
 

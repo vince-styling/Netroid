@@ -1,5 +1,5 @@
 title: Netroid ImageLoader
-decorator: index
+decorator: post
 slug: imageloader.html
 ‡‡‡‡‡‡‡‡‡‡‡‡‡‡
 
@@ -87,19 +87,15 @@ public View getView(int position, View convertView, ViewGroup parent) {
 }
 ```
 
-ImageLoader内部对于批量加载做了很好的处理，开发者可以设定每个任务的延时执行时间，在列表快速滑动时，可最大限度避免已离开屏幕的失效请求占用线程资源。
-在请求执行前，会根据url对请求进行重复性判断，避免相同的url执行多次，在请求失效时会立即调用 **Request.cancel()** 方法尝试终止操作。
+ImageLoader内部对于批量加载做了很好的处理，开发者可以设定每个任务的延时执行时间，在列表快速滑动时，可最大限度避免已离开屏幕的失效请求占用线程资源。在请求执行前，会根据url对请求进行重复性判断，避免相同的url执行多次，在请求失效时会立即调用 **Request.cancel()** 方法尝试终止操作。
 
-注：在图片一次加载成功后不再改变的情况下，可以使用普通的ImageView，但在ListView、GridView这种场景时建议使用 **NetworkImageView**，
-特别是遇到GridView position 0多次getView的bug时，普通的ImageView将会导致图片错位的异常问题，这种情况在演示程序中有专门的解决方案。
+注：在图片一次加载成功后不再改变的情况下，可以使用普通的ImageView，但在ListView、GridView这种场景时建议使用 **NetworkImageView**，特别是遇到GridView position 0多次getView的bug时，普通的ImageView将会导致图片错位的异常问题，这种情况在演示程序中有专门的解决方案。
 
 ## 非Http图片
 
-默认情况下，ImageLoader只能加载网络图片并使用缓存方案，但在实际开发中你除此之外可能也需要读取assets、raw、drawable、sdcard
-目录中的图片资源，这种非Http的请求在原来的Volley架构中是无法实现的。
+默认情况下，ImageLoader只能加载网络图片并使用缓存方案，但在实际开发中你除此之外可能也需要读取assets、raw、drawable、sdcard目录中的图片资源，这种非Http的请求在原来的Volley架构中是无法实现的。
 
-为了避免重复开发，Netroid对此做了扩展，只需要重写 **Request.perform()** 方法，
-手动构造 **NetworkResponse** 对象，就可以模拟Http请求完成整个流程。
+为了避免重复开发，Netroid对此做了扩展，只需要重写 **Request.perform()** 方法，手动构造 **NetworkResponse** 对象，就可以模拟Http请求完成整个流程。
 
 ```java
 ImageRequest request = new ImageRequest("image_file_name_in_assert_folder.jpg", ...) {
@@ -115,8 +111,7 @@ ImageRequest request = new ImageRequest("image_file_name_in_assert_folder.jpg", 
 };
 ```
 
-在 **perform()** 方法中，只需要加载assets资源为字节数组返回即可，InputStreamToBytes()方法的实现在此不详细列出。
-这个扩展方案解决了无法加载本地资源的问题，得以继续应用Cache、ImageLoader的强大功能。
+在 **perform()** 方法中，只需要加载assets资源为字节数组返回即可，InputStreamToBytes()方法的实现在此不详细列出。这个扩展方案解决了无法加载本地资源的问题，得以继续应用Cache、ImageLoader的强大功能。
 
 ImageLoader通过重写 **buildRequest()** 方法来实现同时兼容sdcard、http、assets等不同的图片来源：
 

@@ -1,5 +1,5 @@
 title: Netroid Request
-decorator: index
+decorator: post
 slug: request.html
 ‡‡‡‡‡‡‡‡‡‡‡‡‡‡
 
@@ -91,8 +91,7 @@ public abstract class Listener<T> {
 }
 ```
 
-**Listener**中的所有方法都会由UI线程负责调用，可方便地进行用户界面交互。除 **onSuccess()**
-方法是抽象方法外，其它方法均可在不需要使用时不重写，避免冗余大量无用代码带来的阅读障碍。
+**Listener**中的所有方法都会由UI线程负责调用，可方便地进行用户界面交互。除 **onSuccess()**方法是抽象方法外，其它方法均可在不需要使用时不重写，避免冗余大量无用代码带来的阅读障碍。
 
 注：Listener对于Request来说不是必须的参数，如果你不关注请求的任何执行结果，完全可以不创建Listener对象：
 
@@ -142,9 +141,7 @@ JsonObjectRequest request = new JsonObjectRequest(url, null, new Listener<JSONOb
 });
 ```
 
-Netroid默认的请求重试次数是一次，超时时间是2500ms，可以通过 **Request.setRetryPolicy()** 进行设置。
-Netroid在每次请求重试前都会对请求是否已取消进行判断，目的是当遇到网络或服务器缓慢等问题时能及时退出，避免余下的重试次数继续生效。
-**Listener.onRetry()** 方法可用于在请求执行过程中统计重试次数或请求执行时间，在判定请求无法正常返回时取消请求：
+Netroid默认的请求重试次数是一次，超时时间是2500ms，可以通过 **Request.setRetryPolicy()** 进行设置。Netroid在每次请求重试前都会对请求是否已取消进行判断，目的是当遇到网络或服务器缓慢等问题时能及时退出，避免余下的重试次数继续生效。**Listener.onRetry()** 方法可用于在请求执行过程中统计重试次数或请求执行时间，在判定请求无法正常返回时取消请求：
 
 ```java
 final String REQUESTS_TAG = "Request-Demo";
@@ -188,9 +185,7 @@ request.setTag(REQUESTS_TAG);
 RequestQueue.add(request);
 ```
 
-示例中创建了一个超时时长为5000ms，重试20次的请求，在onPreExecute()时记录开始时间，在每次onRetry()时对重试次数及已运行时间进行判断，超出限制时取消这次请求。
-有些情况下，第一次请求会重试多次，但只要再发起一次请求，就非常快能获取结果，所以示例中的onFinish()方法再次执行了这个请求，这里出现的死循环问题不作解决。
-以下是运行过程中打印的日志：
+示例中创建了一个超时时长为5000ms，重试20次的请求，在onPreExecute()时记录开始时间，在每次onRetry()时对重试次数及已运行时间进行判断，超出限制时取消这次请求。有些情况下，第一次请求会重试多次，但只要再发起一次请求，就非常快能获取结果，所以示例中的onFinish()方法再次执行了这个请求，这里出现的死循环问题不作解决。以下是运行过程中打印的日志：
 
 ```
 01-15 22:08:29.175: ERROR/Netroid(22043): [1] 4.onPreExecute: Request-Demo
@@ -202,14 +197,12 @@ RequestQueue.add(request);
 01-15 22:09:51.021: ERROR/Netroid(22043): [1] 4.onFinish: Request-Demo
 ```
 
-可以明显看出，在第三次重试时由于超出限定运行时间的原因已经调用了取消请求的方法，但仍然执行了第四次才真正取消，是因为回调操作与执行操作不在同一线程所致。
-这个例子充分说明了调用取消方法后，请求并不能立即真正地终止，几乎所有Http库都无法安全地实现立即终止正在调用的请求。
+可以明显看出，在第三次重试时由于超出限定运行时间的原因已经调用了取消请求的方法，但仍然执行了第四次才真正取消，是因为回调操作与执行操作不在同一线程所致。这个例子充分说明了调用取消方法后，请求并不能立即真正地终止，几乎所有Http库都无法安全地实现立即终止正在调用的请求。
 
 
 ## 验证返回结果：
 
-通常情况下，请求成功与否依赖于服务端返回的状态码，200代表成功，Netroid将回调 **Listener.onSuccess()**方法。
-但实际上我们往往需要对服务端的返回结果进行判断，以确认响应是否真正成功，在确认后将其中的某些字符串解析成特定的对象返回：
+通常情况下，请求成功与否依赖于服务端返回的状态码，200代表成功，Netroid将回调 **Listener.onSuccess()**方法。但实际上我们往往需要对服务端的返回结果进行判断，以确认响应是否真正成功，在确认后将其中的某些字符串解析成特定的对象返回：
 
 ```java
 public class BookListRequest<List<Book>> extends Request<List<Book>> {
@@ -276,8 +269,7 @@ public class BookListRequest<List<Book>> extends Request<List<Book>> {
 }
 ```
 
-在上面的返回Json格式示例中，我们可以看到"status"字段，这个字段是服务端处理请求的状态码，如果状态码不是200，我们认为请求失败。
-**BookListRequest** 的实现代码中，我们解析返回结果为List后，对List的size进行了判断，如果List为空时也认为请求失败。
+在上面的返回Json格式示例中，我们可以看到"status"字段，这个字段是服务端处理请求的状态码，如果状态码不是200，我们认为请求失败。**BookListRequest** 的实现代码中，我们解析返回结果为List后，对List的size进行了判断，如果List为空时也认为请求失败。
 
 
 ## 优先层次：
@@ -305,14 +297,12 @@ public enum Priority {
 }
 ```
 
-通常情况下，不建议改变请求的优先级顺序，对于需要执行批量任务的场景，建议设置优先级为 **LOW**，
-这样在大量的任务提交到`RequestQueue`时不至于阻塞普通的交互，后续发起的单个请求可以优先执行。
+通常情况下，不建议改变请求的优先级顺序，对于需要执行批量任务的场景，建议设置优先级为**LOW**，这样在大量的任务提交到`RequestQueue`时不至于阻塞普通的交互，后续发起的单个请求可以优先执行。
 
 
 ## 请求Header：
 
-在 **RequestQueue** 初始化并构造HttpStack实例时设置的User-Agent是一个全局默认的请求Header，
-允许调用每个请求的 **Request.addHeader(...)** 方法添加更多的Header，通常的做法是在构造Request实例时进行设置：
+在**RequestQueue**初始化并构造HttpStack实例时设置的User-Agent是一个全局默认的请求Header，允许调用每个请求的**Request.addHeader(...)**方法添加更多的Header，通常的做法是在构造Request实例时进行设置：
 
 ```java
 public class YourRequest extends Request {
@@ -328,8 +318,7 @@ public class YourRequest extends Request {
 }
 ```
 
-有时候可能你需要在每个请求里都添加一些默认Header，而每次都手动调用Request.addHeader(...)的做法显然太麻烦，
-因此这种场景可以通过继承HttpStack的实例，拦截 **performRequest** 方法来达到目的：
+有时候可能你需要在每个请求里都添加一些默认Header，而每次都手动调用Request.addHeader(...)的做法显然太麻烦，因此这种场景可以通过继承HttpStack的实例，拦截**performRequest**方法来达到目的：
 
 ```java
 public class SelfHurlStack extends HurlStack {
@@ -346,9 +335,7 @@ public class SelfHurlStack extends HurlStack {
 }
 ```
 
-构造请求对象或拦截 **performRequest** 方法来设置Header的做法可以添加一些在请求过程中持久化的Header，但例外的情况是，
-如果你的Header是通过一定的逻辑运算而得到的，这两种做法均显得不合适。Netroid在请求超时后会重新执行一次或多次请求(可设置重试策略来控制次数)，
-此时如果你的Header需要在重试前再次运算来更新，以上两种做法就满足不了需求，Netroid为此提供了 **Request.prepare()** 方法用于解决这个问题。
+构造请求对象或拦截**performRequest**方法来设置Header的做法可以添加一些在请求过程中持久化的Header，但例外的情况是，如果你的Header是通过一定的逻辑运算而得到的，这两种做法均显得不合适。Netroid在请求超时后会重新执行一次或多次请求(可设置重试策略来控制次数)，此时如果你的Header需要在重试前再次运算来更新，以上两种做法就满足不了需求，Netroid为此提供了**Request.prepare()**方法用于解决这个问题。
 
 ```java
 public class Request<T> {
@@ -361,8 +348,7 @@ public class Request<T> {
 }
 ```
 
-这个方法的典型应用场景在断点下载，由于文件的体积或对方服务器限制超长连接的种种原因，有时并不能一次连接就实现下载所有数据，因此需要重试机制去解决这个问题。
-上一次的下载实际上已经使临时文件有了一定的增长，所以必须在重试前更新Header来通知服务端起始位置，避免从旧位置开始下载，Netroid认为临时文件不合法而终止的错误。
+这个方法的典型应用场景在断点下载，由于文件的体积或对方服务器限制超长连接的种种原因，有时并不能一次连接就实现下载所有数据，因此需要重试机制去解决这个问题。上一次的下载实际上已经使临时文件有了一定的增长，所以必须在重试前更新Header来通知服务端起始位置，避免从旧位置开始下载，Netroid认为临时文件不合法而终止的错误。
 
 换句话说，**prepare()** 允许你在开始下载前构造那些需要通过一定的逻辑计算来确定的请求参数，以保证重新发起的请求的状态是最新的。
 
@@ -468,11 +454,9 @@ ImageRequest request = new ImageRequest("sdcard:///sdcard/DCIM/Camera/IMG.jpg", 
 };
 ```
 
-Netroid的线程池在应用程序中应该扮演一个高度可复用的组件，您不仅仅可用于执行Http操作，还可以执行DB操作、IO操作、数据运算等等复杂的逻辑。
-这些代码如果在UI线程上执行，将占用宝贵的界面响应资源，导致"Application Not Responding" (ANR) dialog弹出的问题，严重影响应用程序的用户体验。
+Netroid的线程池在应用程序中应该扮演一个高度可复用的组件，您不仅仅可用于执行Http操作，还可以执行DB操作、IO操作、数据运算等等复杂的逻辑。这些代码如果在UI线程上执行，将占用宝贵的界面响应资源，导致"Application Not Responding" (ANR) dialog弹出的问题，严重影响应用程序的用户体验。
 
-现在，你只需要重写 **Request.perform()** 方法，就能够非常方便地将所有阻塞UI线程的非UI操作置于后端，
-同时还能在有需要的情况下应用Netroid的缓存方案，这对于简化开发进程来讲是很有好处的。
+现在，你只需要重写 **Request.perform()** 方法，就能够非常方便地将所有阻塞UI线程的非UI操作置于后端，同时还能在有需要的情况下应用Netroid的缓存方案，这对于简化开发进程来讲是很有好处的。
 
 #### 注：DB、SharedPreferences操作实际上就是IO操作，具体可查看Android开发者官网的文章。
 

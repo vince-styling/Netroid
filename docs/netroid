@@ -7,13 +7,12 @@
 src_dir=~/dev/netroid/docs
 dest_dir=~/dev/netroid/site
 line_numbers="true"
-css_class="highlight"
-time_pattern="%Y-%m-%d %H:%M"
-date_pattern="%F"
+toc_selection="h1,h2[unique]"
 
 if [[ "$1" == "generate" ]]; then
   diff=$([ "$2" == 'diff' ] && echo "true" || echo "false")
-  khaleesi generate --src-dir "$src_dir" --dest-dir "$dest_dir" --line-numbers $line_numbers --css-class $css_class --time-pattern "$time_pattern" --date-pattern "$date_pattern" --diff-plus $diff
+  khaleesi generate --src-dir "$src_dir" --dest-dir "$dest_dir" \
+    --line-numbers $line_numbers --diff-plus "$diff" --toc-selection "$toc_selection"
 
 elif [[ "$1" == "serve" ]]; then
   #nohup ruby -run -e httpd $dest_dir -p 9090 &
@@ -26,15 +25,17 @@ elif [[ "$1" == "build" ]]; then
   mkdir $temperary_dest_dir
 
   cd $src_dir
+  cd ..
 
   git checkout master
 
-  khaleesi build --src-dir "$src_dir" --dest-dir "$temperary_dest_dir" --line-numbers $line_numbers --css-class $css_class --time-pattern "$time_pattern" --date-pattern "$date_pattern"
+  khaleesi build --src-dir "$src_dir" --dest-dir "$temperary_dest_dir" \
+    --line-numbers $line_numbers --date-pattern "$date_pattern" \
+    --highlighter pygments --toc-selection "$toc_selection"
 
-  cd ..
   git checkout gh-pages
 
-  rsync -auv $temperary_dest_dir/ .
+  rsync -acv $temperary_dest_dir/ .
   rm -fr $temperary_dest_dir
 
 fi

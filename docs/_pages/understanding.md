@@ -1,5 +1,5 @@
 title: Netroid Understanding
-decorator: index
+decorator: post
 slug: understanding.html
 ‡‡‡‡‡‡‡‡‡‡‡‡‡‡
 
@@ -57,8 +57,7 @@ public RequestQueue(Network network, int threadPoolSize, DiskCache cache);
 public BasicNetwork(HttpStack httpStack, String defaultCharset);
 ```
 
-`HttpStack`接口实例用于指示网络请求的执行方式，Netroid提供了 **HurlStack**、**HttpClientStack** 两种默认实现，
-对于这两种执行方式的选择，Volley建议GingerBread(API9)或以上的Android系统选择用HurlStack，参考写法如下：
+`HttpStack`接口实例用于指示网络请求的执行方式，Netroid提供了**HurlStack**、**HttpClientStack**两种默认实现，对于这两种执行方式的选择，Volley建议GingerBread(API9)或以上的Android系统选择用HurlStack，参考写法如下：
 
 ```java
 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
@@ -93,8 +92,7 @@ Netroid默认提供两种类型的Cache，均使用了Lru算法：
 | `DiskCache`基于硬盘的持久化缓存，所有请求均可使用。 |
 | `BitmapImageCache`基于内存的图片缓存，专属于 **ImageLoader** 的缓存方案。 |
 
-Netroid在执行请求时默认不使用任何缓存，所以在初始化`RequestQueue`对象时，开发者必须手动构造硬盘缓存方案。
-同样地，**ImageLoader** 也需要做相同的操作来指定内存缓存。
+Netroid在执行请求时默认不使用任何缓存，所以在初始化`RequestQueue`对象时，开发者必须手动构造硬盘缓存方案。同样地，**ImageLoader** 也需要做相同的操作来指定内存缓存。
 
 这两种缓存方案需要开发者构建，所以你可以继承它们并加以扩展。但实际上Netroid提供的默认实现已经能够满足大部分的应用场景，典型的写法如下：
 

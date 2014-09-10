@@ -1,5 +1,5 @@
 title: Netroid Startup
-decorator: index
+decorator: post
 slug: startup.html
 ‡‡‡‡‡‡‡‡‡‡‡‡‡‡
 
