@@ -30,8 +30,7 @@ elif [[ "$1" == "build" ]]; then
   git checkout master
 
   khaleesi build --src-dir "$src_dir" --dest-dir "$temperary_dest_dir" \
-    --line-numbers $line_numbers --date-pattern "$date_pattern" \
-    --highlighter pygments --toc-selection "$toc_selection"
+    --line-numbers $line_numbers --highlighter pygments --toc-selection "$toc_selection"
 
   git checkout gh-pages
 
