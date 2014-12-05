@@ -102,13 +102,14 @@ public class BasicNetwork implements Network {
 
                 StatusLine statusLine = httpResponse.getStatusLine();
                 int statusCode = statusLine.getStatusCode();
-                if (statusCode < 200 || statusCode > 299) throw new IOException();
 
                 responseContents = request.handleResponse(httpResponse, mDelivery);
 
                 // if the request is slow, log it.
                 long requestLifetime = SystemClock.elapsedRealtime() - requestStart;
                 logSlowRequests(requestLifetime, request, responseContents, statusLine);
+
+                if (statusCode < 200 || statusCode > 299) throw new IOException();
 
                 return new NetworkResponse(statusCode, responseContents, parseCharset(httpResponse));
             } catch (SocketTimeoutException e) {
