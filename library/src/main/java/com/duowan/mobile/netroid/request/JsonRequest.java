@@ -27,12 +27,16 @@ import java.io.UnsupportedEncodingException;
  * @param <T> JSON type of response expected
  */
 public abstract class JsonRequest<T> extends Request<T> {
-    /** Charset for request. */
+    /**
+     * Charset for request.
+     */
     private static final String PROTOCOL_CHARSET = "utf-8";
 
-    /** Content type for request. */
+    /**
+     * Content type for request.
+     */
     private static final String PROTOCOL_CONTENT_TYPE =
-        String.format("application/json; charset=%s", PROTOCOL_CHARSET);
+            String.format("application/json; charset=%s", PROTOCOL_CHARSET);
 
     private final String mRequestBody;
 
@@ -55,7 +59,7 @@ public abstract class JsonRequest<T> extends Request<T> {
             return mRequestBody == null ? null : mRequestBody.getBytes(PROTOCOL_CHARSET);
         } catch (UnsupportedEncodingException uee) {
             NetroidLog.wtf("Unsupported Encoding while trying to get the bytes of %s using %s",
-					mRequestBody, PROTOCOL_CHARSET);
+                    mRequestBody, PROTOCOL_CHARSET);
             return null;
         }
     }

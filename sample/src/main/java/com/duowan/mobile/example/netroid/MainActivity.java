@@ -20,50 +20,45 @@ public class MainActivity extends Activity implements View.OnClickListener {
         setContentView(R.layout.activity_main);
 
         mButtonCommon = (Button) findViewById(R.id.button_common_http_request);
-		mButtonCommon.setOnClickListener(this);
+        mButtonCommon.setOnClickListener(this);
 
-		mButtonImage = (Button) findViewById(R.id.button_image_request);
-		mButtonImage.setOnClickListener(this);
+        mButtonImage = (Button) findViewById(R.id.button_image_request);
+        mButtonImage.setOnClickListener(this);
 
-		btnBatchImageMem = (Button) findViewById(R.id.btnBatchImageMem);
-		btnBatchImageMem.setOnClickListener(this);
+        btnBatchImageMem = (Button) findViewById(R.id.btnBatchImageMem);
+        btnBatchImageMem.setOnClickListener(this);
 
-		btnBatchImageDisk = (Button) findViewById(R.id.btnBatchImageDisk);
-		btnBatchImageDisk.setOnClickListener(this);
+        btnBatchImageDisk = (Button) findViewById(R.id.btnBatchImageDisk);
+        btnBatchImageDisk.setOnClickListener(this);
 
-		btnBatchImageMultCache = (Button) findViewById(R.id.btnBatchImageMultCache);
-		btnBatchImageMultCache.setOnClickListener(this);
+        btnBatchImageMultCache = (Button) findViewById(R.id.btnBatchImageMultCache);
+        btnBatchImageMultCache.setOnClickListener(this);
 
-		btnFileDownload = (Button) findViewById(R.id.btnFileDownload);
-		btnFileDownload.setOnClickListener(this);
-	}
+        btnFileDownload = (Button) findViewById(R.id.btnFileDownload);
+        btnFileDownload.setOnClickListener(this);
+    }
 
     @Override
     public void onClick(View view) {
         if (view.equals(mButtonCommon)) {
             Intent intent = new Intent(this, CommonHttpRequestActivity.class);
             startActivity(intent);
-        }
-		else if (view.equals(mButtonImage)) {
+        } else if (view.equals(mButtonImage)) {
             Intent intent = new Intent(this, ImageRequestActivity.class);
             startActivity(intent);
+        } else if (view.equals(btnBatchImageDisk)) {
+            Intent intent = new Intent(this, BatchImageRequestDiskActivity.class);
+            startActivity(intent);
+        } else if (view.equals(btnBatchImageMem)) {
+            Intent intent = new Intent(this, BatchImageRequestMemActivity.class);
+            startActivity(intent);
+        } else if (view.equals(btnBatchImageMultCache)) {
+            Intent intent = new Intent(this, BatchImageRequestMultCacheActivity.class);
+            startActivity(intent);
+        } else if (view.equals(btnFileDownload)) {
+            Intent intent = new Intent(this, FileDownloadActivity.class);
+            startActivity(intent);
         }
-		else if (view.equals(btnBatchImageDisk)) {
-			Intent intent = new Intent(this, BatchImageRequestDiskActivity.class);
-			startActivity(intent);
-		}
-		else if (view.equals(btnBatchImageMem)) {
-			Intent intent = new Intent(this, BatchImageRequestMemActivity.class);
-			startActivity(intent);
-		}
-		else if (view.equals(btnBatchImageMultCache)) {
-			Intent intent = new Intent(this, BatchImageRequestMultCacheActivity.class);
-			startActivity(intent);
-		}
-		else if (view.equals(btnFileDownload)) {
-			Intent intent = new Intent(this, FileDownloadActivity.class);
-			startActivity(intent);
-		}
     }
 
 }

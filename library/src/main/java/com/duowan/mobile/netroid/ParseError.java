@@ -21,7 +21,8 @@ package com.duowan.mobile.netroid;
  */
 @SuppressWarnings("serial")
 public class ParseError extends NetroidError {
-    public ParseError() { }
+    public ParseError() {
+    }
 
     public ParseError(NetworkResponse networkResponse) {
         super(networkResponse);

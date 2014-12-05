@@ -28,31 +28,46 @@ import java.util.*;
  */
 public class DiskCache {
 
-    /** Map of the Key, CacheHeader pairs */
+    /**
+     * Map of the Key, CacheHeader pairs
+     */
     private final Map<String, CacheHeader> mEntries =
             new LinkedHashMap<String, CacheHeader>(16, .75f, true);
 
-    /** Total amount of space currently used by the cache in bytes. */
+    /**
+     * Total amount of space currently used by the cache in bytes.
+     */
     private long mTotalSize = 0;
 
-    /** The root directory to use for the cache. */
+    /**
+     * The root directory to use for the cache.
+     */
     private final File mRootDirectory;
 
-    /** The maximum size of the cache in bytes. */
+    /**
+     * The maximum size of the cache in bytes.
+     */
     private final int mMaxCacheSizeInBytes;
 
-    /** Default maximum disk usage in bytes. */
+    /**
+     * Default maximum disk usage in bytes.
+     */
     private static final int DEFAULT_DISK_USAGE_BYTES = 5 * 1024 * 1024;
 
-    /** High water mark percentage for the cache */
+    /**
+     * High water mark percentage for the cache
+     */
     private static final float HYSTERESIS_FACTOR = 0.9f;
 
-    /** Magic number for current version of cache file format. */
+    /**
+     * Magic number for current version of cache file format.
+     */
     private static final int CACHE_MAGIC = 0x20120504;
 
     /**
      * Constructs an instance of the DiskCache at the specified directory.
-     * @param rootDirectory The root directory of the cache.
+     *
+     * @param rootDirectory       The root directory of the cache.
      * @param maxCacheSizeInBytes The maximum size of the cache in bytes.
      */
     public DiskCache(File rootDirectory, int maxCacheSizeInBytes) {
@@ -63,6 +78,7 @@ public class DiskCache {
     /**
      * Constructs an instance of the DiskCache at the specified directory using
      * the default maximum cache size of 5MB.
+     *
      * @param rootDirectory The root directory of the cache.
      */
     public DiskCache(File rootDirectory) {
@@ -136,29 +152,31 @@ public class DiskCache {
             try {
                 fis = new FileInputStream(file);
                 CacheHeader entry = CacheHeader.readHeader(fis);
-				if (entry.isExpired()) {
-					file.delete();
-				} else {
-					entry.size = file.length();
-					putEntry(entry.key, entry);
-				}
+                if (entry.isExpired()) {
+                    file.delete();
+                } else {
+                    entry.size = file.length();
+                    putEntry(entry.key, entry);
+                }
             } catch (IOException e) {
                 if (file != null) {
-                   file.delete();
+                    file.delete();
                 }
             } finally {
                 try {
                     if (fis != null) {
                         fis.close();
                     }
-                } catch (IOException ignored) { }
+                } catch (IOException ignored) {
+                }
             }
         }
     }
 
     /**
      * Invalidates an entry in the cache.
-     * @param key Cache key
+     *
+     * @param key        Cache key
      * @param expireTime The new expireTime
      */
     public synchronized void invalidate(String key, long expireTime) {
@@ -196,21 +214,22 @@ public class DiskCache {
     public synchronized void removeEntry(String key) {
         boolean deleted = getFileForKey(key).delete();
 
-		// Removes the entry identified by 'key' from the cache.
-		CacheHeader entry = mEntries.get(key);
-		if (entry != null) {
-			mTotalSize -= entry.size;
-			mEntries.remove(key);
-		}
+        // Removes the entry identified by 'key' from the cache.
+        CacheHeader entry = mEntries.get(key);
+        if (entry != null) {
+            mTotalSize -= entry.size;
+            mEntries.remove(key);
+        }
 
         if (!deleted) {
             NetroidLog.d("Could not delete cache entry for key=%s, filename=%s",
-					key, getFilenameForKey(key));
+                    key, getFilenameForKey(key));
         }
     }
 
     /**
      * Creates a pseudo-unique filename for the specified cache key.
+     *
      * @param key The key to generate a file name for.
      * @return A pseudo-unique filename.
      */
@@ -230,6 +249,7 @@ public class DiskCache {
 
     /**
      * Prunes the cache to fit the amount of bytes specified.
+     *
      * @param neededSpace The amount of bytes we are trying to fit into the cache.
      */
     private void pruneIfNeeded(int neededSpace) {
@@ -252,8 +272,8 @@ public class DiskCache {
             if (deleted) {
                 mTotalSize -= e.size;
             } else {
-               NetroidLog.d("Could not delete cache entry for key=%s, filename=%s",
-					   e.key, getFilenameForKey(e.key));
+                NetroidLog.d("Could not delete cache entry for key=%s, filename=%s",
+                        e.key, getFilenameForKey(e.key));
             }
             iterator.remove();
             prunedFiles++;
@@ -265,13 +285,14 @@ public class DiskCache {
 
         if (NetroidLog.DEBUG) {
             NetroidLog.v("pruned %d files, %d bytes, %d ms",
-					prunedFiles, (mTotalSize - before), SystemClock.elapsedRealtime() - startTime);
+                    prunedFiles, (mTotalSize - before), SystemClock.elapsedRealtime() - startTime);
         }
     }
 
     /**
      * Puts the entry with the specified key into the cache.
-     * @param key The key to identify the entry by.
+     *
+     * @param key   The key to identify the entry by.
      * @param entry The entry to cache.
      */
     private void putEntry(String key, CacheHeader entry) {
@@ -286,7 +307,7 @@ public class DiskCache {
 
     /**
      * Reads the contents of an InputStream into a byte[].
-     * */
+     */
     private static byte[] streamToBytes(InputStream in, int length) throws IOException {
         byte[] bytes = new byte[length];
         int count;
@@ -305,35 +326,46 @@ public class DiskCache {
      */
     // Visible for testing.
     static class CacheHeader {
-        /** The size of the data identified by this CacheHeader. (This is not
-         * serialized to disk. */
+        /**
+         * The size of the data identified by this CacheHeader. (This is not
+         * serialized to disk.
+         */
         public long size;
 
-        /** The key that identifies the cache entry. */
+        /**
+         * The key that identifies the cache entry.
+         */
         public String key;
 
-		/** Expire time for cache entry. */
-		public long expireTime;
+        /**
+         * Expire time for cache entry.
+         */
+        public long expireTime;
 
-		/** Charset for cache entry. */
-		public String charset;
+        /**
+         * Charset for cache entry.
+         */
+        public String charset;
 
-        private CacheHeader() {}
+        private CacheHeader() {
+        }
 
         /**
          * Instantiates a new CacheHeader object
-         * @param key The key that identifies the cache entry
+         *
+         * @param key   The key that identifies the cache entry
          * @param entry The cache entry.
          */
         public CacheHeader(String key, Entry entry) {
             this.key = key;
-			this.size = entry.data.length;
-			this.expireTime = entry.expireTime;
-			this.charset = entry.charset;
-		}
+            this.size = entry.data.length;
+            this.expireTime = entry.expireTime;
+            this.charset = entry.charset;
+        }
 
         /**
          * Reads the header off of an InputStream and returns a CacheHeader object.
+         *
          * @param is The InputStream to read from.
          * @throws IOException
          */
@@ -356,15 +388,17 @@ public class DiskCache {
         public Entry toCacheEntry(byte[] data) {
             Entry e = new Entry();
             e.data = data;
-			e.expireTime = expireTime;
-			e.charset = charset;
-			return e;
+            e.expireTime = expireTime;
+            e.charset = charset;
+            return e;
         }
 
-		/** True if the entry is expired. */
-		public boolean isExpired() {
-			return expireTime < System.currentTimeMillis();
-		}
+        /**
+         * True if the entry is expired.
+         */
+        public boolean isExpired() {
+            return expireTime < System.currentTimeMillis();
+        }
 
 
         /**
@@ -385,52 +419,67 @@ public class DiskCache {
         }
     }
 
-	/**
-	 * Data and metadata for an entry returned by the cache.
-	 */
-	public static class Entry {
-		public Entry() {}
+    /**
+     * Data and metadata for an entry returned by the cache.
+     */
+    public static class Entry {
+        public Entry() {
+        }
 
-		public Entry(byte[] data, String charset) {
-			this.data = data;
-			this.charset = charset;
-		}
+        public Entry(byte[] data, String charset) {
+            this.data = data;
+            this.charset = charset;
+        }
 
-		/** The data returned from cache. */
-		public byte[] data;
+        /**
+         * The data returned from cache.
+         */
+        public byte[] data;
 
-		/** Expire time for cache entry. */
-		public long expireTime;
+        /**
+         * Expire time for cache entry.
+         */
+        public long expireTime;
 
-		/** Charset for cache entry, retrieve by the http header. */
-		public String charset;
+        /**
+         * Charset for cache entry, retrieve by the http header.
+         */
+        public String charset;
 
-		/** True if the entry is expired. */
-		public boolean isExpired() {
-			return expireTime < System.currentTimeMillis();
-		}
+        /**
+         * True if the entry is expired.
+         */
+        public boolean isExpired() {
+            return expireTime < System.currentTimeMillis();
+        }
 
-		/** True if a refresh is needed from the original data source. */
-		public boolean refreshNeeded() {
-			// still unimplemented, might be use a constant like 'refreshTime'?
-			return this.expireTime < System.currentTimeMillis();
-		}
+        /**
+         * True if a refresh is needed from the original data source.
+         */
+        public boolean refreshNeeded() {
+            // still unimplemented, might be use a constant like 'refreshTime'?
+            return this.expireTime < System.currentTimeMillis();
+        }
 
-		/** Get the cache data size in byte. */
-		public int getSize() {
-			return data != null ? data.length : 0;
-		}
+        /**
+         * Get the cache data size in byte.
+         */
+        public int getSize() {
+            return data != null ? data.length : 0;
+        }
 
-		/** Invalidate cache entry by the expireTime. */
-		public static boolean invalidate(Entry entry, long expireTime) {
-			if (entry != null) {
-				entry.expireTime = expireTime;
-				return true;
-			}
-			return false;
-		}
+        /**
+         * Invalidate cache entry by the expireTime.
+         */
+        public static boolean invalidate(Entry entry, long expireTime) {
+            if (entry != null) {
+                entry.expireTime = expireTime;
+                return true;
+            }
+            return false;
+        }
 
-	}
+    }
 
     private static class CountingInputStream extends FilterInputStream {
         private int bytesRead = 0;
@@ -494,14 +543,14 @@ public class DiskCache {
     }
 
     static void writeLong(OutputStream os, long n) throws IOException {
-        os.write((byte)(n >>> 0));
-        os.write((byte)(n >>> 8));
-        os.write((byte)(n >>> 16));
-        os.write((byte)(n >>> 24));
-        os.write((byte)(n >>> 32));
-        os.write((byte)(n >>> 40));
-        os.write((byte)(n >>> 48));
-        os.write((byte)(n >>> 56));
+        os.write((byte) (n >>> 0));
+        os.write((byte) (n >>> 8));
+        os.write((byte) (n >>> 16));
+        os.write((byte) (n >>> 24));
+        os.write((byte) (n >>> 32));
+        os.write((byte) (n >>> 40));
+        os.write((byte) (n >>> 48));
+        os.write((byte) (n >>> 56));
     }
 
     static long readLong(InputStream is) throws IOException {

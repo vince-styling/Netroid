@@ -24,15 +24,16 @@ import org.apache.http.HttpStatus;
 public class NetworkResponse {
     /**
      * Creates a new network response.
+     *
      * @param statusCode the HTTP status code
-     * @param data Response body
-     * @param charset The response body charset, parse by http header
+     * @param data       Response body
+     * @param charset    The response body charset, parse by http header
      */
     public NetworkResponse(int statusCode, byte[] data, String charset) {
-		this.statusCode = statusCode;
-		this.data = data;
+        this.statusCode = statusCode;
+        this.data = data;
         this.charset = charset;
-	}
+    }
 
 //    public NetworkResponse(byte[] data) {
 //        this(HttpStatus.SC_OK, data, Collections.<String, String>emptyMap());
@@ -42,12 +43,18 @@ public class NetworkResponse {
         this(HttpStatus.SC_OK, data, charset);
     }
 
-    /** The HTTP status code. */
+    /**
+     * The HTTP status code.
+     */
     public final int statusCode;
 
-    /** Raw data from this response. */
+    /**
+     * Raw data from this response.
+     */
     public final byte[] data;
 
-    /** Charset from this response. */
+    /**
+     * Charset from this response.
+     */
     public final String charset;
 }

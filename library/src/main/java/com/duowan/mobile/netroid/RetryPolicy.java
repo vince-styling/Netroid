@@ -33,9 +33,10 @@ public interface RetryPolicy {
 
     /**
      * Prepares for the next retry by applying a backoff to the timeout.
+     *
      * @param error The error code of the last attempt.
      * @throws NetroidError In the event that the retry could not be performed (for example if we
-     * ran out of attempts), the passed in error is thrown.
+     *                      ran out of attempts), the passed in error is thrown.
      */
     public void retry(NetroidError error) throws NetroidError;
 }

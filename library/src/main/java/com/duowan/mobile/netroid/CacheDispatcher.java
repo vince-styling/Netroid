@@ -23,7 +23,7 @@ import java.util.concurrent.BlockingQueue;
 
 /**
  * Provides a thread for performing cache triage on a queue of requests.
- *
+ * <p/>
  * Requests added to the specified cache queue are resolved from cache.
  * Any deliverable response is posted back to the caller via a
  * {@link Delivery}. Cache misses and responses that require
@@ -35,37 +35,47 @@ public class CacheDispatcher extends Thread {
 
     private static final boolean DEBUG = NetroidLog.DEBUG;
 
-    /** The queue of requests coming in for triage. */
+    /**
+     * The queue of requests coming in for triage.
+     */
     private final BlockingQueue<Request> mCacheQueue;
 
-    /** The queue of requests going out to the network. */
+    /**
+     * The queue of requests going out to the network.
+     */
     private final BlockingQueue<Request> mNetworkQueue;
 
-	/** The cache to read from. */
+    /**
+     * The cache to read from.
+     */
     private final DiskCache mCache;
 
-    /** For posting responses. */
+    /**
+     * For posting responses.
+     */
     private final Delivery mDelivery;
 
-    /** Used for telling us to die. */
+    /**
+     * Used for telling us to die.
+     */
     private volatile boolean mQuit = false;
 
     /**
      * Creates a new cache triage dispatcher thread.  You must call {@link #start()}
      * in order to begin processing.
      *
-     * @param cacheQueue Queue of incoming requests for triage
+     * @param cacheQueue   Queue of incoming requests for triage
      * @param networkQueue Queue to post requests that require network to
-     * @param cache Cache interface to use for resolution
-     * @param delivery Delivery interface to use for posting responses
+     * @param cache        Cache interface to use for resolution
+     * @param delivery     Delivery interface to use for posting responses
      */
     public CacheDispatcher(BlockingQueue<Request> cacheQueue, BlockingQueue<Request> networkQueue,
-						   DiskCache cache, Delivery delivery) {
-		mCache = cache;
-		mDelivery = delivery;
-		mCacheQueue = cacheQueue;
-		mNetworkQueue = networkQueue;
-	}
+                           DiskCache cache, Delivery delivery) {
+        mCache = cache;
+        mDelivery = delivery;
+        mCacheQueue = cacheQueue;
+        mNetworkQueue = networkQueue;
+    }
 
     /**
      * Forces this dispatcher to quit immediately.  If any requests are still in
@@ -82,47 +92,47 @@ public class CacheDispatcher extends Thread {
         Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
 
         // Make a blocking call to initialize the cache.
-		if (mCache != null) mCache.initialize();
+        if (mCache != null) mCache.initialize();
 
         while (true) {
             try {
                 // Get a request from the cache triage queue, blocking until
                 // at least one is available.
                 final Request request = mCacheQueue.take();
-				request.addMarker("cache-queue-take");
-				mDelivery.postPreExecute(request);
+                request.addMarker("cache-queue-take");
+                mDelivery.postPreExecute(request);
 
                 // If the request has been canceled, don't bother dispatching it.
                 if (request.isCanceled()) {
                     request.finish("cache-discard-canceled");
-					mDelivery.postCancel(request);
-					mDelivery.postFinish(request);
+                    mDelivery.postCancel(request);
+                    mDelivery.postFinish(request);
                     continue;
                 }
 
-				// Attempt to retrieve this item from cache.
-				DiskCache.Entry entry = mCache != null ? mCache.getEntry(request.getCacheKey()) : null;
-				if (entry == null) {
-					request.addMarker("cache-miss");
-					// Cache miss; send off to the network dispatcher.
-					mNetworkQueue.put(request);
-					mDelivery.postNetworking(request);
-					continue;
-				}
+                // Attempt to retrieve this item from cache.
+                DiskCache.Entry entry = mCache != null ? mCache.getEntry(request.getCacheKey()) : null;
+                if (entry == null) {
+                    request.addMarker("cache-miss");
+                    // Cache miss; send off to the network dispatcher.
+                    mNetworkQueue.put(request);
+                    mDelivery.postNetworking(request);
+                    continue;
+                }
 
                 // If it is completely expired, just send it to the network.
                 if (entry.isExpired()) {
-					request.addMarker("cache-hit-expired");
+                    request.addMarker("cache-hit-expired");
                     mNetworkQueue.put(request);
-					mDelivery.postNetworking(request);
-					continue;
+                    mDelivery.postNetworking(request);
+                    continue;
                 }
 
                 // We have a cache hit; parse its data for delivery back to the request.
                 request.addMarker("cache-hit");
                 Response<?> response = request.parseNetworkResponse(new NetworkResponse(entry.data, entry.charset));
                 request.addMarker("cache-hit-parsed");
-				mDelivery.postUsedCache(request);
+                mDelivery.postUsedCache(request);
 
                 if (!entry.refreshNeeded()) {
                     // Completely unexpired cache hit. Just deliver the response.

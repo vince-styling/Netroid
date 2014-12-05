@@ -32,11 +32,12 @@ import java.io.UnsupportedEncodingException;
 public class JsonObjectRequest extends JsonRequest<JSONObject> {
     /**
      * Creates a new request.
-     * @param method the HTTP method to use
-     * @param url URL to fetch the JSON from
+     *
+     * @param method      the HTTP method to use
+     * @param url         URL to fetch the JSON from
      * @param jsonRequest A {@link JSONObject} to post with the request. Null is allowed and
-     *   indicates no parameters will be posted along with request.
-     * @param listener Listener to receive the JSON response or error message
+     *                    indicates no parameters will be posted along with request.
+     * @param listener    Listener to receive the JSON response or error message
      */
     public JsonObjectRequest(int method, String url, JSONObject jsonRequest, Listener<JSONObject> listener) {
         super(method, url, (jsonRequest == null) ? null : jsonRequest.toString(), listener);

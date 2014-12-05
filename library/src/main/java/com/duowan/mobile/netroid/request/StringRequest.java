@@ -30,8 +30,8 @@ public class StringRequest extends Request<String> {
     /**
      * Creates a new request with the given method.
      *
-     * @param method the request {@link Method} to use
-     * @param url URL to fetch the string at
+     * @param method   the request {@link Method} to use
+     * @param url      URL to fetch the string at
      * @param listener Listener to receive the String response or error message
      */
     public StringRequest(int method, String url, Listener<String> listener) {
@@ -41,7 +41,7 @@ public class StringRequest extends Request<String> {
     /**
      * Creates a new GET request.
      *
-     * @param url URL to fetch the string at
+     * @param url      URL to fetch the string at
      * @param listener Listener to receive the String response
      */
     public StringRequest(String url, Listener<String> listener) {

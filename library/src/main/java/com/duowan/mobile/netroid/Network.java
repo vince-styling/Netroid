@@ -21,11 +21,14 @@ package com.duowan.mobile.netroid;
  */
 public interface Network {
 
-	/** Set the request delivery that use to post http networking callbacks. */
-	public void setDelivery(Delivery delivery);
-	
+    /**
+     * Set the request delivery that use to post http networking callbacks.
+     */
+    public void setDelivery(Delivery delivery);
+
     /**
      * Performs the specified request.
+     *
      * @param request Request to process
      * @return A {@link NetworkResponse} with data and caching metadata; will never be null
      * @throws NetroidError on errors

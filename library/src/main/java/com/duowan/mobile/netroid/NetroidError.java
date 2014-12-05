@@ -32,8 +32,8 @@ public class NetroidError extends Exception {
     }
 
     public NetroidError(String exceptionMessage) {
-       super(exceptionMessage);
-       networkResponse = null;
+        super(exceptionMessage);
+        networkResponse = null;
     }
 
     public NetroidError(String exceptionMessage, Throwable reason) {

@@ -20,4 +20,5 @@ package com.duowan.mobile.netroid;
  * Indicates that the connection or the socket timed out.
  */
 @SuppressWarnings("serial")
-public class TimeoutError extends NetroidError { }
+public class TimeoutError extends NetroidError {
+}

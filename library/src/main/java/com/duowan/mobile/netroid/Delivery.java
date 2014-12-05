@@ -18,10 +18,14 @@ package com.duowan.mobile.netroid;
 
 public interface Delivery {
 
-	/** Posts request finished callback for the given request. */
-	void postFinish(Request<?> request);
+    /**
+     * Posts request finished callback for the given request.
+     */
+    void postFinish(Request<?> request);
 
-    /** Parses a response from the network or cache and delivers it. */
+    /**
+     * Parses a response from the network or cache and delivers it.
+     */
     public void postResponse(Request<?> request, Response<?> response);
 
     /**
@@ -30,24 +34,38 @@ public interface Delivery {
      */
     public void postResponse(Request<?> request, Response<?> response, Runnable runnable);
 
-    /** Posts an error for the given request. */
+    /**
+     * Posts an error for the given request.
+     */
     public void postError(Request<?> request, NetroidError error);
 
-	/** Posts a cancel callback for the given request. */
-	void postCancel(Request<?> request);
+    /**
+     * Posts a cancel callback for the given request.
+     */
+    void postCancel(Request<?> request);
 
-	/** Posts starting execute callback for the given request. */
-	void postPreExecute(Request<?> request);
+    /**
+     * Posts starting execute callback for the given request.
+     */
+    void postPreExecute(Request<?> request);
 
-	/** Posts cache used callback for the given request. */
-	void postUsedCache(Request<?> request);
+    /**
+     * Posts cache used callback for the given request.
+     */
+    void postUsedCache(Request<?> request);
 
-	/** Posts networking callback for the given request. */
-	void postNetworking(Request<?> request);
+    /**
+     * Posts networking callback for the given request.
+     */
+    void postNetworking(Request<?> request);
 
-	/** Posts request retry callback for the given request. */
-	void postRetry(Request<?> request);
+    /**
+     * Posts request retry callback for the given request.
+     */
+    void postRetry(Request<?> request);
 
-	/** Posts file download progress stat. */
-	void postDownloadProgress(Request<?> request, long fileSize, long downloadedSize);
+    /**
+     * Posts file download progress stat.
+     */
+    void postDownloadProgress(Request<?> request, long fileSize, long downloadedSize);
 }

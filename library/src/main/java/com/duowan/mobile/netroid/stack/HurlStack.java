@@ -51,37 +51,37 @@ public class HurlStack implements HttpStack {
      */
     public HurlStack(String userAgent, SSLSocketFactory sslSocketFactory) {
         mSslSocketFactory = sslSocketFactory;
-		mUserAgent = userAgent;
+        mUserAgent = userAgent;
     }
 
-	public HurlStack(String userAgent) {
-		this(userAgent, null);
-	}
+    public HurlStack(String userAgent) {
+        this(userAgent, null);
+    }
 
     @Override
     public HttpResponse performRequest(Request<?> request) throws IOException, AuthFailureError {
-		HashMap<String, String> map = new HashMap<String, String>();
-		if (!TextUtils.isEmpty(mUserAgent)) {
-			map.put(HTTP.USER_AGENT, mUserAgent);
-		}
-		map.putAll(request.getHeaders());
+        HashMap<String, String> map = new HashMap<String, String>();
+        if (!TextUtils.isEmpty(mUserAgent)) {
+            map.put(HTTP.USER_AGENT, mUserAgent);
+        }
+        map.putAll(request.getHeaders());
 
-		URL parsedUrl = new URL(request.getUrl());
-		HttpURLConnection connection = openConnection(parsedUrl, request);
-		for (String headerName : map.keySet()) {
-			connection.addRequestProperty(headerName, map.get(headerName));
-		}
+        URL parsedUrl = new URL(request.getUrl());
+        HttpURLConnection connection = openConnection(parsedUrl, request);
+        for (String headerName : map.keySet()) {
+            connection.addRequestProperty(headerName, map.get(headerName));
+        }
 
-		setConnectionParametersForRequest(connection, request);
+        setConnectionParametersForRequest(connection, request);
 
-		int responseCode = connection.getResponseCode();
-		if (responseCode == -1) {
-			// -1 is returned by getResponseCode() if the response code could not be retrieved.
-			// Signal to the caller that something was wrong with the connection.
-			throw new IOException("Could not retrieve response code from HttpUrlConnection.");
-		}
+        int responseCode = connection.getResponseCode();
+        if (responseCode == -1) {
+            // -1 is returned by getResponseCode() if the response code could not be retrieved.
+            // Signal to the caller that something was wrong with the connection.
+            throw new IOException("Could not retrieve response code from HttpUrlConnection.");
+        }
 
-		StatusLine responseStatus = new BasicStatusLine(new ProtocolVersion("HTTP", 1, 1),
+        StatusLine responseStatus = new BasicStatusLine(new ProtocolVersion("HTTP", 1, 1),
                 connection.getResponseCode(), connection.getResponseMessage());
         BasicHttpResponse response = new BasicHttpResponse(responseStatus);
         response.setEntity(entityFromConnection(connection));
@@ -98,6 +98,7 @@ public class HurlStack implements HttpStack {
 
     /**
      * Initializes an {@link HttpEntity} from the given {@link HttpURLConnection}.
+     *
      * @return an HttpEntity populated with data from <code>connection</code>.
      */
     private static HttpEntity entityFromConnection(HttpURLConnection connection) {
@@ -124,6 +125,7 @@ public class HurlStack implements HttpStack {
 
     /**
      * Opens an {@link HttpURLConnection} with parameters.
+     *
      * @return an open connection
      */
     private HttpURLConnection openConnection(URL url, Request<?> request) throws IOException {
@@ -137,14 +139,14 @@ public class HurlStack implements HttpStack {
 
         // use caller-provided custom SslSocketFactory, if any, for HTTPS
         if ("https".equals(url.getProtocol()) && mSslSocketFactory != null) {
-            ((HttpsURLConnection)connection).setSSLSocketFactory(mSslSocketFactory);
+            ((HttpsURLConnection) connection).setSSLSocketFactory(mSslSocketFactory);
         }
 
         return connection;
     }
 
-	private static void setConnectionParametersForRequest(
-			HttpURLConnection connection, Request<?> request) throws IOException, AuthFailureError {
+    private static void setConnectionParametersForRequest(
+            HttpURLConnection connection, Request<?> request) throws IOException, AuthFailureError {
         switch (request.getMethod()) {
             case Method.GET:
                 // Not necessary to set the request method because connection defaults to GET but
@@ -181,7 +183,7 @@ public class HurlStack implements HttpStack {
     }
 
     private static void addBodyIfExists(
-			HttpURLConnection connection, Request<?> request) throws IOException, AuthFailureError {
+            HttpURLConnection connection, Request<?> request) throws IOException, AuthFailureError {
         byte[] body = request.getBody();
         if (body != null) {
             connection.setDoOutput(true);

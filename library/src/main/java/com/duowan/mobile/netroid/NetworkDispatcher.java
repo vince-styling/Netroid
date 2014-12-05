@@ -23,7 +23,7 @@ import java.util.concurrent.BlockingQueue;
 
 /**
  * Provides a thread for performing network dispatch from a queue of requests.
- *
+ * <p/>
  * Requests added to the specified queue are processed from the network via a
  * specified {@link Network} interface. Responses are committed to cache, if
  * eligible, using a specified {@link com.duowan.mobile.netroid.cache.DiskCache} interface.
@@ -31,36 +31,46 @@ import java.util.concurrent.BlockingQueue;
  */
 @SuppressWarnings("rawtypes")
 public class NetworkDispatcher extends Thread {
-    /** The queue of requests to service. */
+    /**
+     * The queue of requests to service.
+     */
     private final BlockingQueue<Request> mQueue;
 
-    /** The network interface for processing requests. */
+    /**
+     * The network interface for processing requests.
+     */
     private final Network mNetwork;
 
-	/** The cache to write to. */
+    /**
+     * The cache to write to.
+     */
     private final DiskCache mCache;
 
-	/** For posting responses and errors. */
+    /**
+     * For posting responses and errors.
+     */
     private final Delivery mDelivery;
 
-	/** Used for telling us to die. */
+    /**
+     * Used for telling us to die.
+     */
     private volatile boolean mQuit = false;
 
     /**
      * Creates a new network dispatcher thread.  You must call {@link #start()}
      * in order to begin processing.
      *
-     * @param queue Queue of incoming requests for triage
-     * @param network Network interface to use for performing requests
-	 * @param cache Cache interface to use for writing responses to cache
+     * @param queue    Queue of incoming requests for triage
+     * @param network  Network interface to use for performing requests
+     * @param cache    Cache interface to use for writing responses to cache
      * @param delivery Delivery interface to use for posting responses
      */
     public NetworkDispatcher(BlockingQueue<Request> queue,
-            Network network, DiskCache cache,
-            Delivery delivery) {
+                             Network network, DiskCache cache,
+                             Delivery delivery) {
         mQueue = queue;
-		mCache = cache;
-		mNetwork = network;
+        mCache = cache;
+        mNetwork = network;
         mDelivery = delivery;
     }
 
@@ -89,14 +99,14 @@ public class NetworkDispatcher extends Thread {
 
             try {
                 request.addMarker("network-queue-take");
-				mDelivery.postPreExecute(request);
+                mDelivery.postPreExecute(request);
 
                 // If the request was cancelled already,
                 // do not perform the network request.
                 if (request.isCanceled()) {
                     request.finish("network-discard-cancelled");
-					mDelivery.postCancel(request);
-					mDelivery.postFinish(request);
+                    mDelivery.postCancel(request);
+                    mDelivery.postFinish(request);
                     continue;
                 }
 
@@ -109,21 +119,21 @@ public class NetworkDispatcher extends Thread {
                 request.addMarker("network-parse-complete");
 
                 // Write to cache if applicable.
-				if (mCache != null && request.shouldCache() && response.cacheEntry != null) {
-					response.cacheEntry.expireTime = request.getCacheExpireTime();
-					mCache.putEntry(request.getCacheKey(), response.cacheEntry);
-					request.addMarker("network-cache-written");
-				}
+                if (mCache != null && request.shouldCache() && response.cacheEntry != null) {
+                    response.cacheEntry.expireTime = request.getCacheExpireTime();
+                    mCache.putEntry(request.getCacheKey(), response.cacheEntry);
+                    request.addMarker("network-cache-written");
+                }
 
                 // Post the response back.
                 request.markDelivered();
                 mDelivery.postResponse(request, response);
             } catch (NetroidError netroidError) {
-				mDelivery.postError(request, request.parseNetworkError(netroidError));
+                mDelivery.postError(request, request.parseNetworkError(netroidError));
             } catch (Exception e) {
-				NetroidLog.e(e, "Unhandled exception %s", e.toString());
-				mDelivery.postError(request, new NetroidError(e));
-			}
+                NetroidLog.e(e, "Unhandled exception %s", e.toString());
+                mDelivery.postError(request, new NetroidError(e));
+            }
         }
     }
 

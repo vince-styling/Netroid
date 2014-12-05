@@ -30,7 +30,9 @@ import com.duowan.mobile.netroid.toolbox.ImageLoader.ImageListener;
  * associated request.
  */
 public class NetworkImageView extends ImageView {
-    /** The URL of the network image to load */
+    /**
+     * The URL of the network image to load
+     */
     private String mUrl;
 
     /**
@@ -43,10 +45,14 @@ public class NetworkImageView extends ImageView {
      */
     private int mErrorImageId;
 
-    /** Local copy of the ImageLoader. */
+    /**
+     * Local copy of the ImageLoader.
+     */
     private ImageLoader mImageLoader;
 
-    /** Current ImageContainer. (either in-flight or finished) */
+    /**
+     * Current ImageContainer. (either in-flight or finished)
+     */
     private ImageContainer mImageContainer;
 
     public NetworkImageView(Context context) {
@@ -65,12 +71,12 @@ public class NetworkImageView extends ImageView {
      * Sets URL of the image that should be loaded into this view. Note that calling this will
      * immediately either set the cached image (if available) or the default image specified by
      * {@link NetworkImageView#setDefaultImageResId(int)} on the view.
-     *
+     * <p/>
      * NOTE: If applicable, {@link NetworkImageView#setDefaultImageResId(int)} and
      * {@link NetworkImageView#setErrorImageResId(int)} should be called prior to calling
      * this function.
      *
-     * @param url The URL that should be loaded into this ImageView.
+     * @param url         The URL that should be loaded into this ImageView.
      * @param imageLoader ImageLoader that will be used to make the request.
      */
     public void setImageUrl(String url, ImageLoader imageLoader) {
@@ -98,6 +104,7 @@ public class NetworkImageView extends ImageView {
 
     /**
      * Loads the image for the view if it isn't already loaded.
+     *
      * @param isInLayoutPass True if this was invoked from a layout pass, false otherwise.
      */
     private void loadImageIfNecessary(final boolean isInLayoutPass) {
@@ -139,13 +146,13 @@ public class NetworkImageView extends ImageView {
             }
         }
 
-		// Calculate the max image width / height to use while ignoring WRAP_CONTENT dimens.
-		int maxWidth = wrapWidth ? 0 : width;
-		int maxHeight = wrapHeight ? 0 : height;
+        // Calculate the max image width / height to use while ignoring WRAP_CONTENT dimens.
+        int maxWidth = wrapWidth ? 0 : width;
+        int maxHeight = wrapHeight ? 0 : height;
 
         // The pre-existing content of this view didn't match the current URL.
         // Load the new image from the network.
-		mImageContainer = mImageLoader.get(mUrl,
+        mImageContainer = mImageLoader.get(mUrl,
                 new ImageListener() {
                     @Override
                     public void onError(NetroidError error) {
@@ -162,30 +169,30 @@ public class NetworkImageView extends ImageView {
                         // the main thread.
                         if (isImmediate && isInLayoutPass) {
                             post(new Runnable() {
-								@Override
-								public void run() {
-									onSuccess(response, false);
-								}
-							});
-							return;
-						}
+                                @Override
+                                public void run() {
+                                    onSuccess(response, false);
+                                }
+                            });
+                            return;
+                        }
 
-						if (response.getBitmap() != null) {
-							setImageBitmap(response.getBitmap());
-						} else {
-							setDefaultImageOrNull();
+                        if (response.getBitmap() != null) {
+                            setImageBitmap(response.getBitmap());
+                        } else {
+                            setDefaultImageOrNull();
                         }
                     }
                 }, maxWidth, maxHeight);
     }
 
     private void setDefaultImageOrNull() {
-		if (mDefaultImageId != 0) {
-			setImageResource(mDefaultImageId);
-		} else {
-			setImageBitmap(null);
-		}
-	}
+        if (mDefaultImageId != 0) {
+            setImageResource(mDefaultImageId);
+        } else {
+            setImageBitmap(null);
+        }
+    }
 
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {

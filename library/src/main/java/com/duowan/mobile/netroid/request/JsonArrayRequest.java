@@ -31,7 +31,8 @@ import java.io.UnsupportedEncodingException;
 public class JsonArrayRequest extends JsonRequest<JSONArray> {
     /**
      * Creates a new request.
-     * @param url URL to fetch the JSON from
+     *
+     * @param url      URL to fetch the JSON from
      * @param listener Listener to receive the JSON response or error message
      */
     public JsonArrayRequest(String url, Listener<JSONArray> listener) {

@@ -20,23 +20,23 @@ import android.graphics.Bitmap;
 import com.duowan.mobile.netroid.toolbox.ImageLoader;
 
 public class BitmapImageCache extends LruCache<String, Bitmap> implements ImageLoader.ImageCache {
-	public BitmapImageCache(int maxSize) {
-		super(maxSize);
-	}
+    public BitmapImageCache(int maxSize) {
+        super(maxSize);
+    }
 
-	@Override
-	protected int sizeOf(String key, Bitmap value) {
-		return value.getRowBytes() * value.getHeight();
-	}
+    @Override
+    protected int sizeOf(String key, Bitmap value) {
+        return value.getRowBytes() * value.getHeight();
+    }
 
-	@Override
-	public Bitmap getBitmap(String url) {
-		return get(url);
-	}
+    @Override
+    public Bitmap getBitmap(String url) {
+        return get(url);
+    }
 
-	@Override
-	public void putBitmap(String url, Bitmap bitmap) {
-		put(url, bitmap);
-	}
+    @Override
+    public void putBitmap(String url, Bitmap bitmap) {
+        put(url, bitmap);
+    }
 
 }

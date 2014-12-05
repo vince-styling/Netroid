@@ -28,7 +28,7 @@ import java.io.IOException;
 public interface HttpStack {
     /**
      * Performs an HTTP request with the given parameters.
-     *
+     * <p/>
      * <p>A GET request is sent if request.getPostBody() == null. A POST request is sent otherwise,
      * and the Content-Type header is set to request.getPostBodyContentType().</p>
      *
@@ -36,5 +36,5 @@ public interface HttpStack {
      * @return the HTTP response
      */
     public HttpResponse performRequest(Request<?> request)
-			throws IOException, AuthFailureError;
+            throws IOException, AuthFailureError;
 }

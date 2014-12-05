@@ -47,9 +47,9 @@ public class HttpClientStack implements HttpStack {
         mClient = AndroidHttpClient.newInstance(userAgent);
     }
 
-	public HttpClientStack(HttpClient client) {
-		mClient = client;
-	}
+    public HttpClientStack(HttpClient client) {
+        mClient = client;
+    }
 
     private static void addHeaders(HttpUriRequest httpRequest, Map<String, String> headers) {
         for (String key : headers.keySet()) {
@@ -66,24 +66,24 @@ public class HttpClientStack implements HttpStack {
         return result;
     }
 
-	@Override
-	public HttpResponse performRequest(Request<?> request) throws IOException, AuthFailureError {
-		HttpUriRequest httpRequest = createHttpRequest(request);
-		onPrepareRequest(httpRequest);
-		addHeaders(httpRequest, request.getHeaders());
-		HttpParams httpParams = httpRequest.getParams();
-		int timeoutMs = request.getTimeoutMs();
-		// TODO: Reevaluate this connection timeout based on more wide-scale
-		// data collection and possibly different for wifi vs. 3G.
-		HttpConnectionParams.setConnectionTimeout(httpParams, 5000);
-		HttpConnectionParams.setSoTimeout(httpParams, timeoutMs);
-		return mClient.execute(httpRequest);
-	}
+    @Override
+    public HttpResponse performRequest(Request<?> request) throws IOException, AuthFailureError {
+        HttpUriRequest httpRequest = createHttpRequest(request);
+        onPrepareRequest(httpRequest);
+        addHeaders(httpRequest, request.getHeaders());
+        HttpParams httpParams = httpRequest.getParams();
+        int timeoutMs = request.getTimeoutMs();
+        // TODO: Reevaluate this connection timeout based on more wide-scale
+        // data collection and possibly different for wifi vs. 3G.
+        HttpConnectionParams.setConnectionTimeout(httpParams, 5000);
+        HttpConnectionParams.setSoTimeout(httpParams, timeoutMs);
+        return mClient.execute(httpRequest);
+    }
 
     /**
      * Creates the appropriate subclass of HttpUriRequest for passed in request.
      */
-	private static HttpUriRequest createHttpRequest(Request<?> request) throws AuthFailureError {
+    private static HttpUriRequest createHttpRequest(Request<?> request) throws AuthFailureError {
         switch (request.getMethod()) {
             case Method.GET:
                 return new HttpGet(request.getUrl());
@@ -119,7 +119,7 @@ public class HttpClientStack implements HttpStack {
     }
 
     private static void setEntityIfNonEmptyBody(HttpEntityEnclosingRequestBase httpRequest,
-            Request<?> request) throws AuthFailureError {
+                                                Request<?> request) throws AuthFailureError {
         byte[] body = request.getBody();
         if (body != null) {
             HttpEntity entity = new ByteArrayEntity(body);
@@ -129,39 +129,39 @@ public class HttpClientStack implements HttpStack {
 
     /**
      * Called before the request is executed using the underlying HttpClient.
-     *
+     * <p/>
      * <p>Overwrite in subclasses to augment the request.</p>
      */
     protected void onPrepareRequest(HttpUriRequest request) throws IOException {
         request.addHeader("Accept-Encoding", "gzip");
-	}
+    }
 
-	/**
-	 * The HttpPatch class does not exist in the Android framework, so this has been defined here.
-	 */
-	public static final class HttpPatch extends HttpEntityEnclosingRequestBase {
-		public final static String METHOD_NAME = "PATCH";
+    /**
+     * The HttpPatch class does not exist in the Android framework, so this has been defined here.
+     */
+    public static final class HttpPatch extends HttpEntityEnclosingRequestBase {
+        public final static String METHOD_NAME = "PATCH";
 
-		public HttpPatch() {
-			super();
-		}
+        public HttpPatch() {
+            super();
+        }
 
-		public HttpPatch(final URI uri) {
-			super();
-			setURI(uri);
-		}
+        public HttpPatch(final URI uri) {
+            super();
+            setURI(uri);
+        }
 
-		/**
-		 * @throws IllegalArgumentException if the uri is invalid.
-		 */
-		public HttpPatch(final String uri) {
-			super();
-			setURI(URI.create(uri));
-		}
+        /**
+         * @throws IllegalArgumentException if the uri is invalid.
+         */
+        public HttpPatch(final String uri) {
+            super();
+            setURI(URI.create(uri));
+        }
 
-		@Override
-		public String getMethod() {
-			return METHOD_NAME;
-		}
-	}
+        @Override
+        public String getMethod() {
+            return METHOD_NAME;
+        }
+    }
 }
