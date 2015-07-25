@@ -21,6 +21,7 @@ import com.vincestyling.netroid.NetroidError;
 import com.vincestyling.netroid.RequestQueue;
 import com.vincestyling.netroid.request.FileDownloadRequest;
 
+import java.io.File;
 import java.util.LinkedList;
 
 /**
@@ -33,7 +34,7 @@ import java.util.LinkedList;
  * <p/>
  * Usage: like {@link ImageLoader}, the best way to use this class is create by {@link RequestQueue}
  * and stand Singleton, just get the only one instance to do everything in anywhere.
- * To start a new download request, invoke the {@link FileDownloader#add(String, String, Listener)}
+ * To start a new download request, invoke the {@link #add(String, String, Listener)}
  * to pass in the task parameters, it will deploy to the Task Queue and execute as soon as possible.
  * <p/>
  * Note: For the multithreading and bandwidth limit reason,
@@ -84,16 +85,16 @@ public class FileDownloader {
      * <p/>
      * Note: this method should invoke in the main thread.
      *
-     * @param storeFilePath Once download successed, we'll find it by the store file path.
-     * @param url           The download url.
-     * @param listener      The event callback by status;
+     * @param storeFile Once download successed, we'll found it by the store file.
+     * @param url       The download url.
+     * @param listener  The event callback by status;
      * @return The task controller allows pause or resume or discard operation.
      */
-    public DownloadController add(String storeFilePath, String url, Listener<Void> listener) {
+    public DownloadController add(File storeFile, String url, Listener<Void> listener) {
         // only fulfill requests that were initiated from the main thread.(reason for the Delivery?)
         throwIfNotOnMainThread();
 
-        DownloadController controller = new DownloadController(storeFilePath, url, listener);
+        DownloadController controller = new DownloadController(storeFile, url, listener);
         synchronized (mTaskQueue) {
             mTaskQueue.add(controller);
         }
@@ -102,20 +103,34 @@ public class FileDownloader {
     }
 
     /**
+     * @see {@link #add(File, String, Listener)}
+     */
+    public DownloadController add(String storeFilePath, String url, Listener<Void> listener) {
+        return add(new File(storeFilePath), url, listener);
+    }
+
+    /**
      * Scanning the Task Queue, fetch a {@link DownloadController} who match the two parameters.
      *
-     * @param storeFilePath The storeFilePath to compare.
-     * @param url           The url to compare.
+     * @param storeFile The store file to looking for.
+     * @param url       The url which download for.
      * @return The matched {@link DownloadController}.
      */
-    public DownloadController get(String storeFilePath, String url) {
+    public DownloadController get(File storeFile, String url) {
         synchronized (mTaskQueue) {
             for (DownloadController controller : mTaskQueue) {
-                if (controller.mStoreFilePath.equals(storeFilePath) &&
+                if (controller.mStoreFile.equals(storeFile) &&
                         controller.mUrl.equals(url)) return controller;
             }
         }
         return null;
+    }
+
+    /**
+     * @see {@link #get(File, String)}
+     */
+    public DownloadController get(String storeFilePath, String url) {
+        return get(new File(storeFilePath), url);
     }
 
     /**
@@ -171,23 +186,23 @@ public class FileDownloader {
 
     /**
      * This method can override by developer to change download behaviour,
-     * such as add customize headers or handle the response himself. <br/>
+     * such as add customize headers even handle the response itself. <br/>
      * Note : before you override this, make sure you are understood the {@link FileDownloadRequest} very well.
      */
-    public FileDownloadRequest buildRequest(String storeFilePath, String url) {
-        return new FileDownloadRequest(storeFilePath, url);
+    public FileDownloadRequest buildRequest(File storeFile, String url) {
+        return new FileDownloadRequest(storeFile, url);
     }
 
     /**
      * This class included all such as PAUSE, RESUME, DISCARD to manipulating download task,
-     * it created by {@link FileDownloader#add(String, String, Listener)},
+     * it created by {@link #add(String, String, Listener)},
      * offer three params to constructing {@link FileDownloadRequest} then perform http downloading,
      * you can check the download status whenever you want to know.
      */
     public class DownloadController {
         // Persist the Request createing params for re-create it when pause operation gone.
         private Listener<Void> mListener;
-        private String mStoreFilePath;
+        private File mStoreFile;
         private String mUrl;
 
         // The download request.
@@ -201,20 +216,24 @@ public class FileDownloader {
         public static final int STATUS_DISCARD = 4;
 
         private DownloadController(String storeFilePath, String url, Listener<Void> listener) {
-            mStoreFilePath = storeFilePath;
+            this(new File(storeFilePath), url, listener);
+        }
+
+        private DownloadController(File storeFile, String url, Listener<Void> listener) {
+            mStoreFile = storeFile;
             mListener = listener;
             mUrl = url;
         }
 
         /**
-         * For the parallel reason, only the {@link FileDownloader#schedule()} can call this method.
+         * For the parallel reason, only the {@link #schedule()} can call this method.
          *
          * @return true if deploy is successed.
          */
         private boolean deploy() {
             if (mStatus != STATUS_WAITING) return false;
 
-            mRequest = buildRequest(mStoreFilePath, mUrl);
+            mRequest = buildRequest(mStoreFile, mUrl);
 
             // we create a Listener to wrapping that Listener which developer specified,
             // for the onFinish(), onSuccess(), onError() won't call when request was cancel reason.

@@ -49,9 +49,13 @@ public class FileDownloadRequest extends Request<Void> {
     private File mTemporaryFile;
 
     public FileDownloadRequest(String storeFilePath, String url) {
+        this(new File(storeFilePath), url);
+    }
+
+    public FileDownloadRequest(File storeFile, String url) {
         super(url, null);
-        mStoreFile = new File(storeFilePath);
-        mTemporaryFile = new File(storeFilePath + ".tmp");
+        mStoreFile = storeFile;
+        mTemporaryFile = new File(storeFile + ".tmp");
 
         // Turn the retries frequency greater.
         setRetryPolicy(new DefaultRetryPolicy(DefaultRetryPolicy.DEFAULT_TIMEOUT_MS, 200, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));

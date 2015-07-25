@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.os.Environment;
 import android.text.TextUtils;
 import android.text.format.Formatter;
 import android.view.View;
@@ -23,12 +24,13 @@ import java.util.LinkedList;
 
 public class FileDownloadActivity extends Activity implements View.OnClickListener, AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener {
     public final static DecimalFormat DECIMAL_POINT = new DecimalFormat("0.0");
-    private static final String mSaveDirPath = "/sdcard/0000netroid/";
 
     private LinkedList<DownloadTask> mTaskList;
     private LinkedList<DownloadTask> mDownloadList;
     private FileDownloader mDownloder;
+    private File mSaveDir;
 
+    private View lotBtnPanel;
     private Button btnAddTask;
     private BaseAdapter mAdapter;
 
@@ -39,8 +41,8 @@ public class FileDownloadActivity extends Activity implements View.OnClickListen
         RequestQueue queue = Netroid.newRequestQueue(getApplicationContext(), null);
         mDownloder = new FileDownloader(queue, 1) {
             @Override
-            public FileDownloadRequest buildRequest(String storeFilePath, String url) {
-                return new FileDownloadRequest(storeFilePath, url) {
+            public FileDownloadRequest buildRequest(File storeFile, String url) {
+                return new FileDownloadRequest(storeFile, url) {
                     @Override
                     public void prepare() {
                         addHeader("Accept-Encoding", "identity");
@@ -50,17 +52,12 @@ public class FileDownloadActivity extends Activity implements View.OnClickListen
             }
         };
 
-        File downloadDir = new File(mSaveDirPath);
-        if (!downloadDir.exists()) downloadDir.mkdir();
+        mSaveDir = new File(Environment.getExternalStorageDirectory(), "netroid-sample");
+        if (!mSaveDir.exists()) mSaveDir.mkdir();
 
         mTaskList = new LinkedList<DownloadTask>();
-        mTaskList.add(new DownloadTask("rfc2965.txt", "http://www.ietf.org/rfc/rfc2965.txt"));
-        mTaskList.add(new DownloadTask("KingReaderAppV5.1.apk", "http://www.kingreader.com/dl/Android/KingReaderAppV5.1.apk"));
-        mTaskList.add(new DownloadTask("FBReaderJ_ice-cream-sandwich.apk", "http://fbreader.org/files/android/FBReaderJ_ice-cream-sandwich.apk"));
         mTaskList.add(new DownloadTask("Duowan20140427.apk", "http://download.game.yy.com/duowanapp/m/Duowan20140427.apk"));
         mTaskList.add(new DownloadTask("Evernote_402491.dmg", "http://cdn1.evernote.com/mac/release/Evernote_402491.dmg"));
-        mTaskList.add(new DownloadTask("mysql-5.6.15-osx10.7-x86_64.dmg", "http://cdn.mysql.com/Downloads/MySQL-5.6/mysql-5.6.15-osx10.7-x86_64.dmg"));
-        mTaskList.add(new DownloadTask("apache-maven-3.1.1-bin.tar.gz", "http://apache.fayea.com/apache-mirror/maven/maven-3/3.1.1/binaries/apache-maven-3.1.1-bin.tar.gz"));
         mTaskList.add(new DownloadTask("netroid-sample.apk", "http://netroid.cn/attach/netroid-sample.apk"));
         mTaskList.add(new DownloadTask("netroid-sample-wrong.apk", "http://netroid.cn/attach/netroid-sample-wrong.apk"));
         mTaskList.add(new DownloadTask("netroid_request_handling_flowchart.png", "http://netroid.cn/netroid_request_handling_flowchart.png"));
@@ -69,6 +66,8 @@ public class FileDownloadActivity extends Activity implements View.OnClickListen
         mTaskList.add(new DownloadTask("Baidumusic_yinyuehexzfc.apk", "http://music.baidu.com/cms/mobile/static/apk/Baidumusic_yinyuehexzfc.apk"));
         mTaskList.add(new DownloadTask("MacWeChat-zh_CN.dmg", "http://dldir1.qq.com/foxmail/Mac/WeChat-zh_CN.dmg"));
         mTaskList.add(new DownloadTask("XamarinInstaller.dmg", "http://download.xamarin.com/Installer/Mac/XamarinInstaller.dmg"));
+
+        lotBtnPanel = findViewById(R.id.lotBtnPanel);
 
         btnAddTask = (Button) findViewById(R.id.btnAddTask);
         btnAddTask.setText("添加任务(" + mTaskList.size() + ")");
@@ -121,9 +120,14 @@ public class FileDownloadActivity extends Activity implements View.OnClickListen
 
     @Override
     public void onClick(View v) {
-        if (mTaskList.size() == 0) return;
+        if (mTaskList.size() == 1) {
+            lotBtnPanel.setVisibility(View.GONE);
+        }
+
         final DownloadTask task = mTaskList.poll();
-        task.controller = mDownloder.add(mSaveDirPath + task.storeFileName, task.url, new Listener<Void>() {
+        final File storeFile = new File(mSaveDir, task.storeFileName);
+
+        task.controller = mDownloder.add(storeFile, task.url, new Listener<Void>() {
             @Override
             public void onPreExecute() {
                 task.invalidate();
@@ -141,8 +145,8 @@ public class FileDownloadActivity extends Activity implements View.OnClickListen
 
             @Override
             public void onFinish() {
-                NetroidLog.e("onFinish size : " + Formatter.formatFileSize(
-                        FileDownloadActivity.this, new File(mSaveDirPath + task.storeFileName).length()));
+                NetroidLog.e("onFinish size : %s", Formatter.formatFileSize(
+                        FileDownloadActivity.this, storeFile.length()));
                 task.invalidate();
             }
 
@@ -196,7 +200,7 @@ public class FileDownloadActivity extends Activity implements View.OnClickListen
     }
 
     private void showToast(String msg) {
-        Toast.makeText(this, msg, 2000).show();
+        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
     }
 
     private class DownloadTask {
