@@ -65,7 +65,7 @@ public class ImageRequest extends Request<Bitmap> {
      *                     none
      * @param decodeConfig Format to decode the bitmap to
      */
-    public ImageRequest(String url, Listener<Bitmap> listener, int maxWidth, int maxHeight, Config decodeConfig) {
+    public ImageRequest(String url, IListener<Bitmap> listener, int maxWidth, int maxHeight, Config decodeConfig) {
         super(Method.GET, url, listener);
         setRetryPolicy(new DefaultRetryPolicy(IMAGE_TIMEOUT_MS, IMAGE_MAX_RETRIES, IMAGE_BACKOFF_MULT));
         mDecodeConfig = decodeConfig;

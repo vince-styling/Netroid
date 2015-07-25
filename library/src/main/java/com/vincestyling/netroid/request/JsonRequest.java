@@ -39,7 +39,7 @@ public abstract class JsonRequest<T> extends Request<T> {
 
     private final String mRequestBody;
 
-    public JsonRequest(int method, String url, String requestBody, Listener<T> listener) {
+    public JsonRequest(int method, String url, String requestBody, IListener<T> listener) {
         super(method, url, listener);
         mRequestBody = requestBody;
     }

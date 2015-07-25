@@ -16,6 +16,7 @@
 package com.vincestyling.netroid.toolbox;
 
 import android.os.Looper;
+import com.vincestyling.netroid.IListener;
 import com.vincestyling.netroid.Listener;
 import com.vincestyling.netroid.NetroidError;
 import com.vincestyling.netroid.RequestQueue;
@@ -34,7 +35,7 @@ import java.util.LinkedList;
  * <p/>
  * Usage: like {@link ImageLoader}, the best way to use this class is create by {@link RequestQueue}
  * and stand Singleton, just get the only one instance to do everything in anywhere.
- * To start a new download request, invoke the {@link #add(String, String, Listener)}
+ * To start a new download request, invoke the {@link #add(String, String, IListener)}
  * to pass in the task parameters, it will deploy to the Task Queue and execute as soon as possible.
  * <p/>
  * Note: For the multithreading and bandwidth limit reason,
@@ -90,7 +91,7 @@ public class FileDownloader {
      * @param listener  The event callback by status;
      * @return The task controller allows pause or resume or discard operation.
      */
-    public DownloadController add(File storeFile, String url, Listener<Void> listener) {
+    public DownloadController add(File storeFile, String url, IListener<Void> listener) {
         // only fulfill requests that were initiated from the main thread.(reason for the Delivery?)
         throwIfNotOnMainThread();
 
@@ -103,9 +104,9 @@ public class FileDownloader {
     }
 
     /**
-     * @see {@link #add(File, String, Listener)}
+     * @see {@link #add(File, String, IListener)}
      */
-    public DownloadController add(String storeFilePath, String url, Listener<Void> listener) {
+    public DownloadController add(String storeFilePath, String url, IListener<Void> listener) {
         return add(new File(storeFilePath), url, listener);
     }
 
@@ -195,13 +196,13 @@ public class FileDownloader {
 
     /**
      * This class included all such as PAUSE, RESUME, DISCARD to manipulating download task,
-     * it created by {@link #add(String, String, Listener)},
+     * it created by {@link #add(String, String, IListener)},
      * offer three params to constructing {@link FileDownloadRequest} then perform http downloading,
      * you can check the download status whenever you want to know.
      */
     public class DownloadController {
         // Persist the Request createing params for re-create it when pause operation gone.
-        private Listener<Void> mListener;
+        private IListener<Void> mListener;
         private File mStoreFile;
         private String mUrl;
 
@@ -215,11 +216,11 @@ public class FileDownloader {
         public static final int STATUS_SUCCESS = 3;
         public static final int STATUS_DISCARD = 4;
 
-        private DownloadController(String storeFilePath, String url, Listener<Void> listener) {
+        private DownloadController(String storeFilePath, String url, IListener<Void> listener) {
             this(new File(storeFilePath), url, listener);
         }
 
-        private DownloadController(File storeFile, String url, Listener<Void> listener) {
+        private DownloadController(File storeFile, String url, IListener<Void> listener) {
             mStoreFile = storeFile;
             mListener = listener;
             mUrl = url;

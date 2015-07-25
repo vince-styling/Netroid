@@ -77,7 +77,7 @@ public abstract class Request<T> implements Comparable<Request<T>> {
     /**
      * Listener interface for response and error.
      */
-    private Listener<T> mListener;
+    private IListener<T> mListener;
 
     /**
      * Sequence number of this request, used to enforce FIFO ordering.
@@ -135,7 +135,7 @@ public abstract class Request<T> implements Comparable<Request<T>> {
      * delivery of responses is provided by subclasses, who have a better idea of how to deliver
      * an already-parsed response.
      */
-    public Request(int method, String url, Listener<T> listener) {
+    public Request(int method, String url, IListener<T> listener) {
         mUrl = url;
         mMethod = method;
         mListener = listener;
@@ -146,7 +146,7 @@ public abstract class Request<T> implements Comparable<Request<T>> {
     /**
      * Creates a new request with GET method
      */
-    public Request(String url, Listener<T> listener) {
+    public Request(String url, IListener<T> listener) {
         this(Method.GET, url, listener);
     }
 
@@ -161,7 +161,7 @@ public abstract class Request<T> implements Comparable<Request<T>> {
     /**
      * Set the response listener.
      */
-    public void setListener(Listener<T> listener) {
+    public void setListener(IListener<T> listener) {
         mListener = listener;
     }
 

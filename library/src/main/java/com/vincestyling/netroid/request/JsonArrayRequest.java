@@ -15,7 +15,7 @@
  */
 package com.vincestyling.netroid.request;
 
-import com.vincestyling.netroid.Listener;
+import com.vincestyling.netroid.IListener;
 import com.vincestyling.netroid.NetworkResponse;
 import com.vincestyling.netroid.ParseError;
 import com.vincestyling.netroid.Response;
@@ -34,7 +34,7 @@ public class JsonArrayRequest extends JsonRequest<JSONArray> {
      * @param url      URL to fetch the JSON from
      * @param listener Listener to receive the JSON response or error message
      */
-    public JsonArrayRequest(String url, Listener<JSONArray> listener) {
+    public JsonArrayRequest(String url, IListener<JSONArray> listener) {
         super(Method.GET, url, null, listener);
     }
 

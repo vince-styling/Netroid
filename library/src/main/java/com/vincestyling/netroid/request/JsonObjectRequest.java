@@ -15,7 +15,7 @@
  */
 package com.vincestyling.netroid.request;
 
-import com.vincestyling.netroid.Listener;
+import com.vincestyling.netroid.IListener;
 import com.vincestyling.netroid.NetworkResponse;
 import com.vincestyling.netroid.ParseError;
 import com.vincestyling.netroid.Response;
@@ -38,7 +38,7 @@ public class JsonObjectRequest extends JsonRequest<JSONObject> {
      *                    indicates no parameters will be posted along with request.
      * @param listener    Listener to receive the JSON response or error message
      */
-    public JsonObjectRequest(int method, String url, JSONObject jsonRequest, Listener<JSONObject> listener) {
+    public JsonObjectRequest(int method, String url, JSONObject jsonRequest, IListener<JSONObject> listener) {
         super(method, url, (jsonRequest == null) ? null : jsonRequest.toString(), listener);
     }
 
@@ -46,9 +46,9 @@ public class JsonObjectRequest extends JsonRequest<JSONObject> {
      * Constructor which defaults to <code>GET</code> if <code>jsonRequest</code> is
      * <code>null</code>, <code>POST</code> otherwise.
      *
-     * @see #JsonObjectRequest(int, String, JSONObject, Listener)
+     * @see #JsonObjectRequest(int, String, JSONObject, IListener)
      */
-    public JsonObjectRequest(String url, JSONObject jsonRequest, Listener<JSONObject> listener) {
+    public JsonObjectRequest(String url, JSONObject jsonRequest, IListener<JSONObject> listener) {
         this(jsonRequest == null ? Method.GET : Method.POST, url, jsonRequest, listener);
     }
 

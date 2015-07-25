@@ -15,7 +15,7 @@
  */
 package com.vincestyling.netroid.request;
 
-import com.vincestyling.netroid.Listener;
+import com.vincestyling.netroid.IListener;
 import com.vincestyling.netroid.NetworkResponse;
 import com.vincestyling.netroid.Request;
 import com.vincestyling.netroid.Response;
@@ -33,7 +33,7 @@ public class StringRequest extends Request<String> {
      * @param url      URL to fetch the string at
      * @param listener Listener to receive the String response or error message
      */
-    public StringRequest(int method, String url, Listener<String> listener) {
+    public StringRequest(int method, String url, IListener<String> listener) {
         super(method, url, listener);
     }
 
@@ -43,7 +43,7 @@ public class StringRequest extends Request<String> {
      * @param url      URL to fetch the string at
      * @param listener Listener to receive the String response
      */
-    public StringRequest(String url, Listener<String> listener) {
+    public StringRequest(String url, IListener<String> listener) {
         this(Method.GET, url, listener);
     }
 
