@@ -17,6 +17,7 @@ import com.vincestyling.netroid.RequestQueue;
 import com.vincestyling.netroid.request.FileDownloadRequest;
 import com.vincestyling.netroid.sample.netroid.Netroid;
 import com.vincestyling.netroid.toolbox.FileDownloader;
+import com.vincestyling.netroid.toolbox.FileDownloader.DownloadController;
 
 import java.io.File;
 import java.text.DecimalFormat;
@@ -165,11 +166,12 @@ public class FileDownloadActivity extends Activity implements View.OnClickListen
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         DownloadTask task = mDownloadList.get(position);
         switch (task.controller.getStatus()) {
-            case FileDownloader.DownloadController.STATUS_DOWNLOADING:
+            case DownloadController.STATUS_DOWNLOADING:
+            case DownloadController.STATUS_WAITING:
                 task.controller.pause();
                 task.invalidate();
                 break;
-            case FileDownloader.DownloadController.STATUS_PAUSE:
+            case DownloadController.STATUS_PAUSE:
                 task.controller.resume();
                 task.invalidate();
                 break;
@@ -204,7 +206,7 @@ public class FileDownloadActivity extends Activity implements View.OnClickListen
     }
 
     private class DownloadTask {
-        FileDownloader.DownloadController controller;
+        DownloadController controller;
         String storeFileName;
         String url;
 
@@ -226,20 +228,20 @@ public class FileDownloadActivity extends Activity implements View.OnClickListen
             if (!TextUtils.equals((CharSequence) btnStatus.getTag(), storeFileName)) return;
 
             switch (controller.getStatus()) {
-                case FileDownloader.DownloadController.STATUS_DOWNLOADING:
+                case DownloadController.STATUS_DOWNLOADING:
                     if (fileSize > 0 && downloadedSize > 0) {
                         btnStatus.setText(DECIMAL_POINT.format(downloadedSize * 1.0f / fileSize * 100) + '%');
                     } else {
                         btnStatus.setText("0%");
                     }
                     break;
-                case FileDownloader.DownloadController.STATUS_WAITING:
+                case DownloadController.STATUS_WAITING:
                     btnStatus.setText("waiting");
                     break;
-                case FileDownloader.DownloadController.STATUS_PAUSE:
+                case DownloadController.STATUS_PAUSE:
                     btnStatus.setText("paused");
                     break;
-                case FileDownloader.DownloadController.STATUS_SUCCESS:
+                case DownloadController.STATUS_SUCCESS:
                     btnStatus.setText("done");
                     break;
             }

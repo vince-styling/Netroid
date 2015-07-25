@@ -137,7 +137,7 @@ public class FileDownloader {
      * Traverse the Task Queue, count the running task then deploy more if it can be.
      */
     private void schedule() {
-        // make sure only one thread can manipulate the Task Queue.
+        // make sure only one thread able manipulate the Task Queue.
         synchronized (mTaskQueue) {
             // counting ran task.
             int parallelTaskCount = 0;
@@ -294,21 +294,24 @@ public class FileDownloader {
         }
 
         /**
-         * Pause this task when it status was DOWNLOADING, in fact, we just marked the request should be cancel,
+         * Pause this task when it status was DOWNLOADING|WAITING. In fact, we just marked the request should be cancel,
          * http request cannot stop immediately, we assume it will finish soon, thus we set the status as PAUSE,
-         * let Task Queue deploy a new Request, that will cause parallel tasks growing beyond maximum task count,
-         * but it doesn't matter, we believe that situation never longer.
+         * let Task Queue deploy a new Request. That will cause parallel tasks growing beyond maximum task count,
+         * but it doesn't matter, we expected that situation never stay longer.
          *
          * @return true if did the pause operation.
          */
         public boolean pause() {
-            if (mStatus == STATUS_DOWNLOADING) {
-                mStatus = STATUS_PAUSE;
-                mRequest.cancel();
-                schedule();
-                return true;
+            switch (mStatus) {
+                case STATUS_DOWNLOADING:
+                    mRequest.cancel();
+                case STATUS_WAITING:
+                    mStatus = STATUS_PAUSE;
+                    schedule();
+                    return true;
+                default:
+                    return false;
             }
-            return false;
         }
 
         /**
