@@ -27,5 +27,9 @@ proguard.cfg
 #OSX
 .DS_Store
 
-# Minerl Site Dir
+# Site Dir
 site
+
+# Gradle
+.gradle
+build
