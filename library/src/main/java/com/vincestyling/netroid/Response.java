@@ -28,7 +28,7 @@ public class Response<T> {
      * Returns a successful response containing the parsed result.
      */
     public static <T> Response<T> success(T result, NetworkResponse response) {
-        return new Response<T>(result, new DiskCache.Entry(response.data, response.charset));
+        return new Response<T>(result, response);
     }
 
     /**
@@ -66,9 +66,9 @@ public class Response<T> {
         return error == null;
     }
 
-    private Response(T result, DiskCache.Entry cacheEntry) {
+    private Response(T result, NetworkResponse response) {
         this.result = result;
-        this.cacheEntry = cacheEntry;
+        cacheEntry = response != null ? new DiskCache.Entry(response.data, response.charset) : null;
         this.error = null;
     }
 
