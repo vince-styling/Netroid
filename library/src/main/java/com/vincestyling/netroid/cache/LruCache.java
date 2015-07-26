@@ -19,7 +19,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * This class copy from android support v4.
+ * This class copied from android support v4 API 22.
  * Static library version of {@link android.util.LruCache}. Used to write apps
  * that run on API levels prior to 12. When running on API level 12 or above,
  * this implementation is still used; it does not try to switch to the
@@ -52,6 +52,21 @@ public class LruCache<K, V> {
         }
         this.maxSize = maxSize;
         this.map = new LinkedHashMap<K, V>(0, 0.75f, true);
+    }
+
+    /**
+     * Sets the size of the cache.
+     * @param maxSize The new maximum size.
+     */
+    public void resize(int maxSize) {
+        if (maxSize <= 0) {
+            throw new IllegalArgumentException("maxSize <= 0");
+        }
+
+        synchronized (this) {
+            this.maxSize = maxSize;
+        }
+        trimToSize(maxSize);
     }
 
     /**
@@ -151,11 +166,24 @@ public class LruCache<K, V> {
                             + ".sizeOf() is reporting inconsistent results!");
                 }
 
-                if (size <= maxSize || map.isEmpty()) {
+                if (size <= maxSize) {
                     break;
                 }
 
-                Map.Entry<K, V> toEvict = map.entrySet().iterator().next();
+                // BEGIN LAYOUTLIB CHANGE
+                // get the last item in the linked list.
+                // This is not efficient, the goal here is to minimize the changes
+                // compared to the platform version.
+                Map.Entry<K, V> toEvict = null;
+                for (Map.Entry<K, V> entry : map.entrySet()) {
+                    toEvict = entry;
+                }
+                // END LAYOUTLIB CHANGE
+
+                if (toEvict == null) {
+                    break;
+                }
+
                 key = toEvict.getKey();
                 value = toEvict.getValue();
                 map.remove(key);
@@ -198,7 +226,7 @@ public class LruCache<K, V> {
      * {@link #remove}, or replaced by a call to {@link #put}. The default
      * implementation does nothing.
      * <p/>
-     * <p>The method is called without synchronization: other threads may
+     * The method is called without synchronization: other threads may
      * access the cache while this method is executing.
      *
      * @param evicted  true if the entry is being removed to make space, false
@@ -215,10 +243,10 @@ public class LruCache<K, V> {
      * Returns the computed value or null if no value can be computed. The
      * default implementation returns null.
      * <p/>
-     * <p>The method is called without synchronization: other threads may
+     * The method is called without synchronization: other threads may
      * access the cache while this method is executing.
      * <p/>
-     * <p>If a value for {@code key} exists in the cache when this method
+     * If a value for {@code key} exists in the cache when this method
      * returns, the created value will be released with {@link #entryRemoved}
      * and discarded. This can occur when multiple threads request the same key
      * at the same time (causing multiple values to be created), or when one
@@ -242,7 +270,7 @@ public class LruCache<K, V> {
      * user-defined units.  The default implementation returns 1 so that size
      * is the number of entries and max size is the maximum number of entries.
      * <p/>
-     * <p>An entry's size must not change while it is in the cache.
+     * An entry's size must not change while it is in the cache.
      */
     protected int sizeOf(K key, V value) {
         return 1;
@@ -274,7 +302,8 @@ public class LruCache<K, V> {
     }
 
     /**
-     * Returns the number of times {@link #get} returned a value.
+     * Returns the number of times {@link #get} returned a value that was
+     * already present in the cache.
      */
     public synchronized final int hitCount() {
         return hitCount;
