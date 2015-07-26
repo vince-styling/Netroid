@@ -18,7 +18,6 @@ package com.vincestyling.netroid;
 /**
  * Indicates that the server's response could not be parsed.
  */
-@SuppressWarnings("serial")
 public class ParseError extends NetroidError {
     public ParseError() {
     }

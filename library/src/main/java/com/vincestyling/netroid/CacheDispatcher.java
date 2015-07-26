@@ -29,7 +29,6 @@ import java.util.concurrent.BlockingQueue;
  * refresh are enqueued on the specified network queue for processing
  * by a {@link NetworkDispatcher}.
  */
-@SuppressWarnings("rawtypes")
 public class CacheDispatcher extends Thread {
 
     private static final boolean DEBUG = NetroidLog.DEBUG;

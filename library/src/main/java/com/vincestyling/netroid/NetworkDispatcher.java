@@ -28,7 +28,6 @@ import java.util.concurrent.BlockingQueue;
  * eligible, using a specified {@link com.vincestyling.netroid.cache.DiskCache} interface.
  * Valid responses and errors are posted back to the caller via a {@link Delivery}.
  */
-@SuppressWarnings("rawtypes")
 public class NetworkDispatcher extends Thread {
     /**
      * The queue of requests to service.

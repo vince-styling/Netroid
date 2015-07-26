@@ -82,9 +82,9 @@ public abstract class ImageLoader {
      * must not block. Implementation with an LruCache is recommended.
      */
     public interface ImageCache {
-        public Bitmap getBitmap(String url);
+        Bitmap getBitmap(String url);
 
-        public void putBitmap(String url, Bitmap bitmap);
+        void putBitmap(String url, Bitmap bitmap);
     }
 
     /**
@@ -152,13 +152,13 @@ public abstract class ImageLoader {
          *                    image loading in order to, for example, run an animation to fade in network loaded
          *                    images.
          */
-        public void onSuccess(ImageContainer response, boolean isImmediate);
+        void onSuccess(ImageContainer response, boolean isImmediate);
 
         /**
          * Callback method that an error has been occurred with the
          * provided error code and optional user-readable message.
          */
-        public void onError(NetroidError error);
+        void onError(NetroidError error);
     }
 
     /**

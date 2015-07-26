@@ -33,9 +33,9 @@ import java.net.SocketTimeoutException;
 public class BasicNetwork implements Network {
     protected static final boolean DEBUG = NetroidLog.DEBUG;
 
-    private static int SLOW_REQUEST_THRESHOLD_MS = 3000;
+    private static final int SLOW_REQUEST_THRESHOLD_MS = 3000;
 
-    private static int DEFAULT_POOL_SIZE = 4096;
+    private static final int DEFAULT_POOL_SIZE = 4096;
 
     private final HttpStack mHttpStack;
 

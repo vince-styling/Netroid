@@ -60,6 +60,6 @@
         android:textSize="16sp"
         android:focusable="false"
         android:clickable="false"
-        android:textColor="@android:color/holo_red_light"/>
+        android:textColor="#ffff4444"/>
 
 </LinearLayout>

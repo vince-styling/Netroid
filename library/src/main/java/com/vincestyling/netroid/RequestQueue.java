@@ -30,7 +30,6 @@ import java.util.concurrent.atomic.AtomicInteger;
  * resolving from either cache or network on a worker thread, and then delivering
  * a parsed response on the main thread.
  */
-@SuppressWarnings("rawtypes")
 public class RequestQueue {
     /**
      * Number of network request dispatcher threads to start.
@@ -184,7 +183,7 @@ public class RequestQueue {
      * {@link RequestQueue#cancelAll(RequestFilter)}.
      */
     public interface RequestFilter {
-        public boolean apply(Request<?> request);
+        boolean apply(Request<?> request);
     }
 
     /**

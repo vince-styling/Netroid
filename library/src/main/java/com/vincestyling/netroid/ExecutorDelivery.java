@@ -153,7 +153,6 @@ public class ExecutorDelivery implements Delivery {
      * A Runnable used for delivering network responses to a listener on the
      * main thread.
      */
-    @SuppressWarnings("rawtypes")
     private class ResponseDeliveryRunnable implements Runnable {
         private final Request mRequest;
         private final Response mResponse;

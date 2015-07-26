@@ -3,6 +3,7 @@ package com.vincestyling.netroid.sample;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Environment;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -93,7 +94,7 @@ public class ImageRequestActivity extends Activity implements View.OnClickListen
     }
 
     private void loadSdcardImage() {
-        mNetworkImageView.setImageUrl(SelfImageLoader.RES_SDCARD + "/sdcard/sample.jpg", mImageLoader);
+        mNetworkImageView.setImageUrl(SelfImageLoader.RES_SDCARD + Environment.getExternalStorageDirectory() + "/sample.jpg", mImageLoader);
     }
 
     private void loadGridView() {

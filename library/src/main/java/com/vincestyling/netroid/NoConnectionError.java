@@ -18,7 +18,6 @@ package com.vincestyling.netroid;
 /**
  * Error indicating that no connection could be established when performing a Netroid request.
  */
-@SuppressWarnings("serial")
 public class NoConnectionError extends NetworkError {
     public NoConnectionError() {
         super();

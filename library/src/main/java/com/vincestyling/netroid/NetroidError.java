@@ -18,7 +18,6 @@ package com.vincestyling.netroid;
 /**
  * Exception style class encapsulating Netroid errors
  */
-@SuppressWarnings("serial")
 public class NetroidError extends Exception {
     public final NetworkResponse networkResponse;
 

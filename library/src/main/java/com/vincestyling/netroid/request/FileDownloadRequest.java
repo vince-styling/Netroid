@@ -178,7 +178,7 @@ public class FileDownloadRequest extends Request<Void> {
         } finally {
             try {
                 // Close the InputStream and release the resources by "consuming the content".
-                if (entity != null) entity.consumeContent();
+                entity.consumeContent();
             } catch (Exception e) {
                 // This can happen if there was an exception above that left the entity in
                 // an invalid state.

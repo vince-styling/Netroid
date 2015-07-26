@@ -23,7 +23,7 @@ public interface Network {
     /**
      * Set the request delivery that use to post http networking callbacks.
      */
-    public void setDelivery(Delivery delivery);
+    void setDelivery(Delivery delivery);
 
     /**
      * Performs the specified request.
@@ -32,5 +32,5 @@ public interface Network {
      * @return A {@link NetworkResponse} with data and caching metadata; will never be null
      * @throws NetroidError on errors
      */
-    public NetworkResponse performRequest(Request<?> request) throws NetroidError;
+    NetworkResponse performRequest(Request<?> request) throws NetroidError;
 }

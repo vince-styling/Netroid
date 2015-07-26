@@ -18,7 +18,6 @@ package com.vincestyling.netroid;
 /**
  * Indicates that there was a network error when performing a Netroid request.
  */
-@SuppressWarnings("serial")
 public class NetworkError extends NetroidError {
     public NetworkError() {
         super();

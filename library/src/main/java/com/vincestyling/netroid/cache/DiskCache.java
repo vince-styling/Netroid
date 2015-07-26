@@ -158,9 +158,7 @@ public class DiskCache {
                     putEntry(entry.key, entry);
                 }
             } catch (IOException e) {
-                if (file != null) {
-                    file.delete();
-                }
+                file.delete();
             } finally {
                 try {
                     if (fis != null) {

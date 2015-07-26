@@ -1,9 +1,9 @@
 package com.vincestyling.netroid.sample.mock;
 
 public class Book {
-    private String imageUrl;
-    private String name;
-    private String author;
+    private final String imageUrl;
+    private final String name;
+    private final String author;
 
     public Book(String imageUrl, String name, String author) {
         this.imageUrl = imageUrl;

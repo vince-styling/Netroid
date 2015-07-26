@@ -34,6 +34,6 @@ public interface HttpStack {
      * @param request the request to perform
      * @return the HTTP response
      */
-    public HttpResponse performRequest(Request<?> request)
+    HttpResponse performRequest(Request<?> request)
             throws IOException, AuthFailureError;
 }

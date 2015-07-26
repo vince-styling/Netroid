@@ -56,7 +56,6 @@ public class HttpClientStack implements HttpStack {
         }
     }
 
-    @SuppressWarnings("unused")
     private static List<NameValuePair> getPostParameterPairs(Map<String, String> postParams) {
         List<NameValuePair> result = new ArrayList<NameValuePair>(postParams.size());
         for (String key : postParams.keySet()) {
