@@ -295,10 +295,10 @@ public abstract class Request<T> implements Comparable<Request<T>> {
 
     /**
      * Set how long the cache is expired, {@link com.vincestyling.netroid.cache.DiskCache}
-     * will determine the cache entry is expired or not.
-     * For example :
-     * Request.setCacheExpireTime(TimeUnit.MINUTES, 1); // cache stays one minute
-     * Request.setCacheExpireTime(TimeUnit.DAYS, 2); // cache stays two days
+     * will determine whether the cache entry is expired or not.<p/>
+     * For example :<p/>
+     *     Request.setCacheExpireTime(TimeUnit.MINUTES, 1); // cache stays one minute<p/>
+     *     Request.setCacheExpireTime(TimeUnit.DAYS, 2); // cache stays two days<p/>
      *
      * @param timeUnit what unit for the amount value
      * @param amount   how much unit should calculate
@@ -405,11 +405,13 @@ public abstract class Request<T> implements Comparable<Request<T>> {
         StringBuilder encodedParams = new StringBuilder();
         try {
             for (Map.Entry<String, String> entry : params.entrySet()) {
+                if (encodedParams.length() > 0) encodedParams.append('&');
+
                 encodedParams.append(URLEncoder.encode(entry.getKey(), paramsEncoding));
                 encodedParams.append('=');
                 encodedParams.append(URLEncoder.encode(entry.getValue(), paramsEncoding));
-                encodedParams.append('&');
             }
+
             return encodedParams.toString().getBytes(paramsEncoding);
         } catch (UnsupportedEncodingException uee) {
             throw new RuntimeException("Encoding not supported: " + paramsEncoding, uee);
