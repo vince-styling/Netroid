@@ -15,28 +15,40 @@
  */
 package com.vincestyling.netroid;
 
-public abstract class Listener<T> implements IListener<T> {
+public class Listener<T> implements IListener<T> {
+    @Override
     public void onPreExecute() {
     }
 
+    @Override
     public void onFinish() {
     }
 
+    @Override
+    public void onSuccess(T response) {
+    }
+
+    @Override
     public void onError(NetroidError error) {
     }
 
+    @Override
     public void onCancel() {
     }
 
+    @Override
     public void onNetworking() {
     }
 
+    @Override
     public void onUsedCache() {
     }
 
+    @Override
     public void onRetry() {
     }
 
+    @Override
     public void onProgressChange(long fileSize, long downloadedSize) {
     }
 }
