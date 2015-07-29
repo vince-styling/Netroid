@@ -20,7 +20,18 @@ import android.os.Handler;
 import java.util.concurrent.Executor;
 
 /**
- * Delivers responses and errors.
+ * Delivers responses and errors. This class supposed to perform the delivers on the main thread.
+ * Whereas you can still take off with it via {@link #ExecutorDelivery(Executor)}
+ * by pass a simple Executor like following :
+ * <pre> {@code
+ * new ExecutorDelivery(new Executor() {
+ *     public void execute(Runnable command) {
+ *       // invoke run() directly.
+ *       command.run();
+ *     }
+ * });}</pre>
+ * Take advantage of it, we're able to perform a Http Request on
+ * blocking purpose while we on background thread explicitly.
  */
 public class ExecutorDelivery implements Delivery {
     /**
@@ -107,7 +118,7 @@ public class ExecutorDelivery implements Delivery {
 
     @Override
     public void postUsedCache(final Request<?> request) {
-        request.addMarker("post-preexecute");
+        request.addMarker("post-usedcache");
         mResponsePoster.execute(new Runnable() {
             @Override
             public void run() {
@@ -129,7 +140,7 @@ public class ExecutorDelivery implements Delivery {
 
     @Override
     public void postRetry(final Request<?> request) {
-        request.addMarker("post-preexecute");
+        request.addMarker("post-retry");
         mResponsePoster.execute(new Runnable() {
             @Override
             public void run() {

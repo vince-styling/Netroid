@@ -95,43 +95,7 @@ public class NetworkDispatcher extends Thread {
                 continue;
             }
 
-            try {
-                request.addMarker("network-queue-take");
-                mDelivery.postPreExecute(request);
-
-                // If the request was cancelled already,
-                // do not perform the network request.
-                if (request.isCanceled()) {
-                    request.finish("network-discard-cancelled");
-                    mDelivery.postCancel(request);
-                    mDelivery.postFinish(request);
-                    continue;
-                }
-
-                // Perform the network request.
-                NetworkResponse networkResponse = mNetwork.performRequest(request);
-                request.addMarker("network-http-complete");
-
-                // Parse the response here on the worker thread.
-                Response<?> response = request.parseNetworkResponse(networkResponse);
-                request.addMarker("network-parse-complete");
-
-                // Write to cache if applicable.
-                if (mCache != null && request.shouldCache() && response.cacheEntry != null) {
-                    response.cacheEntry.expireTime = request.getCacheExpireTime();
-                    mCache.putEntry(request.getCacheKey(), response.cacheEntry);
-                    request.addMarker("network-cache-written");
-                }
-
-                // Post the response back.
-                request.markDelivered();
-                mDelivery.postResponse(request, response);
-            } catch (NetroidError netroidError) {
-                mDelivery.postError(request, request.parseNetworkError(netroidError));
-            } catch (Exception e) {
-                NetroidLog.e(e, "Unhandled exception %s", e.toString());
-                mDelivery.postError(request, new NetroidError(e));
-            }
+            RequestPerformer.perform(request, mNetwork, mCache, mDelivery);
         }
     }
 
