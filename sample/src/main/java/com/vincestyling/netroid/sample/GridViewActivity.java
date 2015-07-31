@@ -7,7 +7,7 @@ import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.TextView;
 import com.vincestyling.netroid.cache.BitmapImageCache;
-import com.vincestyling.netroid.image.NetworkImageView;
+import com.vincestyling.netroid.widget.NetworkImageView;
 import com.vincestyling.netroid.sample.mock.Book;
 import com.vincestyling.netroid.sample.mock.BookDataMock;
 import com.vincestyling.netroid.sample.netroid.Netroid;

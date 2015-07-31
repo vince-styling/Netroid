@@ -8,7 +8,7 @@
     android:padding="10dp"
     android:baselineAligned="true">
 
-    <com.vincestyling.netroid.image.NetworkImageView
+    <com.vincestyling.netroid.widget.NetworkImageView
         android:id="@+id/imvCover"
         android:layout_width="76dp"
         android:layout_height="89dp"

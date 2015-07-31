@@ -4,7 +4,7 @@ import android.os.Build;
 import android.widget.ImageView;
 import com.vincestyling.netroid.*;
 import com.vincestyling.netroid.cache.DiskCache;
-import com.vincestyling.netroid.image.NetworkImageView;
+import com.vincestyling.netroid.widget.NetworkImageView;
 import com.vincestyling.netroid.stack.HttpClientStack;
 import com.vincestyling.netroid.stack.HttpStack;
 import com.vincestyling.netroid.stack.HurlStack;

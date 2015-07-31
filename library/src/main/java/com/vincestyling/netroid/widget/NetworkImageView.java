@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.vincestyling.netroid.image;
+package com.vincestyling.netroid.widget;
 
 import android.content.Context;
 import android.text.TextUtils;
