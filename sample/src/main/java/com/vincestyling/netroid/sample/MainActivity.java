@@ -6,6 +6,13 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
+/**
+ * The main entry of all the samples.
+ * <p/>
+ * Note : every sub-activities acted a standalone test case, never involve of others.
+ * The <code>Netroid</code> initialization of them in particularly, best
+ * been invokes where app startup(i.e. {@link android.app.Application}).
+ */
 public class MainActivity extends Activity implements View.OnClickListener {
     private Button mButtonCommon;
     private Button mButtonImage;
@@ -13,6 +20,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
     private Button btnBatchImageDisk;
     private Button btnBatchImageMultCache;
     private Button btnFileDownload;
+    private Button btnBlockingRequest;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +44,9 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
         btnFileDownload = (Button) findViewById(R.id.btnFileDownload);
         btnFileDownload.setOnClickListener(this);
+
+        btnBlockingRequest = (Button) findViewById(R.id.btnBlockingRequest);
+        btnBlockingRequest.setOnClickListener(this);
     }
 
     @Override
@@ -43,20 +54,29 @@ public class MainActivity extends Activity implements View.OnClickListener {
         if (view.equals(mButtonCommon)) {
             Intent intent = new Intent(this, CommonHttpRequestActivity.class);
             startActivity(intent);
-        } else if (view.equals(mButtonImage)) {
+        }
+        else if (view.equals(mButtonImage)) {
             Intent intent = new Intent(this, ImageRequestActivity.class);
             startActivity(intent);
-        } else if (view.equals(btnBatchImageDisk)) {
+        }
+        else if (view.equals(btnBatchImageDisk)) {
             Intent intent = new Intent(this, BatchImageRequestDiskActivity.class);
             startActivity(intent);
-        } else if (view.equals(btnBatchImageMem)) {
+        }
+        else if (view.equals(btnBatchImageMem)) {
             Intent intent = new Intent(this, BatchImageRequestMemActivity.class);
             startActivity(intent);
-        } else if (view.equals(btnBatchImageMultCache)) {
+        }
+        else if (view.equals(btnBatchImageMultCache)) {
             Intent intent = new Intent(this, BatchImageRequestMultCacheActivity.class);
             startActivity(intent);
-        } else if (view.equals(btnFileDownload)) {
+        }
+        else if (view.equals(btnFileDownload)) {
             Intent intent = new Intent(this, FileDownloadActivity.class);
+            startActivity(intent);
+        }
+        else if (view.equals(btnBlockingRequest)) {
+            Intent intent = new Intent(this, OffWithMainThreadPerformingActivity.class);
             startActivity(intent);
         }
     }

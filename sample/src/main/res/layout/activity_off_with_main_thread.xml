@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="10dp">
+
+    <TextView
+        style="@style/txv_desc"
+        android:text="Sometimes, we may invoke our logical in an AsyncTask or just a Thread, when the time we want to perform a Http Request in that, it is messy to leave current thread to performing. Thus we brought you this sample to demonstrating how to perform a blocking request in background threads."/>
+
+    <Button
+        android:id="@+id/btnPerform"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Perform"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"/>
+
+    <TextView
+        android:id="@+id/txvResult"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"/>
+
+</LinearLayout>

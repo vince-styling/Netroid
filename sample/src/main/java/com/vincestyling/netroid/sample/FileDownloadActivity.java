@@ -1,6 +1,5 @@
 package com.vincestyling.netroid.sample;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -12,8 +11,6 @@ import android.view.ViewGroup;
 import android.widget.*;
 import com.vincestyling.netroid.Listener;
 import com.vincestyling.netroid.NetroidError;
-import com.vincestyling.netroid.NetroidLog;
-import com.vincestyling.netroid.RequestQueue;
 import com.vincestyling.netroid.request.FileDownloadRequest;
 import com.vincestyling.netroid.sample.netroid.Netroid;
 import com.vincestyling.netroid.toolbox.FileDownloader;
@@ -23,12 +20,11 @@ import java.io.File;
 import java.text.DecimalFormat;
 import java.util.LinkedList;
 
-public class FileDownloadActivity extends Activity implements View.OnClickListener, AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener {
+public class FileDownloadActivity extends BaseActivity implements View.OnClickListener, AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener {
     public final static DecimalFormat DECIMAL_POINT = new DecimalFormat("0.0");
 
     private LinkedList<DownloadTask> mTaskList;
     private LinkedList<DownloadTask> mDownloadList;
-    private FileDownloader mDownloder;
     private File mSaveDir;
 
     private View lotBtnPanel;
@@ -38,20 +34,6 @@ public class FileDownloadActivity extends Activity implements View.OnClickListen
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.file_downloader);
-
-        RequestQueue queue = Netroid.newRequestQueue(getApplicationContext(), null);
-        mDownloder = new FileDownloader(queue, 1) {
-            @Override
-            public FileDownloadRequest buildRequest(File storeFile, String url) {
-                return new FileDownloadRequest(storeFile, url) {
-                    @Override
-                    public void prepare() {
-                        addHeader("Accept-Encoding", "identity");
-                        super.prepare();
-                    }
-                };
-            }
-        };
 
         mSaveDir = new File(Environment.getExternalStorageDirectory(), "netroid-sample");
         if (!mSaveDir.exists()) mSaveDir.mkdir();
@@ -71,8 +53,8 @@ public class FileDownloadActivity extends Activity implements View.OnClickListen
         lotBtnPanel = findViewById(R.id.lotBtnPanel);
 
         btnAddTask = (Button) findViewById(R.id.btnAddTask);
-        btnAddTask.setText("添加任务(" + mTaskList.size() + ")");
         btnAddTask.setOnClickListener(this);
+        invalidateBtn();
 
         mDownloadList = new LinkedList<DownloadTask>();
 
@@ -119,6 +101,25 @@ public class FileDownloadActivity extends Activity implements View.OnClickListen
         lsvTaskCollector.setOnItemLongClickListener(this);
     }
 
+    // initialize netroid, this code should be invoke at Application in product stage.
+    @Override
+    protected void initNetroid() {
+        Netroid.init(null);
+
+        Netroid.setFileDownloder(new FileDownloader(Netroid.getRequestQueue(), 1) {
+            @Override
+            public FileDownloadRequest buildRequest(File storeFile, String url) {
+                return new FileDownloadRequest(storeFile, url) {
+                    @Override
+                    public void prepare() {
+                        addHeader("Accept-Encoding", "identity");
+                        super.prepare();
+                    }
+                };
+            }
+        });
+    }
+
     @Override
     public void onClick(View v) {
         if (mTaskList.size() == 1) {
@@ -128,7 +129,7 @@ public class FileDownloadActivity extends Activity implements View.OnClickListen
         final DownloadTask task = mTaskList.poll();
         final File storeFile = new File(mSaveDir, task.storeFileName);
 
-        task.controller = mDownloder.add(storeFile, task.url, new Listener<Void>() {
+        task.controller = Netroid.getFileDownloader().add(storeFile, task.url, new Listener<Void>() {
             @Override
             public void onPreExecute() {
                 task.invalidate();
@@ -141,12 +142,12 @@ public class FileDownloadActivity extends Activity implements View.OnClickListen
 
             @Override
             public void onError(NetroidError error) {
-                NetroidLog.e(error.getMessage());
+                AppLog.e("onError : %s", error.getMessage());
             }
 
             @Override
             public void onFinish() {
-                NetroidLog.e("onFinish size : %s", Formatter.formatFileSize(
+                AppLog.e("onFinish size : %s", Formatter.formatFileSize(
                         FileDownloadActivity.this, storeFile.length()));
                 task.invalidate();
             }
@@ -154,12 +155,12 @@ public class FileDownloadActivity extends Activity implements View.OnClickListen
             @Override
             public void onProgressChange(long fileSize, long downloadedSize) {
                 task.onProgressChange(fileSize, downloadedSize);
-//				NetroidLog.e("---- fileSize : " + fileSize + " downloadedSize : " + downloadedSize);
+//				AppLog.e("---- fileSize : " + fileSize + " downloadedSize : " + downloadedSize);
             }
         });
         mDownloadList.add(task);
         mAdapter.notifyDataSetChanged();
-        btnAddTask.setText("添加任务(" + mTaskList.size() + ")");
+        invalidateBtn();
     }
 
     @Override
@@ -182,8 +183,8 @@ public class FileDownloadActivity extends Activity implements View.OnClickListen
     public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
         final DownloadTask task = mDownloadList.get(position);
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("是否删除”" + task.storeFileName + "“的下载任务？");
-        builder.setPositiveButton("删除", new DialogInterface.OnClickListener() {
+        builder.setMessage("do you want to remove \"" + task.storeFileName + "\" task？");
+        builder.setPositiveButton("Remove", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 task.controller.discard();
@@ -191,7 +192,7 @@ public class FileDownloadActivity extends Activity implements View.OnClickListen
                 mAdapter.notifyDataSetChanged();
             }
         });
-        builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.cancel();
@@ -203,6 +204,10 @@ public class FileDownloadActivity extends Activity implements View.OnClickListen
 
     private void showToast(String msg) {
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+    }
+
+    private void invalidateBtn() {
+        btnAddTask.setText("Add Task(" + mTaskList.size() + ")");
     }
 
     private class DownloadTask {
@@ -254,11 +259,5 @@ public class FileDownloadActivity extends Activity implements View.OnClickListen
             this.storeFileName = storeFileName;
             this.url = url;
         }
-    }
-
-    @Override
-    public void finish() {
-        mDownloder.clearAll();
-        super.finish();
     }
 }

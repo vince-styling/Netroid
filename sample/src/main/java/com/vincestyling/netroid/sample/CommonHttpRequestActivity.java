@@ -1,13 +1,15 @@
 package com.vincestyling.netroid.sample;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
-import com.vincestyling.netroid.*;
+import com.vincestyling.netroid.DefaultRetryPolicy;
+import com.vincestyling.netroid.Listener;
+import com.vincestyling.netroid.NetroidError;
+import com.vincestyling.netroid.Request;
 import com.vincestyling.netroid.cache.DiskCache;
 import com.vincestyling.netroid.request.JsonArrayRequest;
 import com.vincestyling.netroid.request.JsonObjectRequest;
@@ -19,9 +21,7 @@ import org.json.JSONObject;
 import java.io.File;
 import java.util.concurrent.TimeUnit;
 
-public class CommonHttpRequestActivity extends Activity implements View.OnClickListener {
-    private RequestQueue mQueue;
-
+public class CommonHttpRequestActivity extends BaseActivity implements View.OnClickListener {
     private Button btnJsonObject;
     private Button btnJsonArray;
     private Button btnStringRequs;
@@ -44,16 +44,14 @@ public class CommonHttpRequestActivity extends Activity implements View.OnClickL
         btnStringRequs.setOnClickListener(this);
         btnForceUpdate.setOnClickListener(this);
         btnEventListener.setOnClickListener(this);
-
-        File diskCacheDir = new File(getCacheDir(), "netroid");
-        int diskCacheSize = 50 * 1024 * 1024; // 50MB
-        mQueue = Netroid.newRequestQueue(getApplicationContext(), new DiskCache(diskCacheDir, diskCacheSize));
     }
 
+    // initialize netroid, this code should be invoke at Application in product stage.
     @Override
-    public void finish() {
-        mQueue.stop();
-        super.finish();
+    protected void initNetroid() {
+        File diskCacheDir = new File(getCacheDir(), "netroid");
+        int diskCacheSize = 50 * 1024 * 1024; // 50MB
+        Netroid.init(new DiskCache(diskCacheDir, diskCacheSize));
     }
 
     @Override
@@ -82,7 +80,7 @@ public class CommonHttpRequestActivity extends Activity implements View.OnClickL
                 });
         request.setCacheExpireTime(TimeUnit.MINUTES, 1);
         request.addHeader("HeaderTest", "11");
-        mQueue.add(request);
+        Netroid.add(request);
     }
 
     private void processJsonArray() {
@@ -96,7 +94,7 @@ public class CommonHttpRequestActivity extends Activity implements View.OnClickL
                 });
         jsonArrayRequest.addHeader("HeaderTest", "11");
         jsonArrayRequest.setCacheExpireTime(TimeUnit.SECONDS, 10);
-        mQueue.add(jsonArrayRequest);
+        Netroid.add(jsonArrayRequest);
     }
 
     private void processStringRequs() {
@@ -113,7 +111,7 @@ public class CommonHttpRequestActivity extends Activity implements View.OnClickL
                     }
                 });
         request.addHeader("HeaderTest", "11");
-        mQueue.add(request);
+        Netroid.add(request);
     }
 
     private void processForceUpdate() {
@@ -126,7 +124,7 @@ public class CommonHttpRequestActivity extends Activity implements View.OnClickL
                     }
                 });
         stringRequest.setForceUpdate(true);
-        mQueue.add(stringRequest);
+        Netroid.add(stringRequest);
     }
 
     private void processEventListener() {
@@ -139,19 +137,19 @@ public class CommonHttpRequestActivity extends Activity implements View.OnClickL
             @Override
             public void onPreExecute() {
                 startTimeMs = SystemClock.elapsedRealtime();
-                NetroidLog.e(REQUESTS_TAG);
+                AppLog.e(REQUESTS_TAG);
                 Toast.makeText(CommonHttpRequestActivity.this, "onPreExecute()", Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onFinish() {
-                NetroidLog.e(REQUESTS_TAG);
+                AppLog.e(REQUESTS_TAG);
                 Toast.makeText(CommonHttpRequestActivity.this, "onFinish()", Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onSuccess(JSONObject response) {
-                NetroidLog.e(REQUESTS_TAG);
+                AppLog.e(REQUESTS_TAG);
                 Toast.makeText(CommonHttpRequestActivity.this, "onSuccess()", Toast.LENGTH_SHORT).show();
             }
 
@@ -160,23 +158,23 @@ public class CommonHttpRequestActivity extends Activity implements View.OnClickL
                 Toast.makeText(CommonHttpRequestActivity.this, "onRetry()", Toast.LENGTH_SHORT).show();
                 long executedTime = SystemClock.elapsedRealtime() - startTimeMs;
                 if (++retryCount > 5 || executedTime > 30000) {
-                    NetroidLog.e("retryCount : " + retryCount + " executedTime : " + executedTime);
-                    mQueue.cancelAll(REQUESTS_TAG);
+                    AppLog.e("retryCount : " + retryCount + " executedTime : " + executedTime);
+                    Netroid.getRequestQueue().cancelAll(REQUESTS_TAG);
                 } else {
-                    NetroidLog.e(REQUESTS_TAG);
+                    AppLog.e(REQUESTS_TAG);
                 }
             }
 
             @Override
             public void onCancel() {
                 Toast.makeText(CommonHttpRequestActivity.this, "onCancel()", Toast.LENGTH_SHORT).show();
-                NetroidLog.e(REQUESTS_TAG);
+                AppLog.e(REQUESTS_TAG);
             }
         });
 
         request.setRetryPolicy(new DefaultRetryPolicy(DefaultRetryPolicy.DEFAULT_TIMEOUT_MS, 20, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         request.setTag(REQUESTS_TAG);
-        mQueue.add(request);
+        Netroid.add(request);
     }
 
     private void showResult(String result) {

@@ -1,39 +1,28 @@
 package com.vincestyling.netroid.sample;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.TextView;
-import com.vincestyling.netroid.RequestQueue;
 import com.vincestyling.netroid.cache.BitmapImageCache;
 import com.vincestyling.netroid.image.NetworkImageView;
 import com.vincestyling.netroid.sample.mock.Book;
 import com.vincestyling.netroid.sample.mock.BookDataMock;
 import com.vincestyling.netroid.sample.netroid.Netroid;
 import com.vincestyling.netroid.sample.netroid.SelfImageLoader;
-import com.vincestyling.netroid.toolbox.ImageLoader;
 
 import java.util.Collections;
 import java.util.List;
 
-public class GridViewActivity extends Activity {
-    private RequestQueue mQueue;
-    private ImageLoader mImageLoader;
+public class GridViewActivity extends BaseActivity {
     private BaseAdapter mAdapter;
     private List<Book> bookList;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.gridview_acty);
-
-        mQueue = Netroid.newRequestQueue(getApplicationContext(), null);
-        int memoryCacheSize = 5 * 1024 * 1024;
-        ImageLoader.ImageCache cache = new BitmapImageCache(memoryCacheSize);
-        mImageLoader = new SelfImageLoader(mQueue, cache, getResources(), getAssets());
-//		mImageLoader = new SelfImageLoader(mQueue, null, getResources(), getAssets());
+        setContentView(R.layout.activity_gridview_p0);
 
         bookList = BookDataMock.getData();
         while (bookList.size() > 5) {
@@ -65,14 +54,13 @@ public class GridViewActivity extends Activity {
                 TextView txvName = (TextView) convertView.findViewById(R.id.txvName);
 
                 if (position == bookList.size()) {
-                    imvCover.setDefaultImageResId(0);
-                    imvCover.setImageUrl(SelfImageLoader.RES_DRAWABLE + R.drawable.default190x338, mImageLoader);
+                    Netroid.displayImage(SelfImageLoader.RES_DRAWABLE + R.drawable.default190x338, imvCover);
                     txvName.setText("");
                 } else {
                     Book book = getItem(position);
 
-                    imvCover.setDefaultImageResId(android.R.drawable.ic_menu_rotate);
-                    imvCover.setImageUrl(book.getImageUrl(), mImageLoader);
+                    Netroid.displayImage(book.getImageUrl(), imvCover,
+                            android.R.drawable.ic_menu_rotate, android.R.drawable.ic_delete);
                     txvName.setText(book.getName());
                 }
 
@@ -104,10 +92,13 @@ public class GridViewActivity extends Activity {
         });
     }
 
+    // initialize netroid, this code should be invoke at Application in product stage.
     @Override
-    public void finish() {
-        mQueue.stop();
-        super.finish();
-    }
+    protected void initNetroid() {
+        Netroid.init(null);
 
+        int memoryCacheSize = 5 * 1024 * 1024; // 5MB
+        Netroid.setImageLoader(new SelfImageLoader(Netroid.getRequestQueue(),
+                new BitmapImageCache(memoryCacheSize), getResources(), getAssets()));
+    }
 }

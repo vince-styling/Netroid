@@ -65,6 +65,10 @@
         <activity
             android:name=".FileDownloadActivity"
             android:label="FileDownload"/>
+
+        <activity
+            android:name=".OffWithMainThreadPerformingActivity"
+            android:label="OffWithMainThreadPerforming"/>
     </application>
 
 </manifest>

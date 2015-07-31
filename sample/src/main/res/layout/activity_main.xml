@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="10dp">
@@ -11,39 +12,38 @@
 
         <Button
             android:id="@+id/button_common_http_request"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Http请求"/>
+            android:text="Common Http Request"
+            style="@style/main_btn"/>
 
         <Button
             android:id="@+id/button_image_request"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="图片加载"/>
+            android:text="Image Request"
+            style="@style/main_btn"/>
 
         <Button
             android:id="@+id/btnBatchImageMem"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="批量图片加载-内存缓存"/>
+            android:text="Batch Image Loader - Only enable Memory Cache"
+            style="@style/main_btn"/>
 
         <Button
             android:id="@+id/btnBatchImageDisk"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="批量图片加载-硬盘缓存"/>
+            android:text="Batch Image Loader - Only enable Disk Cache"
+            style="@style/main_btn"/>
 
         <Button
             android:id="@+id/btnBatchImageMultCache"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="批量图片加载-双缓存"/>
+            android:text="Batch Image Loader - enable Memory and Disk Cache"
+            style="@style/main_btn"/>
 
         <Button
             android:id="@+id/btnFileDownload"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="文件下载器"/>
+            android:text="File Downloader"
+            style="@style/main_btn"/>
+
+        <Button
+            android:id="@+id/btnBlockingRequest"
+            android:text="Off With Main Thread Performing"
+            style="@style/main_btn"/>
 
     </LinearLayout>
 

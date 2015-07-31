@@ -8,7 +8,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
-import com.vincestyling.netroid.RequestQueue;
 import com.vincestyling.netroid.cache.DiskCache;
 import com.vincestyling.netroid.image.NetworkImageView;
 import com.vincestyling.netroid.request.ImageRequest;
@@ -16,30 +15,17 @@ import com.vincestyling.netroid.sample.mock.Book;
 import com.vincestyling.netroid.sample.mock.BookDataMock;
 import com.vincestyling.netroid.sample.netroid.Netroid;
 import com.vincestyling.netroid.sample.netroid.SelfImageLoader;
-import com.vincestyling.netroid.toolbox.ImageLoader;
 
 import java.io.File;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class BatchImageRequestDiskActivity extends ListActivity {
-    private RequestQueue mQueue;
-    private ImageLoader mImageLoader;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        File diskCacheDir = new File(getCacheDir(), "netroid");
-        int diskCacheSize = 50 * 1024 * 1024; // 50MB
-        mQueue = Netroid.newRequestQueue(getApplicationContext(), new DiskCache(diskCacheDir, diskCacheSize));
-
-        mImageLoader = new SelfImageLoader(mQueue, null, getResources(), getAssets()) {
-            @Override
-            public void makeRequest(ImageRequest request) {
-                request.setCacheExpireTime(TimeUnit.MINUTES, 10);
-            }
-        };
+        initNetroid();
 
         getListView().setDivider(new ColorDrawable(Color.parseColor("#efefef")));
         getListView().setFastScrollEnabled(true);
@@ -75,7 +61,8 @@ public class BatchImageRequestDiskActivity extends ListActivity {
 
                 Book book = getItem(position);
 
-                imvCover.setImageUrl(book.getImageUrl(), mImageLoader);
+                Netroid.displayImage(book.getImageUrl(), imvCover,
+                        android.R.drawable.ic_menu_rotate, android.R.drawable.ic_delete);
                 txvAuthor.setText(book.getAuthor());
                 txvName.setText(book.getName());
 
@@ -84,10 +71,23 @@ public class BatchImageRequestDiskActivity extends ListActivity {
         });
     }
 
-    @Override
-    public void finish() {
-        mQueue.stop();
-        super.finish();
+    // initialize netroid, this code should be invoke at Application in product stage.
+    private void initNetroid() {
+        File diskCacheDir = new File(getCacheDir(), "netroid");
+        int diskCacheSize = 50 * 1024 * 1024; // 50MB
+        Netroid.init(new DiskCache(diskCacheDir, diskCacheSize));
+
+        Netroid.setImageLoader(new SelfImageLoader(Netroid.getRequestQueue(), null, getResources(), getAssets()) {
+            @Override
+            public void makeRequest(ImageRequest request) {
+                request.setCacheExpireTime(TimeUnit.MINUTES, 10);
+            }
+        });
     }
 
+    @Override
+    public void finish() {
+        Netroid.destroy();
+        super.finish();
+    }
 }
