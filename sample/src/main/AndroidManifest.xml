@@ -36,7 +36,7 @@
 
         <activity
             android:name=".BatchImageRequestDiskActivity"
-            android:label="BatchImageRequestDisk">
+            android:label="Batch Image Loader - Disk Cache">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
             </intent-filter>
@@ -44,7 +44,7 @@
 
         <activity
             android:name=".BatchImageRequestMemActivity"
-            android:label="BatchImageRequestMem">
+            android:label="Batch Image Loader - Memory Cache">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
             </intent-filter>
@@ -52,7 +52,7 @@
 
         <activity
             android:name=".BatchImageRequestMultCacheActivity"
-            android:label="BatchImageRequestMultCache">
+            android:label="Batch Image Loader - Dual Caches">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
             </intent-filter>
@@ -60,11 +60,11 @@
 
         <activity
             android:name=".GridViewActivity"
-            android:label="GridView"/>
+            android:label="GridView.getView(position == 0) issue"/>
 
         <activity
             android:name=".FileDownloadActivity"
-            android:label="FileDownload"/>
+            android:label="File Downloader"/>
 
         <activity
             android:name=".OffWithMainThreadPerformingActivity"

@@ -11,12 +11,12 @@
         android:layout_height="wrap_content">
 
         <Button
-            android:id="@+id/button_common_http_request"
+            android:id="@+id/btnCommonHttpRequest"
             android:text="Common Http Request"
             style="@style/main_btn"/>
 
         <Button
-            android:id="@+id/button_image_request"
+            android:id="@+id/btnImageRequest"
             android:text="Image Request"
             style="@style/main_btn"/>
 

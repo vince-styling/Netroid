@@ -8,9 +8,9 @@ import android.widget.Button;
 import android.widget.ImageView;
 import com.vincestyling.netroid.cache.BitmapImageCache;
 import com.vincestyling.netroid.cache.DiskCache;
-import com.vincestyling.netroid.image.NetworkImageView;
 import com.vincestyling.netroid.sample.netroid.Netroid;
 import com.vincestyling.netroid.sample.netroid.SelfImageLoader;
+import com.vincestyling.netroid.widget.NetworkImageView;
 
 import java.io.File;
 
@@ -26,10 +26,10 @@ public class ImageRequestActivity extends BaseActivity implements View.OnClickLi
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.image_request);
+        setContentView(R.layout.activity_image_request);
 
-        mImageView = (ImageView) findViewById(R.id.image_view);
-        mNetworkImageView = (NetworkImageView) findViewById(R.id.network_image_view);
+        mImageView = (ImageView) findViewById(R.id.imvAnchor);
+        mNetworkImageView = (NetworkImageView) findViewById(R.id.imvNetwork);
         btnLoadSingleImage = (Button) findViewById(R.id.btnLoadSingleImage);
         btnImageLoaderHttp = (Button) findViewById(R.id.btnImageLoaderHttp);
         btnImageLoaderAssets = (Button) findViewById(R.id.btnImageLoaderAssets);
@@ -78,18 +78,23 @@ public class ImageRequestActivity extends BaseActivity implements View.OnClickLi
 
     private void loadHttpImage() {
         String url = "http://i3.sinaimg.cn/blog/sports/idx/2014/0114/U5295P346T302D1F7961DT20140114132743.jpg";
-        Netroid.displayImage(url, mNetworkImageView);
+        Netroid.displayImage(url, mNetworkImageView, android.R.drawable.ic_menu_rotate, android.R.drawable.ic_delete);
     }
 
     private void loadAssetsImage() {
-        Netroid.displayImage(SelfImageLoader.RES_ASSETS + "cover_16539.jpg", mNetworkImageView);
+        String url = SelfImageLoader.RES_ASSETS + "cover_16539.jpg";
+        Netroid.displayImage(url, mNetworkImageView, android.R.drawable.ic_menu_rotate, android.R.drawable.ic_delete);
     }
 
     private void loadSdcardImage() {
-        Netroid.displayImage(SelfImageLoader.RES_SDCARD + Environment.getExternalStorageDirectory() + "/sample.jpg", mNetworkImageView);
+        String url = SelfImageLoader.RES_SDCARD + Environment.getExternalStorageDirectory() + "/sample.jpg";
+        Netroid.displayImage(url, mNetworkImageView, android.R.drawable.ic_menu_rotate, android.R.drawable.ic_delete);
     }
 
     private void loadGridView() {
+        // Note : when back from GridViewActivity then click any others buttons,
+        // app will crash because Netroid requirements destroyed by GridViewActivity,
+        // this problem not need to be solve in such sample context.
         startActivity(new Intent(this, GridViewActivity.class));
     }
 }

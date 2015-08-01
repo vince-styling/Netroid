@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="10dp">
@@ -9,35 +10,39 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
+        <TextView
+            style="@style/txv_desc"
+            android:text="This sample demonstrating a bunch of most basic request operations. included JsonObject, JsonArray, String, Ignore Disk Cache to Force Performing, Various Listener Events."/>
+
         <Button
             android:id="@+id/btnJsonObject"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Json对象请求"/>
+            android:text="JsonObjectRequest"/>
 
         <Button
             android:id="@+id/btnJsonArray"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Json数组请求"/>
+            android:text="JsonArrayRequest"/>
 
         <Button
             android:id="@+id/btnStringRequs"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="字符串请求"/>
+            android:text="StringRequest"/>
 
         <Button
             android:id="@+id/btnForceUpdate"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="强制刷新缓存"/>
+            android:text="StringRequest-ForceUpdate"/>
 
         <Button
             android:id="@+id/btnEventListener"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="各种请求事件"/>
+            android:text="Various Listener Events"/>
 
     </LinearLayout>
 

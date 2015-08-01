@@ -1,5 +1,7 @@
 package com.vincestyling.netroid.sample.mock;
 
+import android.text.TextUtils;
+
 public class Book {
     private final String imageUrl;
     private final String name;
@@ -21,5 +23,10 @@ public class Book {
 
     public String getAuthor() {
         return author;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return obj instanceof Book && TextUtils.equals(name, ((Book) obj).name);
     }
 }

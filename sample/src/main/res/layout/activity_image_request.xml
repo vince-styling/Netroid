@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="10dp">
@@ -10,12 +11,13 @@
         android:layout_height="wrap_content">
 
         <ImageView
-            android:id="@+id/image_view"
+            android:id="@+id/imvAnchor"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:contentDescription="Image Anchor"/>
 
-        <com.vincestyling.netroid.image.NetworkImageView
-            android:id="@+id/network_image_view"
+        <com.vincestyling.netroid.widget.NetworkImageView
+            android:id="@+id/imvNetwork"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
 
@@ -23,31 +25,31 @@
             android:id="@+id/btnLoadSingleImage"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="ImageLoader常规加载"/>
+            android:text="Normal Loading"/>
 
         <Button
             android:id="@+id/btnImageLoaderHttp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="ImageLoader加载Http图片"/>
+            android:text="NetworkImageView Loading"/>
 
         <Button
             android:id="@+id/btnImageLoaderAssets"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="ImageLoader加载assets图片"/>
+            android:text="Assets Loading"/>
 
         <Button
             android:id="@+id/btnImageLoaderSdcard"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="ImageLoader加载sdcard图片"/>
+            android:text="Sdcard Loading"/>
 
         <Button
             android:id="@+id/btnGridView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="GridViewP0重复加载问题"/>
+            android:text="GridView P0 Loading"/>
 
     </LinearLayout>
 

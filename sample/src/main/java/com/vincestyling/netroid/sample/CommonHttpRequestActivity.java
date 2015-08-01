@@ -1,6 +1,7 @@
 package com.vincestyling.netroid.sample;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.view.View;
@@ -21,7 +22,13 @@ import org.json.JSONObject;
 import java.io.File;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * This sample demonstrating a bunch of most basic request operations. included JsonObject,
+ * JsonArray, String, Ignore Disk Cache to Force Performing, Various Listener Events.
+ */
 public class CommonHttpRequestActivity extends BaseActivity implements View.OnClickListener {
+    private String PREFIX = "http://netroid.cn/dummy/";
+
     private Button btnJsonObject;
     private Button btnJsonArray;
     private Button btnStringRequs;
@@ -70,105 +77,81 @@ public class CommonHttpRequestActivity extends BaseActivity implements View.OnCl
     }
 
     private void processJsonObject() {
-        String url = "http://client.azrj.cn/json/cook/cook_list.jsp?type=1&p=2&size=10";
-        JsonObjectRequest request = new JsonObjectRequest(url, null,
-                new Listener<JSONObject>() {
-                    @Override
-                    public void onSuccess(JSONObject response) {
-                        showResult(response.toString());
-                    }
-                });
+        String url = PREFIX + "hot_keywords";
+        JsonObjectRequest request = new JsonObjectRequest(url, null, new BaseListener<JSONObject>());
         request.setCacheExpireTime(TimeUnit.MINUTES, 1);
         request.addHeader("HeaderTest", "11");
         Netroid.add(request);
     }
 
     private void processJsonArray() {
-        String url = "http://172.17.2.243:8080/json_array.json";
-        JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(url,
-                new Listener<JSONArray>() {
-                    @Override
-                    public void onSuccess(JSONArray response) {
-                        showResult(response.toString());
-                    }
-                });
-        jsonArrayRequest.addHeader("HeaderTest", "11");
-        jsonArrayRequest.setCacheExpireTime(TimeUnit.SECONDS, 10);
-        Netroid.add(jsonArrayRequest);
+        String url = PREFIX + "categories";
+        JsonArrayRequest request = new JsonArrayRequest(url, new BaseListener<JSONArray>());
+        request.setCacheExpireTime(TimeUnit.SECONDS, 10);
+        Netroid.add(request);
     }
 
     private void processStringRequs() {
-        String url = "http://client.azrj.cn/json/cook/cook_list.jsp?type=1&p=2&size=10";
-        StringRequest request = new StringRequest(Request.Method.GET, url,
-                new Listener<String>() {
-                    @Override
-                    public void onSuccess(String response) {
-                        showResult(response);
-                    }
-
-                    @Override
-                    public void onError(NetroidError error) {
-                    }
-                });
-        request.addHeader("HeaderTest", "11");
+        String url = PREFIX + "offwith_1";
+        StringRequest request = new StringRequest(Request.Method.GET, url, new BaseListener<String>());
+        request.setCacheExpireTime(TimeUnit.HOURS, 1);
         Netroid.add(request);
     }
 
     private void processForceUpdate() {
-        String url = "http://client.azrj.cn/json/cook/cook_list.jsp?type=1&p=2&size=10";
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
-                new Listener<String>() {
-                    @Override
-                    public void onSuccess(String response) {
-                        showResult(response);
-                    }
-                });
-        stringRequest.setForceUpdate(true);
-        Netroid.add(stringRequest);
+        String url = PREFIX + "offwith_1";
+        StringRequest request = new StringRequest(url, new BaseListener<String>());
+        request.setForceUpdate(true);
+        Netroid.add(request);
     }
 
     private void processEventListener() {
         final String REQUESTS_TAG = "Request-Demo";
         String url = "http://facebook.com/";
-        JsonObjectRequest request = new JsonObjectRequest(url, null, new Listener<JSONObject>() {
+        StringRequest request = new StringRequest(url, new BaseListener<String>() {
             long startTimeMs;
             int retryCount;
 
             @Override
             public void onPreExecute() {
+                super.onPreExecute();
                 startTimeMs = SystemClock.elapsedRealtime();
-                AppLog.e(REQUESTS_TAG);
                 Toast.makeText(CommonHttpRequestActivity.this, "onPreExecute()", Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onFinish() {
-                AppLog.e(REQUESTS_TAG);
+                super.onFinish();
                 Toast.makeText(CommonHttpRequestActivity.this, "onFinish()", Toast.LENGTH_SHORT).show();
             }
 
             @Override
-            public void onSuccess(JSONObject response) {
-                AppLog.e(REQUESTS_TAG);
+            public void onSuccess(String response) {
+                super.onSuccess(response);
                 Toast.makeText(CommonHttpRequestActivity.this, "onSuccess()", Toast.LENGTH_SHORT).show();
             }
 
             @Override
+            public void onError(NetroidError error) {
+                super.onError(error);
+                Toast.makeText(CommonHttpRequestActivity.this, "onError()", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
             public void onRetry() {
+                super.onRetry();
                 Toast.makeText(CommonHttpRequestActivity.this, "onRetry()", Toast.LENGTH_SHORT).show();
                 long executedTime = SystemClock.elapsedRealtime() - startTimeMs;
                 if (++retryCount > 5 || executedTime > 30000) {
-                    AppLog.e("retryCount : " + retryCount + " executedTime : " + executedTime);
+                    AppLog.e("retryCount : %d executedTime : %d", retryCount, executedTime);
                     Netroid.getRequestQueue().cancelAll(REQUESTS_TAG);
-                } else {
-                    AppLog.e(REQUESTS_TAG);
                 }
             }
 
             @Override
             public void onCancel() {
+                super.onCancel();
                 Toast.makeText(CommonHttpRequestActivity.this, "onCancel()", Toast.LENGTH_SHORT).show();
-                AppLog.e(REQUESTS_TAG);
             }
         });
 
@@ -183,4 +166,29 @@ public class CommonHttpRequestActivity extends BaseActivity implements View.OnCl
         builder.show();
     }
 
+    private class BaseListener<T> extends Listener<T> {
+        private ProgressDialog mProgressDialog;
+
+        @Override
+        public void onPreExecute() {
+            mProgressDialog = ProgressDialog.show(CommonHttpRequestActivity.this, null, "request executing");
+        }
+
+        @Override
+        public void onFinish() {
+            if (mProgressDialog != null) {
+                mProgressDialog.cancel();
+            }
+        }
+
+        @Override
+        public void onSuccess(T response) {
+            showResult(response.toString());
+        }
+
+        @Override
+        public void onError(NetroidError error) {
+            showResult("REQUEST ERROR : " + error.getMessage());
+        }
+    }
 }

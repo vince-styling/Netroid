@@ -6,6 +6,10 @@
     android:layout_height="match_parent"
     android:padding="10dp">
 
+    <TextView
+        style="@style/txv_desc"
+        android:text="This sample demonstrating the FileDownloader component which just like the ImageLoader. FileDownloader brings us two main functionalities, download task management and continuous transmission on the breakpoint, it's a good choice for multiple tasks purpose."/>
+
     <ListView
         android:id="@+id/lsvTaskCollector"
         android:layout_width="match_parent"

@@ -5,6 +5,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <TextView
+        style="@style/txv_desc"
+        android:text="This sample aim to show you how Netroid resolved GridView.getView(position == 0) invoke too many times then make the grid disorder during dataset changed. It's totally benefit by NetworkImageView widget which provided by Netroid."/>
+
     <GridView
         android:id="@+id/grvDemonstration"
         android:layout_width="match_parent"

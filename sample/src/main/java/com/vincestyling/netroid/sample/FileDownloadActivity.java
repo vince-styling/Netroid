@@ -20,7 +20,13 @@ import java.io.File;
 import java.text.DecimalFormat;
 import java.util.LinkedList;
 
-public class FileDownloadActivity extends BaseActivity implements View.OnClickListener, AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener {
+/**
+ * This sample demonstrating the FileDownloader component which just like the ImageLoader.
+ * FileDownloader brings us two main functionalities, download task management and continuous
+ * transmission on the breakpoint, it's a good choice for multiple tasks purpose.
+ */
+public class FileDownloadActivity extends BaseActivity implements
+        View.OnClickListener, AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener {
     public final static DecimalFormat DECIMAL_POINT = new DecimalFormat("0.0");
 
     private LinkedList<DownloadTask> mTaskList;
@@ -33,7 +39,7 @@ public class FileDownloadActivity extends BaseActivity implements View.OnClickLi
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.file_downloader);
+        setContentView(R.layout.activity_file_downloader);
 
         mSaveDir = new File(Environment.getExternalStorageDirectory(), "netroid-sample");
         if (!mSaveDir.exists()) mSaveDir.mkdir();
@@ -77,23 +83,38 @@ public class FileDownloadActivity extends BaseActivity implements View.OnClickLi
 
             @Override
             public View getView(int position, View convertView, ViewGroup parent) {
+                Holder holder;
                 if (convertView == null) {
                     convertView = getLayoutInflater().inflate(R.layout.download_task_item, null);
+                    holder = new Holder();
+                    holder.btnStatus = (Button) convertView.findViewById(R.id.btnStatus);
+                    holder.txvTaskName = (TextView) convertView.findViewById(R.id.txvTaskName);
+                    holder.txvFileSize = (TextView) convertView.findViewById(R.id.txvFileSize);
+                    holder.txvDownloadedSize = (TextView) convertView.findViewById(R.id.txvDownloadedSize);
+                    convertView.setTag(holder);
+                } else {
+                    holder = (Holder) convertView.getTag();
                 }
 
                 DownloadTask task = getItem(position);
-                TextView txvTaskName = (TextView) convertView.findViewById(R.id.txvTaskName);
-                txvTaskName.setText(task.storeFileName);
+                holder.txvTaskName.setText(task.storeFileName);
 
-                task.txvFileSize = (TextView) convertView.findViewById(R.id.txvFileSize);
-                task.txvDownloadedSize = (TextView) convertView.findViewById(R.id.txvDownloadedSize);
+                task.txvFileSize = holder.txvFileSize;
+                task.txvDownloadedSize = holder.txvDownloadedSize;
 
-                task.btnStatus = (Button) convertView.findViewById(R.id.btnStatus);
+                task.btnStatus = holder.btnStatus;
                 task.btnStatus.setTag(task.storeFileName);
 
                 task.invalidate();
 
                 return convertView;
+            }
+
+            class Holder {
+                TextView txvTaskName;
+                TextView txvFileSize;
+                TextView txvDownloadedSize;
+                Button btnStatus;
             }
         };
         lsvTaskCollector.setAdapter(mAdapter);
