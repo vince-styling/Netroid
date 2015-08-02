@@ -25,6 +25,7 @@ import org.apache.http.protocol.HTTP;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.zip.GZIPInputStream;
 
 public class HttpUtils {
@@ -106,4 +107,13 @@ public class HttpUtils {
         return TextUtils.equals(getHeader(response, "Content-Encoding"), "gzip");
     }
 
+    public static String parseResponse(NetworkResponse response) {
+        String parsed;
+        try {
+            parsed = new String(response.data, response.charset);
+        } catch (UnsupportedEncodingException e) {
+            parsed = new String(response.data);
+        }
+        return parsed;
+    }
 }

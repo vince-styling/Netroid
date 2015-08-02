@@ -15,12 +15,7 @@
  */
 package com.vincestyling.netroid.request;
 
-import com.vincestyling.netroid.IListener;
-import com.vincestyling.netroid.NetworkResponse;
-import com.vincestyling.netroid.Request;
-import com.vincestyling.netroid.Response;
-
-import java.io.UnsupportedEncodingException;
+import com.vincestyling.netroid.*;
 
 /**
  * A canned request for retrieving the response body at a given URL as a String.
@@ -49,12 +44,7 @@ public class StringRequest extends Request<String> {
 
     @Override
     protected Response<String> parseNetworkResponse(NetworkResponse response) {
-        String parsed;
-        try {
-            parsed = new String(response.data, response.charset);
-        } catch (UnsupportedEncodingException e) {
-            parsed = new String(response.data);
-        }
+        String parsed = HttpUtils.parseResponse(response);
         return Response.success(parsed, response);
     }
 }
