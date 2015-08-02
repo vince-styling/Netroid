@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.TextView;
 import com.vincestyling.netroid.Listener;
 import com.vincestyling.netroid.request.StringRequest;
+import com.vincestyling.netroid.sample.netroid.TransactionalRequest;
 import com.vincestyling.netroid.sample.netroid.Netroid;
 
 import java.util.Arrays;
@@ -22,6 +23,8 @@ import java.util.List;
  * to demonstrating how to perform a blocking request in background threads.
  */
 public class OffWithMainThreadPerformingActivity extends BaseActivity {
+    private List<String> urls;
+
     private TextView txvResult;
 
     @Override
@@ -29,10 +32,41 @@ public class OffWithMainThreadPerformingActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_off_with_main_thread);
 
-        findViewById(R.id.btnPerform).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.btnPerformByAsyncTask).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 new CombineTask().execute();
+            }
+        });
+
+        findViewById(R.id.btnPerformByCustomRequest).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                produceDummyUrls();
+
+                // the two requests would be perform just like a transaction.
+                Netroid.add(new TransactionalRequest(urls.get(0), urls.get(1), new Listener<String>() {
+                    private ProgressDialog mProgressDialog;
+
+                    @Override
+                    public void onPreExecute() {
+                        mProgressDialog = ProgressDialog.show(OffWithMainThreadPerformingActivity.this, null, "task executing");
+                        txvResult.setText("");
+                    }
+
+                    @Override
+                    public void onSuccess(String result) {
+                        if (mProgressDialog != null) {
+                            mProgressDialog.cancel();
+                        }
+
+                        if (TextUtils.isEmpty(result)) {
+                            result = "result is empty!";
+                        }
+
+                        txvResult.setText(result);
+                    }
+                }));
             }
         });
 
@@ -45,9 +79,9 @@ public class OffWithMainThreadPerformingActivity extends BaseActivity {
         Netroid.init(null);
     }
 
-    private ProgressDialog mProgressDialog;
-
     private class CombineTask extends AsyncTask<Void, Void, String> {
+        private ProgressDialog mProgressDialog;
+
         @Override
         protected void onPreExecute() {
             mProgressDialog = ProgressDialog.show(OffWithMainThreadPerformingActivity.this, null, "task executing");
@@ -82,11 +116,7 @@ public class OffWithMainThreadPerformingActivity extends BaseActivity {
     private String perform() {
         AppLog.e("Is run on main thread : %s", Looper.myLooper() == Looper.getMainLooper());
 
-        String prefix = "http://netroid.cn/dummy/";
-
-        List<String> urls = Arrays.asList(prefix + "offwith_1", prefix + "offwith_2", prefix + "offwith_1_1");
-        // shuffling the List so we can make the results not always identical.
-        Collections.shuffle(urls);
+        produceDummyUrls();
 
         final String[] results = new String[2];
 
@@ -106,5 +136,13 @@ public class OffWithMainThreadPerformingActivity extends BaseActivity {
         }
 
         return "result <1>[" + results[0] + "] result <2>[" + results[1] + "] equals : " + TextUtils.equals(results[0], results[1]);
+    }
+
+    private void produceDummyUrls() {
+        String prefix = "http://netroid.cn/dummy/";
+
+        urls = Arrays.asList(prefix + "offwith_1", prefix + "offwith_2", prefix + "offwith_1_1");
+        // shuffling the List so we can make the results not always identical.
+        Collections.shuffle(urls);
     }
 }

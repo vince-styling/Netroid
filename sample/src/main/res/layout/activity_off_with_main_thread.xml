@@ -11,12 +11,18 @@
         android:text="Sometimes, we may invoke our logical in an AsyncTask or just a Thread, when the time we want to perform a Http Request in that, it is messy to leave current thread to performing. Thus we brought you this sample to demonstrating how to perform a blocking request in background threads."/>
 
     <Button
-        android:id="@+id/btnPerform"
+        android:id="@+id/btnPerformByAsyncTask"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Perform"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="10dp"/>
+        android:text="Perform by AsyncTask"
+        android:layout_marginTop="5dp"/>
+
+    <Button
+        android:id="@+id/btnPerformByCustomRequest"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Perform by Custom Request"
+        android:layout_marginBottom="5dp"/>
 
     <TextView
         android:id="@+id/txvResult"
