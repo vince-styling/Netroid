@@ -133,8 +133,8 @@ public class FileDownloadRequest extends Request<Void> {
 			downloadedSize = 0;
 		}
 
+		InputStream in = entity.getContent();
 		try {
-			InputStream in = entity.getContent();
 			// Determine the response gzip encoding, support for HttpClientStack download.
 			if (HttpUtils.isGzipContent(response) && !(in instanceof GZIPInputStream)) {
 				in = new GZIPInputStream(in);
@@ -154,6 +154,7 @@ public class FileDownloadRequest extends Request<Void> {
 				}
 			}
 		} finally {
+			in.close();
 			try {
 				// Close the InputStream and release the resources by "consuming the content".
 				if (entity != null) entity.consumeContent();
