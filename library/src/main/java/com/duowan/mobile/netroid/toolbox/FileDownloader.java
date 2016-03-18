@@ -134,7 +134,7 @@ public class FileDownloader {
 	public void clearAll() {
 		// make sure only one thread can manipulate the Task Queue.
 		synchronized (mTaskQueue) {
-			while (mTaskQueue.size() > 0) {
+			while (!mTaskQueue.isEmpty()) {
 				mTaskQueue.get(0).discard();
 			}
 		}

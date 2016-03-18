@@ -121,7 +121,7 @@ public class FileDownloadActivity extends Activity implements View.OnClickListen
 
 	@Override
 	public void onClick(View v) {
-		if (mTaskList.size() == 0) return;
+		if (mTaskList.isEmpty()) return;
 		final DownloadTask task = mTaskList.poll();
 		task.controller = mDownloder.add(mSaveDirPath + task.storeFileName, task.url, new Listener<Void>() {
 			@Override
