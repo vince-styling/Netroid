@@ -110,7 +110,7 @@ public class NetworkDispatcher extends Thread {
 
                 // Write to cache if applicable.
 				if (mCache != null && request.shouldCache() && response.cacheEntry != null) {
-					response.cacheEntry.expireTime = request.getCacheExpireTime();
+					response.cacheEntry.setExpireTime(request.getCacheExpireTime());
 					mCache.putEntry(request.getCacheKey(), response.cacheEntry);
 					request.addMarker("network-cache-written");
 				}

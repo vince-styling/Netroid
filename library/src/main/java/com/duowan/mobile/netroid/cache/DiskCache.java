@@ -172,13 +172,13 @@ public class DiskCache {
      * Puts the entry with the specified key into the cache.
      */
     public synchronized void putEntry(String key, Entry entry) {
-        pruneIfNeeded(entry.data.length);
+        pruneIfNeeded(entry.getData().length);
         File file = getFileForKey(key);
         try {
             FileOutputStream fos = new FileOutputStream(file);
             CacheHeader e = new CacheHeader(key, entry);
             e.writeHeader(fos);
-            fos.write(entry.data);
+            fos.write(entry.getData());
             fos.close();
             putEntry(key, e);
             return;
@@ -307,16 +307,16 @@ public class DiskCache {
     static class CacheHeader {
         /** The size of the data identified by this CacheHeader. (This is not
          * serialized to disk. */
-        public long size;
+        private long size;
 
         /** The key that identifies the cache entry. */
-        public String key;
+        private String key;
 
 		/** Expire time for cache entry. */
-		public long expireTime;
+		private long expireTime;
 
 		/** Charset for cache entry. */
-		public String charset;
+		private String charset;
 
         private CacheHeader() {}
 
@@ -327,9 +327,9 @@ public class DiskCache {
          */
         public CacheHeader(String key, Entry entry) {
             this.key = key;
-			this.size = entry.data.length;
-			this.expireTime = entry.expireTime;
-			this.charset = entry.charset;
+			this.size = entry.getData().length;
+			this.expireTime = entry.getExpireTime();
+			this.charset = entry.getCharset();
 		}
 
         /**
@@ -383,6 +383,39 @@ public class DiskCache {
                 return false;
             }
         }
+
+        public long getSize() {
+            return size;
+        }
+
+        public void setSize(long size) {
+            this.size = size;
+        }
+
+        public String getKey() {
+            return key;
+        }
+
+        public void setKey(String key) {
+            this.key = key;
+        }
+
+        public long getExpireTime() {
+            return expireTime;
+        }
+
+        public void setExpireTime(long expireTime) {
+            this.expireTime = expireTime;
+        }
+
+        public String getCharset() {
+            return charset;
+        }
+
+        public void setCharset(String charset) {
+            this.charset = charset;
+        }
+        
     }
 
 	/**
@@ -397,13 +430,13 @@ public class DiskCache {
 		}
 
 		/** The data returned from cache. */
-		public byte[] data;
+		private byte[] data;
 
 		/** Expire time for cache entry. */
-		public long expireTime;
+		private long expireTime;
 
 		/** Charset for cache entry, retrieve by the http header. */
-		public String charset;
+		private String charset;
 
 		/** True if the entry is expired. */
 		public boolean isExpired() {
@@ -418,7 +451,7 @@ public class DiskCache {
 
 		/** Get the cache data size in byte. */
 		public int getSize() {
-			return data != null ? data.length : 0;
+			return getData() != null ? getData().length : 0;
 		}
 
 		/** Invalidate cache entry by the expireTime. */
@@ -429,6 +462,30 @@ public class DiskCache {
 			}
 			return false;
 		}
+
+        public byte[] getData() {
+            return data;
+        }
+
+        public void setData(byte[] data) {
+            this.data = data;
+        }
+
+        public long getExpireTime() {
+            return expireTime;
+        }
+
+        public void setExpireTime(long expireTime) {
+            this.expireTime = expireTime;
+        }
+
+        public String getCharset() {
+            return charset;
+        }
+
+        public void setCharset(String charset) {
+            this.charset = charset;
+        }
 
 	}
 
