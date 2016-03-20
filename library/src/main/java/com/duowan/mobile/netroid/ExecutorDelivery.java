@@ -176,7 +176,7 @@ public class ExecutorDelivery implements Delivery {
             if (mResponse.isSuccess()) {
                 mRequest.deliverSuccess(mResponse.result);
             } else {
-                mRequest.deliverError(mResponse.error);
+                mRequest.deliverError(mResponse.errorDetail);
             }
 
             // If this is an intermediate response, add a marker, otherwise we're done

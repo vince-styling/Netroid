@@ -17,9 +17,11 @@
 package com.duowan.mobile.netroid.stack;
 
 import android.text.TextUtils;
+
 import com.duowan.mobile.netroid.AuthFailureError;
 import com.duowan.mobile.netroid.Request;
 import com.duowan.mobile.netroid.Request.Method;
+
 import org.apache.http.*;
 import org.apache.http.entity.BasicHttpEntity;
 import org.apache.http.message.BasicHeader;
@@ -29,6 +31,7 @@ import org.apache.http.protocol.HTTP;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLSocketFactory;
+
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -68,8 +71,8 @@ public class HurlStack implements HttpStack {
 
 		URL parsedUrl = new URL(request.getUrl());
 		HttpURLConnection connection = openConnection(parsedUrl, request);
-		for (String headerName : map.keySet()) {
-			connection.addRequestProperty(headerName, map.get(headerName));
+		for (Entry<String, String> header : map.entrySet()) {
+			connection.addRequestProperty(header.getKey(), header.getValue());
 		}
 
 		setConnectionParametersForRequest(connection, request);

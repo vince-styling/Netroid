@@ -44,7 +44,7 @@ public class Response<T> {
     public final DiskCache.Entry cacheEntry;
 
     /** Detailed error information if <code>errorCode != OK</code>. */
-    public final NetroidError error;
+    public final NetroidError errorDetail;
 
     /** True if this response was a soft-expired one and a second one MAY be coming. */
     public boolean intermediate = false;
@@ -53,18 +53,18 @@ public class Response<T> {
      * Returns whether this response is considered successful.
      */
     public boolean isSuccess() {
-        return error == null;
+        return errorDetail == null;
     }
 
     private Response(T result, DiskCache.Entry cacheEntry) {
         this.result = result;
         this.cacheEntry = cacheEntry;
-        this.error = null;
+        this.errorDetail = null;
     }
 
     private Response(NetroidError error) {
         this.result = null;
         this.cacheEntry = null;
-        this.error = error;
+        this.errorDetail = error;
     }
 }

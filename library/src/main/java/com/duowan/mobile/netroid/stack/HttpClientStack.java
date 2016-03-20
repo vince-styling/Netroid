@@ -17,9 +17,11 @@
 package com.duowan.mobile.netroid.stack;
 
 import android.net.http.AndroidHttpClient;
+
 import com.duowan.mobile.netroid.AuthFailureError;
 import com.duowan.mobile.netroid.Request;
 import com.duowan.mobile.netroid.Request.Method;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -36,6 +38,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * An HttpStack that performs request over an {@link HttpClient}.
@@ -52,16 +55,16 @@ public class HttpClientStack implements HttpStack {
 	}
 
     private static void addHeaders(HttpUriRequest httpRequest, Map<String, String> headers) {
-        for (String key : headers.keySet()) {
-            httpRequest.setHeader(key, headers.get(key));
+        for (Entry<String, String> header : headers.entrySet()) {
+            httpRequest.setHeader(header.getKey(), header.getValue());
         }
     }
 
     @SuppressWarnings("unused")
     private static List<NameValuePair> getPostParameterPairs(Map<String, String> postParams) {
         List<NameValuePair> result = new ArrayList<NameValuePair>(postParams.size());
-        for (String key : postParams.keySet()) {
-            result.add(new BasicNameValuePair(key, postParams.get(key)));
+        for (Entry<String, String> param : postParams.entrySet()) {
+            result.add(new BasicNameValuePair(param.getKey(), param.getValue()));
         }
         return result;
     }
