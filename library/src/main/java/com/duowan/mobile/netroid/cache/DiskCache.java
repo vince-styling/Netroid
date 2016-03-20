@@ -94,10 +94,8 @@ public class DiskCache {
             return null;
         }
 
-        File file = getFileForKey(key);
-        CountingInputStream cis = null;
-        try {
-            cis = new CountingInputStream(new FileInputStream(file));
+        File file = getFileForKey(key);        
+        try (CountingInputStream cis = new CountingInputStream(new FileInputStream(file))) {
             CacheHeader.readHeader(cis); // eat header
             byte[] data = streamToBytes(cis, (int) (file.length() - cis.bytesRead));
             return entry.toCacheEntry(data);
@@ -105,13 +103,6 @@ public class DiskCache {
             NetroidLog.d("%s: %s", file.getAbsolutePath(), e.toString());
             removeEntry(key);
             return null;
-        } finally {
-            if (cis != null) {
-                try {
-                    cis.close();
-                } catch (IOException ioe) {
-                }
-            }
         }
     }
 
@@ -131,10 +122,8 @@ public class DiskCache {
         if (files == null) {
             return;
         }
-        for (File file : files) {
-            FileInputStream fis = null;
-            try {
-                fis = new FileInputStream(file);
+        for (File file : files) {            
+            try (FileInputStream fis = new FileInputStream(file)) {
                 CacheHeader entry = CacheHeader.readHeader(fis);
 				if (entry.isExpired()) {
 					file.delete();
@@ -146,12 +135,6 @@ public class DiskCache {
                 if (file != null) {
                    file.delete();
                 }
-            } finally {
-                try {
-                    if (fis != null) {
-                        fis.close();
-                    }
-                } catch (IOException ignored) { }
             }
         }
     }

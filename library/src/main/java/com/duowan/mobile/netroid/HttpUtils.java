@@ -17,10 +17,10 @@ public class HttpUtils {
 	/** Reads the contents of HttpEntity into a byte[]. */
 	public static byte[] responseToBytes(HttpResponse response) throws IOException, ServerError {
 		HttpEntity entity = response.getEntity();
-		PoolingByteArrayOutputStream bytes =
-				new PoolingByteArrayOutputStream(ByteArrayPool.get(), (int) entity.getContentLength());
+		
 		byte[] buffer = null;
-		try {
+		try (PoolingByteArrayOutputStream bytes =
+                new PoolingByteArrayOutputStream(ByteArrayPool.get(), (int) entity.getContentLength())) {
 			InputStream in = entity.getContent();
 			if (isGzipContent(response) && !(in instanceof GZIPInputStream)) {
 				in = new GZIPInputStream(in);
@@ -46,7 +46,6 @@ public class HttpUtils {
 				NetroidLog.v("Error occured when calling consumingContent");
 			}
 			ByteArrayPool.get().returnBuf(buffer);
-			bytes.close();
 		}
 	}
 
@@ -59,10 +58,8 @@ public class HttpUtils {
 				String[] params = contentType.split(";");
 				for (int i = 1; i < params.length; i++) {
 					String[] pair = params[i].trim().split("=");
-					if (pair.length == 2) {
-						if (pair[0].equals("charset")) {
-							return pair[1];
-						}
+					if (pair.length == 2 && pair[0].equals("charset")) {
+					    return pair[1];
 					}
 				}
 			}
