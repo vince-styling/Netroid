@@ -14,6 +14,8 @@ import java.util.zip.GZIPInputStream;
 
 public class HttpUtils {
 
+    private HttpUtils() {}
+    
 	/** Reads the contents of HttpEntity into a byte[]. */
 	public static byte[] responseToBytes(HttpResponse response) throws IOException, ServerError {
 		HttpEntity entity = response.getEntity();
