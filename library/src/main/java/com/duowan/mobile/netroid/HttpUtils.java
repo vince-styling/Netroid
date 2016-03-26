@@ -59,10 +59,8 @@ public class HttpUtils {
 				String[] params = contentType.split(";");
 				for (int i = 1; i < params.length; i++) {
 					String[] pair = params[i].trim().split("=");
-					if (pair.length == 2) {
-						if (pair[0].equals("charset")) {
-							return pair[1];
-						}
+					if (pair.length == 2 && pair[0].equals("charset")) {
+					    return pair[1];
 					}
 				}
 			}
