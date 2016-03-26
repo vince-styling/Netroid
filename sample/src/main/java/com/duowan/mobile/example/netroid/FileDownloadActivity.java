@@ -23,7 +23,7 @@ import java.util.LinkedList;
 
 public class FileDownloadActivity extends Activity implements View.OnClickListener, AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener {
 	public final static DecimalFormat DECIMAL_POINT = new DecimalFormat("0.0");
-	private static final String mSaveDirPath = "/sdcard/0000netroid/";
+	private static final String SAVE_DIR_PATH = "/sdcard/0000netroid/";
 
 	private LinkedList<DownloadTask> mTaskList;
 	private LinkedList<DownloadTask> mDownloadList;
@@ -50,7 +50,7 @@ public class FileDownloadActivity extends Activity implements View.OnClickListen
 			}
 		};
 
-		File downloadDir = new File(mSaveDirPath);
+		File downloadDir = new File(SAVE_DIR_PATH);
 		if (!downloadDir.exists()) downloadDir.mkdir();
 
 		mTaskList = new LinkedList<DownloadTask>();
@@ -123,7 +123,7 @@ public class FileDownloadActivity extends Activity implements View.OnClickListen
 	public void onClick(View v) {
 		if (mTaskList.isEmpty()) return;
 		final DownloadTask task = mTaskList.poll();
-		task.controller = mDownloder.add(mSaveDirPath + task.storeFileName, task.url, new Listener<Void>() {
+		task.controller = mDownloder.add(SAVE_DIR_PATH + task.storeFileName, task.url, new Listener<Void>() {
 			@Override
 			public void onPreExecute() {
 				task.invalidate();
@@ -142,7 +142,7 @@ public class FileDownloadActivity extends Activity implements View.OnClickListen
 			@Override
 			public void onFinish() {
 				NetroidLog.e("onFinish size : " + Formatter.formatFileSize(
-						FileDownloadActivity.this, new File(mSaveDirPath + task.storeFileName).length()));
+						FileDownloadActivity.this, new File(SAVE_DIR_PATH + task.storeFileName).length()));
 				task.invalidate();
 			}
 

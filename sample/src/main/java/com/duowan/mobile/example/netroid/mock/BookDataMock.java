@@ -4,6 +4,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class BookDataMock {
+    
+    private BookDataMock() {}
 
 	public static List<Book> getData() {
 		List<Book> bookList = new LinkedList<Book>();

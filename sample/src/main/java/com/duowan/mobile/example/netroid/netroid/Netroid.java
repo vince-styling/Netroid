@@ -15,6 +15,8 @@ import org.apache.http.protocol.HTTP;
 
 public class Netroid {
 
+    private Netroid() {}
+    
     /**
      * Creates a default instance of the worker pool and calls {@link RequestQueue#start()} on it.
      * @param context A {@link Context} to use for creating the cache dir.
