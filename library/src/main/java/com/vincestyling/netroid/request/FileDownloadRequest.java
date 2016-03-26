@@ -155,8 +155,9 @@ public class FileDownloadRequest extends Request<Void> {
             downloadedSize = 0;
         }
 
+        InputStream in = null;
         try {
-            InputStream in = entity.getContent();
+            in = entity.getContent();
             // Determine the response gzip encoding, support for HttpClientStack download.
             if (HttpUtils.isGzipContent(response) && !(in instanceof GZIPInputStream)) {
                 in = new GZIPInputStream(in);
@@ -177,7 +178,14 @@ public class FileDownloadRequest extends Request<Void> {
             }
         } finally {
             try {
-                // Close the InputStream and release the resources by "consuming the content".
+                // Close the InputStream
+                if (in != null) in.close();
+            } catch (Exception e) {
+                NetroidLog.v("Error occured when calling InputStream.close");
+            }
+
+            try {
+                // release the resources by "consuming the content".
                 entity.consumeContent();
             } catch (Exception e) {
                 // This can happen if there was an exception above that left the entity in
@@ -201,5 +209,4 @@ public class FileDownloadRequest extends Request<Void> {
     @Override
     public void setCacheExpireTime(TimeUnit timeUnit, int amount) {
     }
-
 }
