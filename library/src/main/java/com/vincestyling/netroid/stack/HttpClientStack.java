@@ -21,20 +21,17 @@ import com.vincestyling.netroid.Request;
 import com.vincestyling.netroid.Request.Method;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.*;
 import org.apache.http.entity.ByteArrayEntity;
-import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 import org.apache.http.protocol.HTTP;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * An HttpStack that performs request over an {@link HttpClient}.
@@ -51,18 +48,18 @@ public class HttpClientStack implements HttpStack {
     }
 
     private static void addHeaders(HttpUriRequest httpRequest, Map<String, String> headers) {
-        for (String key : headers.keySet()) {
-            httpRequest.setHeader(key, headers.get(key));
+        for (Entry<String, String> header : headers.entrySet()) {
+            httpRequest.setHeader(header.getKey(), header.getValue());
         }
     }
 
-    private static List<NameValuePair> getPostParameterPairs(Map<String, String> postParams) {
-        List<NameValuePair> result = new ArrayList<NameValuePair>(postParams.size());
-        for (String key : postParams.keySet()) {
-            result.add(new BasicNameValuePair(key, postParams.get(key)));
-        }
-        return result;
-    }
+//    private static List<NameValuePair> getPostParameterPairs(Map<String, String> postParams) {
+//        List<NameValuePair> result = new ArrayList<>(postParams.size());
+//        for (Entry<String, String> param : postParams.entrySet()) {
+//            result.add(new BasicNameValuePair(param.getKey(), param.getValue()));
+//        }
+//        return result;
+//    }
 
     @Override
     public HttpResponse performRequest(Request<?> request) throws IOException, AuthFailureError {

@@ -28,7 +28,7 @@ public class Response<T> {
      * Returns a successful response containing the parsed result.
      */
     public static <T> Response<T> success(T result, NetworkResponse response) {
-        return new Response<T>(result, response);
+        return new Response<>(result, response);
     }
 
     /**
@@ -36,7 +36,7 @@ public class Response<T> {
      * localized message displayed to the user.
      */
     public static <T> Response<T> error(NetroidError error) {
-        return new Response<T>(error);
+        return new Response<>(error);
     }
 
     /**
@@ -52,7 +52,7 @@ public class Response<T> {
     /**
      * Detailed error information if <code>errorCode != OK</code>.
      */
-    public final NetroidError error;
+    public final NetroidError errorDetail;
 
     /**
      * True if this response was a soft-expired one and a second one MAY be coming.
@@ -63,18 +63,18 @@ public class Response<T> {
      * Returns whether this response is considered successful.
      */
     public boolean isSuccess() {
-        return error == null;
+        return errorDetail == null;
     }
 
     private Response(T result, NetworkResponse response) {
         this.result = result;
         cacheEntry = response != null ? new DiskCache.Entry(response.data, response.charset) : null;
-        this.error = null;
+        this.errorDetail = null;
     }
 
     private Response(NetroidError error) {
         this.result = null;
         this.cacheEntry = null;
-        this.error = error;
+        this.errorDetail = error;
     }
 }

@@ -28,6 +28,7 @@ import java.util.Map;
  */
 public class LruCache<K, V> {
     private final LinkedHashMap<K, V> map;
+    private static final int DEF_ENTRY_SIZE = 1;
 
     /**
      * Size of this cache in units. Not necessarily the number of elements.
@@ -273,7 +274,7 @@ public class LruCache<K, V> {
      * An entry's size must not change while it is in the cache.
      */
     protected int sizeOf(K key, V value) {
-        return 1;
+        return DEF_ENTRY_SIZE;
     }
 
     /**
