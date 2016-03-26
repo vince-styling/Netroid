@@ -48,7 +48,7 @@ public final class RequestPerformer {
 
             // Write to cache if applicable.
             if (cache != null && request.shouldCache() && response.cacheEntry != null) {
-                response.cacheEntry.expireTime = request.getCacheExpireTime();
+                response.cacheEntry.setExpireTime(request.getCacheExpireTime());
                 cache.putEntry(request.getCacheKey(), response.cacheEntry);
                 request.addMarker("network-cache-written");
             }
