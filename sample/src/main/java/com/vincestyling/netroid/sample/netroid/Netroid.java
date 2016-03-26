@@ -24,6 +24,7 @@ public class Netroid {
     private FileDownloader mFileDownloader;
 
     private Netroid() {
+        /* cannot be instantiated */
     }
 
     private static Netroid mInstance;

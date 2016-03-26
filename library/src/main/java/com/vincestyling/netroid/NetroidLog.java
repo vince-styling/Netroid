@@ -26,6 +26,11 @@ import java.util.Locale;
  * Logging helper class.
  */
 public class NetroidLog {
+
+    private NetroidLog() {
+        /* cannot be instantiated */
+    }
+
     public static String TAG = "Netroid";
 
     public static boolean DEBUG = Log.isLoggable(TAG, Log.VERBOSE);

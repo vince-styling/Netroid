@@ -30,6 +30,10 @@ import java.util.zip.GZIPInputStream;
 
 public class HttpUtils {
 
+    private HttpUtils() {
+        /* cannot be instantiated */
+    }
+
     /**
      * Reads the contents of HttpEntity into a byte[].
      */

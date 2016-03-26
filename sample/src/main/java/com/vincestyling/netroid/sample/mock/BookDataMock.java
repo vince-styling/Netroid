@@ -5,6 +5,10 @@ import java.util.List;
 
 public class BookDataMock {
 
+    private BookDataMock() {
+        /* cannot be instantiated */
+    }
+
     public static List<Book> getData() {
         List<Book> bookList = new LinkedList<Book>();
 
