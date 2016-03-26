@@ -164,7 +164,7 @@ public class NetroidLog {
 
         /** Returns the time difference between the first and last events in this log. */
         private long getTotalDuration() {
-            if (mMarkers.size() == 0) {
+            if (mMarkers.isEmpty()) {
                 return 0;
             }
 

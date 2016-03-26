@@ -96,7 +96,7 @@ public class GridViewActivity extends Activity {
 		findViewById(R.id.btnRemoveView).setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				if (bookList.size() > 0) {
+				if (!bookList.isEmpty()) {
 					bookList.remove(bookList.size() - 1);
 					mAdapter.notifyDataSetChanged();
 				}
