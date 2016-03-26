@@ -64,7 +64,7 @@ public class GridViewActivity extends BaseActivity {
                 bookList.remove(bookList.size() - 1);
                 mAdapter.notifyDataSetChanged();
 
-                if (bookList.size() == 0) {
+                if (bookList.isEmpty()) {
                     btnRemoveView.setVisibility(View.GONE);
                 }
             }

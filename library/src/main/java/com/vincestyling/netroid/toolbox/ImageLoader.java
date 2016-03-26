@@ -367,7 +367,7 @@ public abstract class ImageLoader {
                 request = mBatchedResponses.get(mCacheKey);
                 if (request != null) {
                     request.removeContainerAndCancelIfNecessary(this);
-                    if (request.mContainers.size() == 0) {
+                    if (request.mContainers.isEmpty()) {
                         mBatchedResponses.remove(mCacheKey);
                     }
                 }

@@ -172,10 +172,7 @@ public class NetroidLog {
          * Returns the time difference between the first and last events in this log.
          */
         private long getTotalDuration() {
-            if (mMarkers.size() == 0) {
-                return 0;
-            }
-
+            if (mMarkers.isEmpty()) return 0;
             long first = mMarkers.get(0).time;
             long last = mMarkers.get(mMarkers.size() - 1).time;
             return last - first;
