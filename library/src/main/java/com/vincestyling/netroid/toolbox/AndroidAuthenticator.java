@@ -67,6 +67,13 @@ public class AndroidAuthenticator implements Authenticator {
         return mAccount;
     }
 
+    /**
+     * Returns the Auth Token Type used by this authenticator.
+     */
+    public String getAuthTokenType() {
+        return mAuthTokenType;
+    }
+
     @Override
     public String getAuthToken() throws AuthFailureError {
         final AccountManager accountManager = AccountManager.get(mContext);
