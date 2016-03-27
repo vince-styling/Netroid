@@ -140,7 +140,7 @@ public abstract class Request<T> implements Comparable<Request<T>> {
         mMethod = method;
         mListener = listener;
         setRetryPolicy(new DefaultRetryPolicy());
-        mHashHeaders = new HashMap<String, String>();
+        mHashHeaders = new HashMap<>();
     }
 
     /**
@@ -168,9 +168,12 @@ public abstract class Request<T> implements Comparable<Request<T>> {
     /**
      * Set a tag on this request. Can be used to cancel all requests with this
      * tag by {@link RequestQueue#cancelAll(Object)}.
+     *
+     * @return This Request object to allow for chaining.
      */
-    public void setTag(Object tag) {
+    public Request<?> setTag(Object tag) {
         mTag = tag;
+        return this;
     }
 
     /**
@@ -184,9 +187,12 @@ public abstract class Request<T> implements Comparable<Request<T>> {
 
     /**
      * Sets the retry policy for this request.
+     *
+     * @return This Request object to allow for chaining.
      */
-    public void setRetryPolicy(RetryPolicy retryPolicy) {
+    public Request<?> setRetryPolicy(RetryPolicy retryPolicy) {
         mRetryPolicy = retryPolicy;
+        return this;
     }
 
     /**
@@ -238,16 +244,22 @@ public abstract class Request<T> implements Comparable<Request<T>> {
     /**
      * Associates this request with the given queue. The request queue will be notified when this
      * request has finished.
+     *
+     * @return This Request object to allow for chaining.
      */
-    public void setRequestQueue(RequestQueue requestQueue) {
+    public Request<?> setRequestQueue(RequestQueue requestQueue) {
         mRequestQueue = requestQueue;
+        return this;
     }
 
     /**
      * Sets the sequence number of this request.  Used by {@link RequestQueue}.
+     *
+     * @return This Request object to allow for chaining.
      */
-    public final void setSequence(int sequence) {
+    public final Request<?> setSequence(int sequence) {
         mSequence = sequence;
+        return this;
     }
 
     /**
