@@ -17,10 +17,22 @@ android {
         targetCompatibility JavaVersion.VERSION_1_6
     }
 
+    signingConfigs {
+        releaseConfig {
+            storeFile file('debug.keystore')
+            storePassword 'android'
+            keyAlias 'AndroidDebugKey'
+            keyPassword 'android'
+        }
+    }
+
     buildTypes {
         release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            minifyEnabled true
+            shrinkResources true
+            debuggable false
+            proguardFiles 'proguard-rules.pro'
+            signingConfig signingConfigs.releaseConfig
         }
     }
 }
