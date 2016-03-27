@@ -122,16 +122,32 @@ public class BasicNetwork implements Network {
 
                 int statusCode = httpResponse.getStatusLine().getStatusCode();
                 NetroidLog.e("Unexpected response code %d for %s", statusCode, request.getUrl());
+
                 if (responseContents != null) {
                     networkResponse = new NetworkResponse(statusCode, responseContents, parseCharset(httpResponse));
-                    if (statusCode == HttpStatus.SC_UNAUTHORIZED || statusCode == HttpStatus.SC_FORBIDDEN) {
+
+                    if (statusCode == HttpStatus.SC_UNAUTHORIZED ||
+                            statusCode == HttpStatus.SC_FORBIDDEN) {
                         attemptRetryOnException("auth", request, new AuthFailureError(networkResponse));
+
+                    } else if (statusCode >= 400 && statusCode <= 499) {
+                        // Don't retry other client errors.
+                        throw new ClientError(networkResponse);
+
+                    } else if (statusCode >= 500 && statusCode <= 599) {
+                        if (request.shouldRetryServerErrors()) {
+                            attemptRetryOnException("server",
+                                    request, new ServerError(networkResponse));
+                        } else {
+                            throw new ServerError(networkResponse);
+                        }
+
                     } else {
-                        // TODO: Only throw ServerError for 5xx status codes.
+                        // 3xx? No reason to retry.
                         throw new ServerError(networkResponse);
                     }
                 } else {
-                    throw new NetworkError(networkResponse);
+                    attemptRetryOnException("network", request, new NetworkError());
                 }
             }
         }

@@ -104,6 +104,9 @@ public abstract class Request<T> implements Comparable<Request<T>> {
      */
     private boolean mResponseDelivered = false;
 
+    /** Whether the request should be retried in the event of an HTTP 5xx (server) error. */
+    private boolean mShouldRetryServerErrors = false;
+
     /**
      * A cheap variant of request tracing used to dump slow requests.
      */
@@ -471,6 +474,23 @@ public abstract class Request<T> implements Comparable<Request<T>> {
      */
     public final boolean shouldCache() {
         return mCacheExpireTime > 0;
+    }
+
+    /**
+     * Sets whether or not the request should be retried in the event of an HTTP 5xx (server) error.
+     *
+     * @return This Request object to allow for chaining.
+     */
+    public final Request<?> setShouldRetryServerErrors(boolean shouldRetryServerErrors) {
+        mShouldRetryServerErrors = shouldRetryServerErrors;
+        return this;
+    }
+
+    /**
+     * Returns true if this request should be retried in the event of an HTTP 5xx (server) error.
+     */
+    public final boolean shouldRetryServerErrors() {
+        return mShouldRetryServerErrors;
     }
 
     /**
