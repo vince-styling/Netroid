@@ -27,7 +27,7 @@ import java.util.LinkedList;
  */
 public class FileDownloadActivity extends BaseActivity implements
         View.OnClickListener, AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener {
-    public final static DecimalFormat DECIMAL_POINT = new DecimalFormat("0.0");
+    public static final DecimalFormat DECIMAL_POINT = new DecimalFormat("0.0");
 
     private LinkedList<DownloadTask> mTaskList;
     private LinkedList<DownloadTask> mDownloadList;
