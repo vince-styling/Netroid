@@ -52,7 +52,7 @@ public class NetworkDispatcher extends Thread {
     /**
      * Used for telling us to die.
      */
-    private volatile boolean mQuit = false;
+    private volatile boolean mQuit;
 
     /**
      * Creates a new network dispatcher thread.  You must call {@link #start()}

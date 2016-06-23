@@ -97,20 +97,20 @@ public abstract class Request<T> implements Comparable<Request<T>> {
     /**
      * Whether or not this request has been canceled.
      */
-    private boolean mCanceled = false;
+    private boolean mCanceled;
 
     /**
      * Whether or not a response has been delivered for this request yet.
      */
-    private boolean mResponseDelivered = false;
+    private boolean mResponseDelivered;
 
     /** Whether the request should be retried in the event of an HTTP 5xx (server) error. */
-    private boolean mShouldRetryServerErrors = false;
+    private boolean mShouldRetryServerErrors;
 
     /**
      * A cheap variant of request tracing used to dump slow requests.
      */
-    private long mRequestBirthTime = 0;
+    private long mRequestBirthTime;
 
     /**
      * Threshold at which we should log the request (even when debug logging is not enabled).
