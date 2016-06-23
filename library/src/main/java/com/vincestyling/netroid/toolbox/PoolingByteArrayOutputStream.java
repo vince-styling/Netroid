@@ -60,7 +60,7 @@ public class PoolingByteArrayOutputStream extends ByteArrayOutputStream {
     }
 
     @Override
-    public void finalize() {
+    protected void finalize() {
         mPool.returnBuf(buf);
     }
 
