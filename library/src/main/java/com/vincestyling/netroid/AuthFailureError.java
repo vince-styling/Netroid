@@ -24,9 +24,10 @@ public class AuthFailureError extends NetroidError {
     /**
      * An intent that can be used to resolve this exception. (Brings up the password dialog.)
      */
-    private Intent mResolutionIntent;
+    private final Intent mResolutionIntent;
 
     public AuthFailureError() {
+        mResolutionIntent = null;
     }
 
     public AuthFailureError(Intent intent) {
@@ -35,14 +36,17 @@ public class AuthFailureError extends NetroidError {
 
     public AuthFailureError(NetworkResponse response) {
         super(response);
+        mResolutionIntent = null;
     }
 
     public AuthFailureError(String message) {
         super(message);
+        mResolutionIntent = null;
     }
 
     public AuthFailureError(String message, Exception reason) {
         super(message, reason);
+        mResolutionIntent = null;
     }
 
     public Intent getResolutionIntent() {
