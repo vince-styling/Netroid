@@ -135,7 +135,7 @@ public class HttpClientStack implements HttpStack {
      * The HttpPatch class does not exist in the Android framework, so this has been defined here.
      */
     public static final class HttpPatch extends HttpEntityEnclosingRequestBase {
-        public final static String METHOD_NAME = "PATCH";
+        public static final String METHOD_NAME = "PATCH";
 
         public HttpPatch() {
             super();
