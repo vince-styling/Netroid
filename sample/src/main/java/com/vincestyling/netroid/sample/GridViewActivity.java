@@ -23,6 +23,8 @@ public class GridViewActivity extends BaseActivity {
     private BaseAdapter mAdapter;
     private List<Book> bookList;
 
+    private Toast mToast;
+
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_gridview_p0);
@@ -133,8 +135,6 @@ public class GridViewActivity extends BaseActivity {
             }
         });
     }
-
-    private Toast mToast;
 
     private void showToast(CharSequence msg) {
         if (mToast != null) mToast.cancel();

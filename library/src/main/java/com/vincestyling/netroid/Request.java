@@ -132,6 +132,14 @@ public abstract class Request<T> implements Comparable<Request<T>> {
      */
     private Object mTag;
 
+
+    /**
+     * Indicates DeliverPreExecute operation is done or not,
+     * because the {@link CacheDispatcher} and {@link NetworkDispatcher}
+     * both will call this deliver, and we must ensure just invoke once.
+     */
+    private boolean mIsDeliverPreExecute;
+
     /**
      * Creates a new request with the given method (one of the values from {@link Method}),
      * URL, and error listener.  Note that the normal response listener is not provided here as
@@ -597,13 +605,6 @@ public abstract class Request<T> implements Comparable<Request<T>> {
             mListener.onCancel();
         }
     }
-
-    /**
-     * Indicates DeliverPreExecute operation is done or not,
-     * because the {@link CacheDispatcher} and {@link NetworkDispatcher}
-     * both will call this deliver, and we must ensure just invoke once.
-     */
-    private boolean mIsDeliverPreExecute;
 
     /**
      * Delivers request is handling to the Listener.

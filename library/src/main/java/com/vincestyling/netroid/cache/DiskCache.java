@@ -452,13 +452,6 @@ public class DiskCache {
      * Data and metadata for an entry returned by the cache.
      */
     public static class Entry {
-        public Entry() {
-        }
-
-        public Entry(byte[] data, String charset) {
-            this.data = data;
-            this.charset = charset;
-        }
 
         /**
          * The data returned from cache.
@@ -474,6 +467,14 @@ public class DiskCache {
          * Charset for cache entry, retrieve by the http header.
          */
         private String charset;
+
+        public Entry() {
+        }
+
+        public Entry(byte[] data, String charset) {
+            this.data = data;
+            this.charset = charset;
+        }
 
         /**
          * True if the entry is expired.

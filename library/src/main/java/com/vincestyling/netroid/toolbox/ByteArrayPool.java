@@ -65,6 +65,11 @@ public class ByteArrayPool {
     private final int mSizeLimit;
 
     /**
+     * Singleton for this class.
+     */
+    private static ByteArrayPool mPool;
+
+    /**
      * Compares buffers by size
      */
     protected static final Comparator<byte[]> BUF_COMPARATOR = new Comparator<byte[]>() {
@@ -81,10 +86,6 @@ public class ByteArrayPool {
         mSizeLimit = sizeLimit;
     }
 
-    /**
-     * Singleton for this class.
-     */
-    private static ByteArrayPool mPool;
 
     /**
      * Get the singleton instance.
