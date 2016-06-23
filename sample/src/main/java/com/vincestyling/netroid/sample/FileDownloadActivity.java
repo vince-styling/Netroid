@@ -243,6 +243,11 @@ public class FileDownloadActivity extends BaseActivity implements
         long fileSize;
         long downloadedSize;
 
+        private DownloadTask(String storeFileName, String url) {
+            this.storeFileName = storeFileName;
+            this.url = url;
+        }
+
         private void onProgressChange(long fileSize, long downloadedSize) {
             this.fileSize = fileSize;
             this.downloadedSize = downloadedSize;
@@ -276,9 +281,5 @@ public class FileDownloadActivity extends BaseActivity implements
             txvFileSize.setText(Formatter.formatFileSize(FileDownloadActivity.this, fileSize));
         }
 
-        private DownloadTask(String storeFileName, String url) {
-            this.storeFileName = storeFileName;
-            this.url = url;
-        }
     }
 }

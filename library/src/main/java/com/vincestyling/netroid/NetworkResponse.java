@@ -21,6 +21,22 @@ import org.apache.http.HttpStatus;
  * Data and headers returned from {@link Network#performRequest(Request)}.
  */
 public class NetworkResponse {
+
+    /**
+     * The HTTP status code.
+     */
+    public final int statusCode;
+
+    /**
+     * Raw data from this response.
+     */
+    public final byte[] data;
+
+    /**
+     * Charset from this response.
+     */
+    public final String charset;
+
     /**
      * Creates a new network response.
      *
@@ -42,18 +58,4 @@ public class NetworkResponse {
         this(HttpStatus.SC_OK, data, charset);
     }
 
-    /**
-     * The HTTP status code.
-     */
-    public final int statusCode;
-
-    /**
-     * Raw data from this response.
-     */
-    public final byte[] data;
-
-    /**
-     * Charset from this response.
-     */
-    public final String charset;
 }

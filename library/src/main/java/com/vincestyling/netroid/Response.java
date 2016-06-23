@@ -24,20 +24,6 @@ import com.vincestyling.netroid.cache.DiskCache;
  */
 public class Response<T> {
 
-    /**
-     * Returns a successful response containing the parsed result.
-     */
-    public static <T> Response<T> success(T result, NetworkResponse response) {
-        return new Response<>(result, response);
-    }
-
-    /**
-     * Returns a failed response containing the given error code and an optional
-     * localized message displayed to the user.
-     */
-    public static <T> Response<T> error(NetroidError error) {
-        return new Response<>(error);
-    }
 
     /**
      * Parsed response, or null in the case of error.
@@ -59,12 +45,6 @@ public class Response<T> {
      */
     public boolean intermediate = false;
 
-    /**
-     * Returns whether this response is considered successful.
-     */
-    public boolean isSuccess() {
-        return errorDetail == null;
-    }
 
     private Response(T result, NetworkResponse response) {
         this.result = result;
@@ -77,4 +57,27 @@ public class Response<T> {
         this.cacheEntry = null;
         this.errorDetail = error;
     }
+
+    /**
+     * Returns a successful response containing the parsed result.
+     */
+    public static <T> Response<T> success(T result, NetworkResponse response) {
+        return new Response<>(result, response);
+    }
+
+    /**
+     * Returns a failed response containing the given error code and an optional
+     * localized message displayed to the user.
+     */
+    public static <T> Response<T> error(NetroidError error) {
+        return new Response<>(error);
+    }
+
+    /**
+     * Returns whether this response is considered successful.
+     */
+    public boolean isSuccess() {
+        return errorDetail == null;
+    }
+
 }

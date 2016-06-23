@@ -27,13 +27,14 @@ import java.util.Locale;
  */
 public class NetroidLog {
 
-    private NetroidLog() {
-        /* cannot be instantiated */
-    }
 
     public static String TAG = "Netroid";
 
     public static boolean DEBUG = Log.isLoggable(TAG, Log.VERBOSE);
+
+    private NetroidLog() {
+        /* cannot be instantiated */
+    }
 
     /**
      * Customize the log tag for your application, so that other apps
