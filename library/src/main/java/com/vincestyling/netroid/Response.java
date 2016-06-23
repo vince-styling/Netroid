@@ -57,7 +57,7 @@ public class Response<T> {
     /**
      * True if this response was a soft-expired one and a second one MAY be coming.
      */
-    public boolean intermediate = false;
+    public boolean intermediate;
 
     /**
      * Returns whether this response is considered successful.

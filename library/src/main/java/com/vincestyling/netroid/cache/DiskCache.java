@@ -36,7 +36,7 @@ public class DiskCache {
     /**
      * Total amount of space currently used by the cache in bytes.
      */
-    private long mTotalSize = 0;
+    private long mTotalSize;
 
     /**
      * The root directory to use for the cache.
@@ -534,7 +534,7 @@ public class DiskCache {
     }
 
     private static class CountingInputStream extends FilterInputStream {
-        private int bytesRead = 0;
+        private int bytesRead;
 
         private CountingInputStream(InputStream in) {
             super(in);

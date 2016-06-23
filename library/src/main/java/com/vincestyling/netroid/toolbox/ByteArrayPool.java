@@ -56,7 +56,7 @@ public class ByteArrayPool {
     /**
      * The total size of the buffers in the pool
      */
-    private int mCurrentSize = 0;
+    private int mCurrentSize;
 
     /**
      * The maximum aggregate size of the buffers in the pool. Old buffers are discarded to stay

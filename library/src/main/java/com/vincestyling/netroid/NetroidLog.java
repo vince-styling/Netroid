@@ -127,7 +127,7 @@ public class NetroidLog {
         }
 
         private final List<Marker> mMarkers = new ArrayList<Marker>();
-        private boolean mFinished = false;
+        private boolean mFinished;
 
         /**
          * Adds a marker to this log with the specified name.
